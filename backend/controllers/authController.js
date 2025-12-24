@@ -74,10 +74,27 @@ const getMe = asyncHandler(async (req, res) => {
     res.status(200).json(req.user);
 });
 
-// @desc    Google OAuth callback
+// @desc    Google OAuth callback (handles both login and calendar integration)
 // @route   GET /api/auth/google/callback
 // @access  Public
 const googleAuthCallback = asyncHandler(async (req, res) => {
+    const { state } = req.query;
+
+    // Check if this is a calendar integration request (state contains userId)
+    if (state) {
+        try {
+            const decoded = jwt.verify(state, process.env.JWT_SECRET);
+            if (decoded.userId) {
+                // This is a calendar integration request, redirect to calendar callback handler
+                return connectGoogleCalendarCallback(req, res);
+            }
+        } catch (error) {
+            // Invalid state token, treat as normal login
+            console.log('Invalid state token, proceeding with normal login');
+        }
+    }
+
+    // Normal login flow
     const token = generateToken(req.user._id);
 
     // Redirect to frontend with token and user data
@@ -98,9 +115,66 @@ const generateToken = (id) => {
     });
 };
 
+// @desc    Connect Google Calendar to existing account
+// @route   GET /api/auth/google/calendar/callback
+// @access  Public (but requires valid state token)
+const connectGoogleCalendarCallback = asyncHandler(async (req, res) => {
+    const { code, state } = req.query;
+
+    if (!code) {
+        return res.redirect('http://localhost:5173/dashboard/settings?error=no_code');
+    }
+
+    if (!state) {
+        return res.redirect('http://localhost:5173/dashboard/settings?error=no_state');
+    }
+
+    try {
+        // Decode state to get user ID
+        const decoded = jwt.verify(state, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        // Exchange code for tokens
+        const { getTokensFromCode } = require('../services/googleCalendarService');
+        const tokens = await getTokensFromCode(code);
+
+        // Update user with tokens
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.redirect('http://localhost:5173/dashboard/settings?error=user_not_found');
+        }
+
+        user.googleAccessToken = tokens.access_token;
+        user.googleRefreshToken = tokens.refresh_token || user.googleRefreshToken; // Keep old refresh token if not provided
+        user.googleTokenExpiry = new Date(Date.now() + (tokens.expires_in || 3600) * 1000);
+        await user.save();
+
+        res.redirect('http://localhost:5173/dashboard/settings?calendar_connected=true');
+    } catch (error) {
+        console.error('Error connecting Google Calendar:', error);
+        res.redirect('http://localhost:5173/dashboard/settings?error=auth_failed');
+    }
+});
+
+// @desc    Disconnect Google Calendar
+// @route   POST /api/auth/google/calendar/disconnect
+// @access  Private
+const disconnectGoogleCalendar = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    user.googleAccessToken = undefined;
+    user.googleRefreshToken = undefined;
+    user.googleTokenExpiry = undefined;
+    await user.save();
+
+    res.json({ message: 'Google Calendar disconnected successfully' });
+});
+
 module.exports = {
     registerUser,
     loginUser,
     getMe,
-    googleAuthCallback
+    googleAuthCallback,
+    connectGoogleCalendarCallback,
+    disconnectGoogleCalendar
 };

@@ -1,11 +1,11 @@
 const { google } = require('googleapis');
 
 // OAuth2 client for Google Calendar API
-const createOAuth2Client = () => {
+const createOAuth2Client = (callbackUrl = null) => {
     return new google.auth.OAuth2(
         process.env.GOOGLE_CLIENT_ID,
         process.env.GOOGLE_CLIENT_SECRET,
-        process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'
+        callbackUrl || process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'
     );
 };
 
@@ -62,8 +62,10 @@ const createCalendarEventWithMeet = async (accessToken, meetingDetails) => {
 
 /**
  * Generate Google Meet link URL for OAuth flow
+ * @param {string} state - Optional state parameter for security
  */
-const getCalendarAuthUrl = () => {
+const getCalendarAuthUrl = (state = '') => {
+    // Use default OAuth callback URL (same as general login) to avoid redirect_uri_mismatch
     const oauth2Client = createOAuth2Client();
 
     const scopes = [
@@ -71,17 +73,24 @@ const getCalendarAuthUrl = () => {
         'https://www.googleapis.com/auth/calendar.events',
     ];
 
-    return oauth2Client.generateAuthUrl({
+    const authUrlOptions = {
         access_type: 'offline',
         scope: scopes,
         prompt: 'consent',
-    });
+    };
+
+    if (state) {
+        authUrlOptions.state = state;
+    }
+
+    return oauth2Client.generateAuthUrl(authUrlOptions);
 };
 
 /**
  * Exchange authorization code for tokens
  */
 const getTokensFromCode = async (code) => {
+    // Use default callback URL (same as getCalendarAuthUrl)
     const oauth2Client = createOAuth2Client();
     const { tokens } = await oauth2Client.getToken(code);
     return tokens;
@@ -113,9 +122,31 @@ const listEvents = async (accessToken) => {
     }
 };
 
+/**
+ * Refresh expired access token using refresh token
+ * @param {string} refreshToken - User's refresh token
+ * @returns {Object} - New access token and expiry
+ */
+const refreshAccessToken = async (refreshToken) => {
+    const oauth2Client = createOAuth2Client();
+    oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+    try {
+        const { credentials } = await oauth2Client.refreshAccessToken();
+        return {
+            access_token: credentials.access_token,
+            expires_in: credentials.expiry_date ? Math.floor((credentials.expiry_date - Date.now()) / 1000) : 3600
+        };
+    } catch (error) {
+        console.error('Error refreshing access token:', error.message);
+        throw error;
+    }
+};
+
 module.exports = {
     createCalendarEventWithMeet,
     getCalendarAuthUrl,
     getTokensFromCode,
-    listEvents
+    listEvents,
+    refreshAccessToken
 };

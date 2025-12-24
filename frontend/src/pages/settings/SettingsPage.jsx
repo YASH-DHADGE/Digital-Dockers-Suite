@@ -4,10 +4,12 @@ import {
     TextField, Button, Grid, Avatar, IconButton, Tabs, Tab,
     Select, MenuItem, FormControl, InputLabel, Alert
 } from '@mui/material';
-import { PhotoCamera, Save } from '@mui/icons-material';
+import { PhotoCamera, Save, Event, CheckCircle, Warning } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { useThemeMode } from '../../context/ThemeContext';
 import { toast } from 'react-toastify';
+import api from '../../services/api';
+import { useEffect } from 'react';
 
 function TabPanel({ children, value, index }) {
     return (
@@ -40,6 +42,30 @@ const SettingsPage = () => {
         newPassword: '',
         confirmPassword: '',
     });
+    const [googleCalendarConnected, setGoogleCalendarConnected] = useState(false);
+    const [calendarLoading, setCalendarLoading] = useState(false);
+
+    // Check URL parameters for calendar connection status
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('calendar_connected') === 'true') {
+            setGoogleCalendarConnected(true);
+            toast.success('Google Calendar connected successfully!');
+            // Clean up URL
+            window.history.replaceState({}, '', '/dashboard/settings');
+        }
+        if (params.get('error')) {
+            toast.error('Failed to connect Google Calendar');
+            window.history.replaceState({}, '', '/dashboard/settings');
+        }
+    }, []);
+
+    // Check if user has Google Calendar connected on mount
+    useEffect(() => {
+        // You can add an API call here to check connection status
+        // For now, we'll check if user object has googleAccessToken
+        setGoogleCalendarConnected(!!user?.googleAccessToken);
+    }, [user]);
 
     const handleProfileChange = (e) => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
@@ -73,6 +99,34 @@ const SettingsPage = () => {
         setSecurity({ currentPassword: '', newPassword: '', confirmPassword: '' });
     };
 
+    const handleConnectGoogleCalendar = async () => {
+        try {
+            setCalendarLoading(true);
+            const res = await api.get('/auth/google/calendar/auth');
+            // Redirect user to Google OAuth
+            window.location.href = res.data.authUrl;
+        } catch (error) {
+            toast.error('Failed to initiate Google Calendar connection');
+            setCalendarLoading(false);
+        }
+    };
+
+    const handleDisconnectGoogleCalendar = async () => {
+        if (!window.confirm('Are you sure you want to disconnect Google Calendar? Meetings will no longer generate real Google Meet links.')) {
+            return;
+        }
+        try {
+            setCalendarLoading(true);
+            await api.post('/auth/google/calendar/disconnect');
+            setGoogleCalendarConnected(false);
+            toast.success('Google Calendar disconnected');
+        } catch (error) {
+            toast.error('Failed to disconnect Google Calendar');
+        } finally {
+            setCalendarLoading(false);
+        }
+    };
+
     return (
         <Box>
             <Typography variant="h4" sx={{ mb: 3, fontWeight: 600 }}>
@@ -89,6 +143,7 @@ const SettingsPage = () => {
                     <Tab label="Notifications" />
                     <Tab label="Appearance" />
                     <Tab label="Security" />
+                    <Tab label="Integrations" />
                 </Tabs>
 
                 {/* Profile Tab */}
@@ -427,6 +482,91 @@ const SettingsPage = () => {
                             <Button variant="outlined" color="error">
                                 Delete My Account
                             </Button>
+                        </Paper>
+                    </Box>
+                </TabPanel>
+
+                {/* Integrations Tab */}
+                <TabPanel value={activeTab} index={4}>
+                    <Box sx={{ p: 3 }}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Google Calendar Integration
+                        </Typography>
+                        <Alert severity="info" sx={{ mb: 3 }}>
+                            Connect your Google Calendar to enable real Google Meet links for scheduled meetings.
+                            Without this connection, meeting links will be placeholders only.
+                        </Alert>
+
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: 3,
+                                border: '1px solid',
+                                borderColor: googleCalendarConnected ? 'success.main' : 'divider',
+                                bgcolor: googleCalendarConnected
+                                    ? (mode === 'light' ? '#E3FCEF' : 'rgba(34, 197, 94, 0.1)')
+                                    : 'background.paper'
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                <Event
+                                    sx={{
+                                        fontSize: 40,
+                                        color: googleCalendarConnected ? 'success.main' : 'text.secondary'
+                                    }}
+                                />
+                                <Box sx={{ flex: 1 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Typography variant="h6">Google Calendar</Typography>
+                                        {googleCalendarConnected && (
+                                            <CheckCircle sx={{ fontSize: 20, color: 'success.main' }} />
+                                        )}
+                                    </Box>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {googleCalendarConnected
+                                            ? 'Your Google Calendar is connected'
+                                            : 'Not connected'}
+                                    </Typography>
+                                </Box>
+                            </Box>
+
+                            {googleCalendarConnected ? (
+                                <Box>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                        ✓ Real Google Meet links will be generated for new meetings
+                                        <br />
+                                        ✓ Meetings will appear in your Google Calendar
+                                        <br />
+                                        ✓ Participants will receive calendar invites
+                                    </Typography>
+                                    <Button
+                                        variant="outlined"
+                                        color="error"
+                                        onClick={handleDisconnectGoogleCalendar}
+                                        disabled={calendarLoading}
+                                    >
+                                        Disconnect Calendar
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
+                                        <Warning sx={{ fontSize: 20, color: 'warning.main', mt: 0.5 }} />
+                                        <Typography variant="body2" color="text.secondary">
+                                            Without Google Calendar connection, meeting links will be placeholder URLs that don't work.
+                                            Connect your Google account to generate real, working Google Meet links.
+                                        </Typography>
+                                    </Box>
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<Event />}
+                                        onClick={handleConnectGoogleCalendar}
+                                        disabled={calendarLoading}
+                                    >
+                                        {calendarLoading ? 'Connecting...' : 'Connect Google Calendar'}
+                                    </Button>
+                                </Box>
+                            )}
                         </Paper>
                     </Box>
                 </TabPanel>

@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Meeting = require('../models/Meeting');
 const User = require('../models/User');
-const { createCalendarEventWithMeet, getCalendarAuthUrl } = require('../services/googleCalendarService');
+const { createCalendarEventWithMeet, getCalendarAuthUrl, refreshAccessToken } = require('../services/googleCalendarService');
 
 // Generate a Google Meet-like link (placeholder for when Google API is not configured)
 const generateMeetLink = () => {
@@ -40,9 +40,37 @@ const scheduleMeeting = asyncHandler(async (req, res) => {
 
     // Check if user has Google credentials linked
     const user = await User.findById(req.user._id);
-    const googleAccessToken = user.googleAccessToken;
+    let googleAccessToken = user.googleAccessToken;
 
-    // Try to create real Google Meet link if configured and user has access token
+    // Check if token is expired and refresh if needed
+    if (googleAccessToken && user.googleRefreshToken && user.googleTokenExpiry) {
+        const now = new Date();
+        const tokenExpiry = new Date(user.googleTokenExpiry);
+
+        // Refresh if token expires within 5 minutes
+        if (tokenExpiry <= new Date(now.getTime() + 5 * 60 * 1000)) {
+            try {
+                console.log('Access token expired or expiring soon, refreshing...');
+                const refreshed = await refreshAccessToken(user.googleRefreshToken);
+                googleAccessToken = refreshed.access_token;
+
+                // Update user with new token
+                user.googleAccessToken = refreshed.access_token;
+                user.googleTokenExpiry = new Date(Date.now() + refreshed.expires_in * 1000);
+                await user.save();
+            } catch (error) {
+                console.error('Token refresh failed:', error.message);
+                // Token is invalid, clear it
+                user.googleAccessToken = undefined;
+                user.googleRefreshToken = undefined;
+                user.googleTokenExpiry = undefined;
+                await user.save();
+                googleAccessToken = null;
+            }
+        }
+    }
+
+    // Try to create real Google Meet link if configured and user has valid access token
     if (isGoogleCalendarConfigured() && googleAccessToken) {
         try {
             const calendarResult = await createCalendarEventWithMeet(googleAccessToken, {
@@ -55,8 +83,15 @@ const scheduleMeeting = asyncHandler(async (req, res) => {
             meetLink = calendarResult.meetLink;
             calendarEventId = calendarResult.eventId;
         } catch (error) {
-            console.error('Google Calendar API failed, using placeholder link:', error.message);
-            // If token expired, we might need to refresh it (omitted for brevity, but crucial for prod)
+            console.error('Google Calendar API failed:', error.message);
+            // If token expired during the request, clear tokens
+            if (error.message.includes('invalid_grant') || error.message.includes('Token has been expired')) {
+                user.googleAccessToken = undefined;
+                user.googleRefreshToken = undefined;
+                user.googleTokenExpiry = undefined;
+                await user.save();
+            }
+            // Use placeholder link as fallback
             meetLink = generateMeetLink();
         }
     } else {

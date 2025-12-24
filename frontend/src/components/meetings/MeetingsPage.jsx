@@ -6,13 +6,14 @@ import {
 } from '@mui/material';
 import {
     Add, VideoCall, Schedule, Person, ContentCopy,
-    Description, PlayArrow, ExpandMore, ExpandLess
+    Description, PlayArrow, ExpandMore, ExpandLess, Warning, Link as LinkIcon, Settings
 } from '@mui/icons-material';
 import { format, isPast, isFuture } from 'date-fns';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import ScheduleMeetingModal from './ScheduleMeetingModal';
+import { useNavigate } from 'react-router-dom';
 
 const MeetingsPage = () => {
     const { user } = useAuth();
@@ -24,12 +25,16 @@ const MeetingsPage = () => {
     const [transcriptDialogOpen, setTranscriptDialogOpen] = useState(false);
     const [transcriptText, setTranscriptText] = useState('');
     const [expandedMeeting, setExpandedMeeting] = useState(null);
+    const [googleCalendarConnected, setGoogleCalendarConnected] = useState(false);
+    const navigate = useNavigate();
 
     const canScheduleMeetings = ['admin', 'project_manager', 'technical_lead', 'marketing_lead'].includes(user?.role);
 
     useEffect(() => {
         fetchMeetings();
-    }, []);
+        // Check if user has Google Calendar connected
+        setGoogleCalendarConnected(!!user?.googleAccessToken);
+    }, [user]);
 
     const fetchMeetings = async () => {
         try {
@@ -51,8 +56,18 @@ const MeetingsPage = () => {
         toast.success('Meeting link copied!');
     };
 
-    const handleJoinMeeting = (link) => {
+    const handleJoinMeeting = (link, isPlaceholder) => {
+        if (isPlaceholder) {
+            toast.warning('This is a placeholder link. Connect Google Calendar in settings to get real meeting links!');
+            return;
+        }
         window.open(link, '_blank');
+    };
+
+    // Check if meeting link is a placeholder
+    const isPlaceholderLink = (meetLink) => {
+        // Placeholder links don't have calendarEventId, or start with random characters
+        return meetLink && !meetLink.includes('?authuser') && meetLink.match(/^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{3}-[a-z]{3}$/);
     };
 
     const handleAddTranscript = async () => {
@@ -113,12 +128,45 @@ const MeetingsPage = () => {
                         <Box sx={{ display: 'flex', gap: 1 }}>
                             {!isPastMeeting && meeting.meetLink && (
                                 <>
-                                    <Button variant="contained" size="small" startIcon={<PlayArrow />} onClick={() => handleJoinMeeting(meeting.meetLink)}>
-                                        Join
-                                    </Button>
-                                    <IconButton size="small" onClick={() => handleCopyLink(meeting.meetLink)}>
-                                        <ContentCopy fontSize="small" />
-                                    </IconButton>
+                                    {isPlaceholderLink(meeting.meetLink) ? (
+                                        <>
+                                            <Button
+                                                variant="outlined"
+                                                size="small"
+                                                startIcon={<Warning />}
+                                                onClick={() => {
+                                                    toast.info(
+                                                        <div>
+                                                            <div>This is a placeholder link that won't work.</div>
+                                                            <div style={{ marginTop: 8 }}>
+                                                                <IconButton
+                                                                    color="warning"
+                                                                    size="small"
+                                                                    title="Go to Settings to connect Google Calendar"
+                                                                    onClick={() => navigate('/dashboard/settings')}
+                                                                >
+                                                                    <Settings fontSize="small" />
+                                                                </IconButton>
+                                                            </div>
+                                                        </div>,
+                                                        { autoClose: 5000 }
+                                                    );
+                                                }}
+                                                color="warning"
+                                            >
+                                                Invalid Link
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Button variant="contained" size="small" startIcon={<PlayArrow />} onClick={() => handleJoinMeeting(meeting.meetLink, false)}>
+                                                Join
+                                            </Button>
+                                            <IconButton size="small" onClick={() => handleCopyLink(meeting.meetLink)}>
+                                                <ContentCopy fontSize="small" />
+                                            </IconButton>
+                                        </>
+                                    )}
                                 </>
                             )}
                             {isPastMeeting && !meeting.transcript?.text && canScheduleMeetings && (
@@ -160,12 +208,42 @@ const MeetingsPage = () => {
                     {isExpanded && meeting.meetLink && (
                         <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
                             <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>Meeting Link</Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <VideoCall color="primary" />
-                                <Typography variant="body2" sx={{ color: 'primary.main', cursor: 'pointer' }} onClick={() => handleJoinMeeting(meeting.meetLink)}>
-                                    {meeting.meetLink}
-                                </Typography>
-                            </Box>
+                            {isPlaceholderLink(meeting.meetLink) ? (
+                                <Box sx={{
+                                    p: 2,
+                                    bgcolor: 'warning.light',
+                                    borderRadius: 1,
+                                    border: '1px solid',
+                                    borderColor: 'warning.main'
+                                }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                        <Warning color="warning" />
+                                        <Typography variant="body2" sx={{ fontWeight: 600 }}>Placeholder Link</Typography>
+                                    </Box>
+                                    <Typography variant="caption" sx={{ display: 'block', mb: 1 }}>
+                                        This link won't work. Connect Google Calendar in Settings to generate real Google Meet links.
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontFamily: 'monospace' }}>
+                                        {meeting.meetLink}
+                                    </Typography>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        startIcon={<Settings />}
+                                        onClick={() => navigate('/dashboard/settings')}
+                                        sx={{ mt: 1 }}
+                                    >
+                                        Go to Settings
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <VideoCall color="primary" />
+                                    <Typography variant="body2" sx={{ color: 'primary.main', cursor: 'pointer' }} onClick={() => handleJoinMeeting(meeting.meetLink, false)}>
+                                        {meeting.meetLink}
+                                    </Typography>
+                                </Box>
+                            )}
                         </Box>
                     )}
                 </CardContent>

@@ -33,6 +33,7 @@ const userSchema = mongoose.Schema({
     googleId: String,
     googleAccessToken: String,
     googleRefreshToken: String,
+    googleTokenExpiry: Date,
     microsoftId: String,
     profileInfo: {
         phone: String,
