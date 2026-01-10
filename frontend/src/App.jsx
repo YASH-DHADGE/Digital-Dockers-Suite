@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { TimerProvider } from './context/TimerContext';
 import LandingPage from './pages/landing/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -14,7 +15,7 @@ import DashboardHome from './components/dashboards/DashboardHome';
 import NotFoundPage from './pages/NotFoundPage';
 import TasksPage from './components/tasks/TasksPage';
 import BacklogPage from './components/backlog/BacklogPage';
-import RoadmapPage from './components/dashboards/RoadmapPage';
+import RoadmapPage from './pages/RoadmapPage';
 import MeetingsPage from './components/meetings/MeetingsPage';
 import EmailGenerator from './components/email/EmailGenerator';
 import DocumentManager from './components/documents/DocumentManager';
@@ -27,6 +28,7 @@ import { ProjectProvider } from './context/ProjectContext';
 import ChatPage from './components/chat/ChatPage';
 import OrgGraph from './components/org/OrgGraph';
 import ProjectsListPage from './pages/ProjectsListPage';
+import Spaces from './components/spaces/Spaces';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -50,10 +52,11 @@ function App() {
     <ThemeProvider>
       <CssBaseline />
       <AuthProvider>
-        <ChatProvider>
-          <ProjectProvider>
-            <Router>
-              <Routes>
+        <TimerProvider>
+          <ChatProvider>
+            <ProjectProvider>
+              <Router>
+                <Routes>
                 {/* ... existing routes ... */}
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
@@ -84,14 +87,16 @@ function App() {
                   <Route path="chat" element={<ChatPage />} />
                   <Route path="organization" element={<OrgGraph />} />
                   <Route path="projects" element={<ProjectsListPage />} />
+                  <Route path="spaces" element={<Spaces />} />
                 </Route>
 
                 {/* Fallback */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Router>
-          </ProjectProvider>
-        </ChatProvider>
+            </ProjectProvider>
+          </ChatProvider>
+        </TimerProvider>
       </AuthProvider>
       <ToastContainer position="top-right" />
     </ThemeProvider>

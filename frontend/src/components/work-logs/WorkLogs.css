@@ -1,0 +1,615 @@
+/**
+ * Work Log Component Styles
+ * Styles for timer widget, logging modal, and time display components
+ */
+
+/* Timer Widget */
+.timer-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 50px;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+  z-index: 1000;
+  min-width: 280px;
+  animation: slideIn 0.3s ease-out;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.timer-widget:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+}
+
+.timer-widget.paused {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  box-shadow: 0 10px 30px rgba(250, 112, 154, 0.4);
+}
+
+.timer-widget.stopped {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  box-shadow: 0 10px 30px rgba(79, 172, 254, 0.4);
+}
+
+.timer-widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.timer-widget-title {
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.timer-widget-time {
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  margin: 12px 0;
+  letter-spacing: 2px;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.timer-widget-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.timer-widget-btn {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.timer-widget-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.timer-widget-btn.primary {
+  background: rgba(255, 255, 255, 0.3);
+  flex: 1;
+}
+
+.timer-widget-btn.danger {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.timer-widget-btn.danger:hover {
+  background: rgba(255, 67, 54, 0.3);
+  border-color: rgba(255, 67, 54, 0.7);
+}
+
+.timer-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px) translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Work Log Panel */
+.work-log-panel {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.work-log-panel-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f2937;
+}
+
+.work-log-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.work-log-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.work-log-btn.start-timer {
+  background: #10b981;
+  color: white;
+}
+
+.work-log-btn.start-timer:hover {
+  background: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.work-log-btn.stop-timer {
+  background: #ef4444;
+  color: white;
+}
+
+.work-log-btn.stop-timer:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.work-log-btn.manual {
+  background: #3b82f6;
+  color: white;
+}
+
+.work-log-btn.manual:hover {
+  background: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.work-log-btn.secondary {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.work-log-btn.secondary:hover {
+  background: #d1d5db;
+}
+
+/* Work Log List */
+.work-log-list {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.work-log-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+}
+
+.work-log-item:last-child {
+  border-bottom: none;
+}
+
+.work-log-item:hover {
+  background-color: #f9fafb;
+}
+
+.work-log-item-info {
+  flex: 1;
+}
+
+.work-log-item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.work-log-item-user {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.work-log-item-duration {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.work-log-item-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.work-log-item-type.timer {
+  background: #dbeafe;
+  color: #0369a1;
+}
+
+.work-log-item-type.manual {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.work-log-item-description {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.work-log-item-meta {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+  display: flex;
+  gap: 16px;
+}
+
+.work-log-item-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.work-log-item-action-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.work-log-item-action-btn:hover {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.work-log-item-action-btn.delete {
+  color: #ef4444;
+}
+
+.work-log-item-action-btn.delete:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Manual Log Modal */
+.manual-log-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+.manual-log-modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.manual-log-modal-header {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manual-log-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+}
+
+.manual-log-modal-close:hover {
+  color: #1f2937;
+}
+
+.manual-log-form-group {
+  margin-bottom: 16px;
+}
+
+.manual-log-form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.manual-log-form-input,
+.manual-log-form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.manual-log-form-input:focus,
+.manual-log-form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.manual-log-form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.manual-log-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.manual-log-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.manual-log-modal-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.manual-log-modal-btn.primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.manual-log-modal-btn.primary:hover {
+  background: #2563eb;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.manual-log-modal-btn.secondary {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.manual-log-modal-btn.secondary:hover {
+  background: #d1d5db;
+}
+
+/* Time Summary */
+.time-summary {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.time-summary-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.time-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.time-summary-stat {
+  background: #f3f4f6;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.time-summary-stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.time-summary-stat-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.time-summary-by-user {
+  margin-top: 16px;
+}
+
+.time-summary-by-user-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.time-summary-user-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background: #f9fafb;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.time-summary-user-name {
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.time-summary-user-time {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .timer-widget {
+    bottom: 16px;
+    right: 16px;
+    min-width: 240px;
+    padding: 12px 16px;
+  }
+
+  .timer-widget-time {
+    font-size: 24px;
+  }
+
+  .work-log-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .work-log-item-actions {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .manual-log-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .time-summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .work-log-panel {
+    background: #1f2937;
+  }
+
+  .work-log-panel-title {
+    color: #f3f4f6;
+  }
+
+  .work-log-list {
+    background: #111827;
+    border-color: #374151;
+  }
+
+  .work-log-item {
+    border-color: #374151;
+  }
+
+  .work-log-item:hover {
+    background-color: #1f2937;
+  }
+
+  .manual-log-modal-content {
+    background: #111827;
+    color: #f3f4f6;
+  }
+
+  .manual-log-form-label {
+    color: #e5e7eb;
+  }
+
+  .manual-log-form-input,
+  .manual-log-form-textarea {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f3f4f6;
+  }
+
+  .manual-log-form-input:focus,
+  .manual-log-form-textarea:focus {
+    border-color: #3b82f6;
+  }
+
+  .time-summary {
+    background: #111827;
+    border-color: #374151;
+  }
+
+  .time-summary-stat {
+    background: #1f2937;
+  }
+
+  .time-summary-user-item {
+    background: #1f2937;
+  }
+}

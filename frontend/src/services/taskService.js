@@ -7,6 +7,16 @@ const taskService = {
         return response.data;
     },
 
+    getTasksByProject: async (projectId) => {
+        const response = await api.get(`/tasks?projectId=${projectId}`);
+        return response.data;
+    },
+
+    getTasksBySprint: async (sprintId) => {
+        const response = await api.get(`/tasks?sprintId=${sprintId}`);
+        return response.data;
+    },
+
     createTask: async (taskData) => {
         const response = await api.post('/tasks', taskData);
         return response.data;

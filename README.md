@@ -115,6 +115,16 @@ Digital-Dockers-Suite/
 - Export capabilities
 - Scheduled reports
 
+### 10. Sub-Task Management ⭐ NEW
+- **Hierarchical Tasks** - Parent-child task relationships
+- **Auto Status Propagation** - Parent status updates automatically
+- **Story Points Aggregation** - Subtask points roll up to parent
+- **Burndown Analytics** - Real-time sprint progress tracking
+- **Smart Validation** - Prevent invalid nesting and circular references
+- **Audit Logging** - Track all subtask operations
+- **Drag-and-Drop** - Reorganize subtasks visually
+- **Team Collaboration** - Assign and track subtask progress
+
 ## 🛠️ Technology Stack
 
 ### Backend
@@ -319,6 +329,19 @@ npm start
 - `GET /api/tasks` - List tasks
 - `PUT /api/tasks/:id` - Update task
 - `DELETE /api/tasks/:id` - Delete task
+
+### Sub-Tasks ⭐ NEW
+- `POST /api/work-items/:parentId/subtasks` - Create sub-task
+- `GET /api/work-items/:parentId/subtasks` - List sub-tasks
+- `PATCH /api/work-items/:taskId/status` - Update sub-task status (auto-updates parent)
+- `PATCH /api/work-items/:taskId` - Update sub-task details
+- `DELETE /api/work-items/:taskId` - Delete sub-task
+- `PATCH /api/work-items/:taskId/parent` - Move sub-task to different parent
+
+### Sprint Burndown Analytics ⭐ NEW
+- `GET /api/sprints/:sprintId/burndown` - Get burndown chart data (ideal vs actual)
+- `GET /api/burndown/project/:projectId/history` - Get historical burndown data
+- `GET /api/burndown/project/:projectId/velocity` - Get team velocity metrics
 
 ### Chat
 - `GET /api/chat/rooms` - List chat rooms

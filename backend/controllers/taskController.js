@@ -1,13 +1,10 @@
 const asyncHandler = require('express-async-handler');
 const Task = require('../models/Task');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { analyzeTask } = require('../services/openaiService');
 const { createTaskCalendarEvent, updateTaskCalendarEvent, deleteTaskCalendarEvent, refreshAccessToken } = require('../services/googleCalendarService');
-
-// @desc    Create new task
-// @route   POST /api/tasks
-// @access  Private (Leaders/Admins only)
-const Project = require('../models/Project'); // Add Project import
+const Project = require('../models/Project');
 
 // @desc    Create new task
 // @route   POST /api/tasks
@@ -124,6 +121,36 @@ const createTask = asyncHandler(async (req, res) => {
         { path: 'sprint' },
         { path: 'epic' }
     ]);
+
+    // Send notifications to assigned users
+    if (task.assignedTo && task.assignedTo.length > 0) {
+        try {
+            const notificationHandler = req.app.get('notificationHandler');
+            if (notificationHandler) {
+                const notificationService = notificationHandler.getNotificationService();
+                
+                for (const assignee of task.assignedTo) {
+                    await notificationService.createNotification({
+                        recipient: assignee._id,
+                        sender: req.user._id,
+                        type: 'TASK_ASSIGNED',
+                        title: 'New Task Assigned',
+                        description: `${task.title}${task.key ? ` (${task.key})` : ''}`,
+                        entityType: 'Task',
+                        entityId: task._id,
+                        priority: task.priority === 'high' ? 'high' : task.priority === 'medium' ? 'medium' : 'low',
+                        metadata: {
+                            projectId: task.project?._id,
+                            taskKey: task.key,
+                            dueDate: task.dueDate
+                        }
+                    });
+                }
+            }
+        } catch (notifError) {
+            console.error('Error sending task notification:', notifError.message);
+        }
+    }
 
     // Emit socket event for real-time updates to Reports Dashboard
     const io = req.app.get('io');

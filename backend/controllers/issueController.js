@@ -27,6 +27,8 @@ const express = require('express');
 const router = express.Router();
 const Task = require('../models/Task');
 const Project = require('../models/Project');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { validateTransition, moveIssueToStatus } = require('../services/issueWorkflow');
 
 // Middleware: Extract user from JWT token
@@ -167,6 +169,48 @@ router.post('/projects/:projectId/issues', async (req, res) => {
         });
 
         await issue.save();
+
+        // Send notification to assignee if assigned
+        if (issue.assigneeId) {
+            try {
+                const notificationHandler = req.app.get('notificationHandler');
+                if (notificationHandler) {
+                    const notificationService = notificationHandler.getNotificationService();
+                    await notificationService.createNotification({
+                        recipient: issue.assigneeId,
+                        sender: userId,
+                        type: 'ISSUE_ASSIGNED',
+                        title: 'New Issue Assigned',
+                        description: `${issue.key}: ${issue.title}`,
+                        entityType: 'Issue',
+                        entityId: issue._id,
+                        priority: issue.priority === 'CRITICAL' ? 'high' : issue.priority === 'HIGH' ? 'medium' : 'low',
+                        metadata: {
+                            projectId,
+                            issueKey: issue.key,
+                            issueType: issue.issueType
+                        }
+                    });
+                }
+            } catch (notifError) {
+                console.error('Error sending notification:', notifError.message);
+                // Don't fail the request if notification fails
+            }
+        }
+
+        // Broadcast to project members
+        try {
+            const notificationHandler = req.app.get('notificationHandler');
+            if (notificationHandler) {
+                const io = req.app.get('io');
+                io.emit('issue:created', {
+                    issue: issue,
+                    projectId: projectId
+                });
+            }
+        } catch (error) {
+            console.error('Error broadcasting:', error.message);
+        }
 
         return res.status(201).json({
             success: true,
@@ -463,6 +507,48 @@ router.put('/issues/:issueId/move', async (req, res) => {
         const updatedIssue = await Task.findByIdAndUpdate(issueId, updateData, {
             new: true,
         });
+
+        // Send status change notification to assignee
+        if (updatedIssue.assigneeId) {
+            try {
+                const notificationHandler = req.app.get('notificationHandler');
+                if (notificationHandler) {
+                    const notificationService = notificationHandler.getNotificationService();
+                    await notificationService.createNotification({
+                        recipient: updatedIssue.assigneeId,
+                        sender: userId,
+                        type: 'ISSUE_STATUS_CHANGED',
+                        title: 'Issue Status Updated',
+                        description: `${updatedIssue.key}: ${updatedIssue.title} moved to ${targetStatus}`,
+                        entityType: 'Issue',
+                        entityId: updatedIssue._id,
+                        priority: 'medium',
+                        metadata: {
+                            projectId: updatedIssue.projectId,
+                            issueKey: updatedIssue.key,
+                            oldStatus: currentStatus,
+                            newStatus: targetStatus
+                        }
+                    });
+                }
+            } catch (notifError) {
+                console.error('Error sending notification:', notifError.message);
+            }
+        }
+
+        // Broadcast status change
+        try {
+            const io = req.app.get('io');
+            io.emit('issue:statusChanged', {
+                issueId: updatedIssue._id,
+                issueKey: updatedIssue.key,
+                oldStatus: currentStatus,
+                newStatus: targetStatus,
+                projectId: updatedIssue.projectId
+            });
+        } catch (error) {
+            console.error('Error broadcasting:', error.message);
+        }
 
         // TODO: Save to IssueHistory model for audit trail
         // await IssueHistory.create({

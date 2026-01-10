@@ -24,7 +24,7 @@ const taskSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['todo', 'in_progress', 'review', 'done', 'blocked'], // Keeping some old ones but effectively mapping to Jira columns
+        enum: ['todo', 'in_progress', 'review', 'done', 'blocked'],
         default: 'todo'
     },
     storyPoints: Number,
@@ -44,7 +44,23 @@ const taskSchema = mongoose.Schema({
     },
     parentTask: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Task' // For subtasks
+        ref: 'Task', // For subtasks (max nesting = 1 level)
+        validate: {
+            validator: async function(parentId) {
+                if (!parentId) return true; // parentTask is optional
+                const parentTask = await mongoose.model('Task').findById(parentId);
+                // Ensure parent is not a subtask (no nesting beyond 1 level)
+                if (parentTask && parentTask.parentTask) {
+                    throw new Error('Subtasks cannot have subtasks (max nesting depth = 1)');
+                }
+                // Ensure parent is not an epic
+                if (parentTask && parentTask.issueType === 'epic') {
+                    throw new Error('Epics cannot be parents of subtasks');
+                }
+                return true;
+            },
+            message: 'Invalid parent task configuration'
+        }
     },
 
     assignedTo: [{
@@ -122,5 +138,130 @@ const taskSchema = mongoose.Schema({
 }, {
     timestamps: true
 });
+
+// ============================================================================
+// INDEXES for Performance Optimization
+// ============================================================================
+
+// Index for finding children by parent
+taskSchema.index({ parentTask: 1, project: 1 });
+
+// Index for finding tasks by project and status (common query)
+taskSchema.index({ project: 1, status: 1 });
+
+// Index for sprint board queries
+taskSchema.index({ sprint: 1, status: 1 });
+
+// Index for epic queries
+taskSchema.index({ epic: 1 });
+
+// Index for assignee queries
+taskSchema.index({ assignedTo: 1, project: 1 });
+
+// Compound index for parent-child hierarchy with status
+taskSchema.index({ parentTask: 1, status: 1 });
+
+// ============================================================================
+// PRE-SAVE VALIDATION MIDDLEWARE
+// ============================================================================
+
+/**
+ * Validate before saving:
+ * 1. Subtasks must have a parent
+ * 2. Epics cannot have a parent
+ * 3. Max nesting depth = 1 (no sub-sub-tasks)
+ */
+taskSchema.pre('save', async function(next) {
+    try {
+        // Validation 1: Subtasks must have a parent
+        if (this.issueType === 'subtask' && !this.parentTask) {
+            throw new Error('Subtasks must have a parent work item');
+        }
+
+        // Validation 2: Epics cannot have a parent
+        if (this.issueType === 'epic' && this.parentTask) {
+            throw new Error('Epics cannot be subtasks');
+        }
+
+        // Validation 3: Non-subtasks with a parent should have issueType = 'subtask'
+        if (this.parentTask && this.issueType !== 'subtask') {
+            this.issueType = 'subtask'; // Auto-correct for consistency
+        }
+
+        // Validation 4: Max nesting depth = 1
+        if (this.parentTask) {
+            const parentTask = await mongoose.model('Task').findById(this.parentTask);
+            if (parentTask && parentTask.parentTask) {
+                throw new Error('Subtasks cannot have subtasks (max nesting depth = 1)');
+            }
+            if (parentTask && parentTask.issueType === 'epic') {
+                throw new Error('Epics cannot be parents of subtasks');
+            }
+        }
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// ============================================================================
+// SCHEMA METHODS for Parent-Child Operations
+// ============================================================================
+
+/**
+ * Get all children of this task
+ * @returns {Promise<Array>} Array of child tasks
+ */
+taskSchema.methods.getChildren = function() {
+    return mongoose.model('Task').find({ parentTask: this._id })
+        .populate('assignedTo reporter assignedBy')
+        .sort({ createdAt: 1 });
+};
+
+/**
+ * Get parent task
+ * @returns {Promise<Object>} Parent task document
+ */
+taskSchema.methods.getParent = function() {
+    if (!this.parentTask) return null;
+    return mongoose.model('Task').findById(this.parentTask)
+        .populate('assignedTo reporter assignedBy');
+};
+
+/**
+ * Calculate total story points from children
+ * @returns {Promise<Number>} Sum of children's story points
+ */
+taskSchema.methods.calculateChildrenStoryPoints = async function() {
+    const children = await this.getChildren();
+    return children.reduce((sum, child) => sum + (child.storyPoints || 0), 0);
+};
+
+/**
+ * Check if all children are done
+ * @returns {Promise<Boolean>}
+ */
+taskSchema.methods.allChildrenDone = async function() {
+    const children = await this.getChildren();
+    return children.length > 0 && children.every(child => child.status === 'done');
+};
+
+/**
+ * Check if any child is in progress
+ * @returns {Promise<Boolean>}
+ */
+taskSchema.methods.anyChildInProgress = async function() {
+    const children = await this.getChildren();
+    return children.some(child => child.status === 'in_progress');
+};
+
+/**
+ * Count total children
+ * @returns {Promise<Number>}
+ */
+taskSchema.methods.countChildren = function() {
+    return mongoose.model('Task').countDocuments({ parentTask: this._id });
+};
 
 module.exports = mongoose.model('Task', taskSchema);

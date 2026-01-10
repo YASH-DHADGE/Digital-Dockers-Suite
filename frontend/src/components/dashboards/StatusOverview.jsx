@@ -1,121 +1,266 @@
-import { Card, Row, Col, Typography, Empty } from 'antd';
-import { Doughnut } from 'react-chartjs-2';
+import { Card, Row, Col, Typography, Empty, Progress, Skeleton, Space, Tooltip } from 'antd';
+import { CheckCircleOutlined, ClockCircleOutlined, BgColorsOutlined, FileTextOutlined } from '@ant-design/icons';
 
 const { Text, Title } = Typography;
 
 const StatusOverview = ({ stats }) => {
     if (!stats) {
         return (
-            <Card title="Status Overview" variant="borderless">
-                <Empty description="No status data available" />
+            <Card 
+                title="📊 Status Overview" 
+                style={{ 
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    borderRadius: 8,
+                    border: '1px solid #f0f0f0'
+                }}
+            >
+                <Skeleton active paragraph={{ rows: 6 }} />
             </Card>
         );
     }
 
     const backlogCount = stats.statusBreakdown?.todo || 0;
-    const selectedCount = stats.statusBreakdown?.selected || 0;
     const inProgressCount = stats.statusBreakdown?.in_progress || 0;
     const reviewCount = stats.statusBreakdown?.review || 0;
     const doneCount = stats.statusBreakdown?.done || 0;
-    const totalCount = backlogCount + selectedCount + inProgressCount + reviewCount + doneCount;
+    const totalCount = backlogCount + inProgressCount + reviewCount + doneCount;
+    
+    // Fallback: if total is 0 but we have sprint data, calculate from sprint
+    const displayDoneCount = totalCount === 0 && stats.issuesDone ? stats.issuesDone : doneCount;
+    const displayTotalCount = totalCount === 0 && stats.issuesDone ? stats.issuesDone : totalCount;
+    const completionRate = displayTotalCount > 0 ? Math.round((displayDoneCount / displayTotalCount) * 100) : 0;
 
-    const chartData = {
-        labels: ['Backlog', 'Selected', 'In Progress', 'Review', 'Done'],
-        datasets: [{
-            data: [backlogCount, selectedCount, inProgressCount, reviewCount, doneCount],
-            backgroundColor: ['#dfe1e6', '#626f86', '#0052cc', '#ff5630', '#00875a'],
-            borderWidth: 2,
-            borderColor: '#fff',
-        }]
-    };
-
-    const chartOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    padding: 16,
-                    font: { size: 12 }
-                }
-            }
+    // Status breakdown with color coding
+    const statusRows = [
+        { 
+            label: 'To Do', 
+            count: backlogCount, 
+            color: '#dfe1e6', 
+            textColor: '#626f86',
+            icon: '●'
+        },
+        { 
+            label: 'In Progress', 
+            count: inProgressCount, 
+            color: '#0052cc', 
+            textColor: '#0052cc',
+            icon: '●'
+        },
+        { 
+            label: 'In Review', 
+            count: reviewCount, 
+            color: '#ff5630', 
+            textColor: '#ff5630',
+            icon: '●'
+        },
+        { 
+            label: 'Done', 
+            count: doneCount, 
+            color: '#00875a', 
+            textColor: '#00875a',
+            icon: '●'
         }
+    ];
+
+    const metrics = [
+        { 
+            label: 'Total Issues', 
+            value: displayTotalCount, 
+            icon: FileTextOutlined,
+            color: '#0052cc'
+        },
+        { 
+            label: 'Done', 
+            value: displayDoneCount, 
+            icon: CheckCircleOutlined,
+            color: '#00875a'
+        },
+        { 
+            label: 'In Progress', 
+            value: inProgressCount, 
+            icon: ClockCircleOutlined,
+            color: '#0052cc'
+        }
+    ];
+
+    const getProgressColor = (rate) => {
+        if (rate >= 80) return '#00875a';
+        if (rate >= 50) return '#0052cc';
+        if (rate >= 25) return '#ffab00';
+        return '#ff5630';
     };
 
     return (
-        <Card title="Status Overview" variant="borderless">
-            <Row gutter={[24, 24]}>
-                <Col xs={24} md={12}>
-                    <div style={{ height: 250, display: 'flex', justifyContent: 'center' }}>
-                        <Doughnut
-                            data={chartData}
-                            options={{
-                                ...chartOptions,
-                                plugins: {
-                                    ...chartOptions.plugins,
-                                    tooltip: {
-                                        callbacks: {
-                                            label: (context) => {
-                                                const label = context.label || '';
-                                                const value = context.parsed;
-                                                const percent = totalCount > 0 ? ((value / totalCount) * 100).toFixed(1) : 0;
-                                                return `${label}: ${value} (${percent}%)`;
-                                            }
-                                        }
-                                    }
-                                }
-                            }}
-                        />
+        <Card 
+            title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <FileTextOutlined style={{ fontSize: 13 }} />
+                    <Text strong style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Status Overview
+                    </Text>
+                </div>
+            }
+            style={{ 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                borderRadius: 8,
+                border: '1px solid #f0f0f0'
+            }}
+            bodyStyle={{ padding: '10px' }}
+        >
+            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                
+                {/* SECTION 1: Sprint Completion */}
+                <div>
+                    <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Tooltip title="Percentage of tasks marked as done in the current sprint">
+                            <Text strong style={{ fontSize: 11, color: '#262626', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                Sprint Progress
+                            </Text>
+                        </Tooltip>
+                        <Text style={{ fontSize: 20, fontWeight: 700, color: getProgressColor(completionRate) }}>
+                            {completionRate}%
+                        </Text>
                     </div>
-                </Col>
-                <Col xs={24} md={12}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, justifyContent: 'center', height: '100%' }}>
-                        <div>
-                            <Text type="secondary" style={{ fontSize: 12 }}>Total Issues</Text>
-                            <Title level={3} style={{ margin: '4px 0 0 0' }}>
-                                {totalCount}
-                            </Title>
-                        </div>
+                    <Progress 
+                        percent={completionRate}
+                        strokeColor={getProgressColor(completionRate)}
+                        format={() => null}
+                        size="small"
+                        status={completionRate === 100 ? 'success' : 'normal'}
+                        style={{
+                            '.ant-progress-bar': {
+                                height: '6px'
+                            }
+                        }}
+                    />
+                    <Text type="secondary" style={{ fontSize: 11, marginTop: 6, display: 'block' }}>
+                        {displayDoneCount} of {displayTotalCount} issues completed
+                    </Text>
+                </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                            <div style={{ padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
-                                <Text type="secondary" style={{ fontSize: 11 }}>Backlog</Text>
-                                <div style={{ fontSize: 18, fontWeight: 'bold', marginTop: 4, color: '#dfe1e6' }}>
-                                    {backlogCount}
-                                </div>
-                            </div>
-                            <div style={{ padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
-                                <Text type="secondary" style={{ fontSize: 11 }}>Selected</Text>
-                                <div style={{ fontSize: 18, fontWeight: 'bold', marginTop: 4, color: '#626f86' }}>
-                                    {selectedCount}
-                                </div>
-                            </div>
-                            <div style={{ padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
-                                <Text type="secondary" style={{ fontSize: 11 }}>In Progress</Text>
-                                <div style={{ fontSize: 18, fontWeight: 'bold', marginTop: 4, color: '#0052cc' }}>
-                                    {inProgressCount}
-                                </div>
-                            </div>
-                            <div style={{ padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6 }}>
-                                <Text type="secondary" style={{ fontSize: 11 }}>Review</Text>
-                                <div style={{ fontSize: 18, fontWeight: 'bold', marginTop: 4, color: '#ff5630' }}>
-                                    {reviewCount}
-                                </div>
-                            </div>
-                            <div style={{ padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6, gridColumn: '1 / -1' }}>
-                                <Text type="secondary" style={{ fontSize: 11 }}>Done</Text>
-                                <div style={{ fontSize: 18, fontWeight: 'bold', marginTop: 4, color: '#00875a' }}>
-                                    {doneCount}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Col>
-            </Row>
+                {/* Divider */}
+                <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
+
+                {/* SECTION 2: Status Breakdown */}
+                <div>
+                    <Text strong style={{ fontSize: 11, color: '#262626', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 12 }}>
+                        Status Distribution
+                    </Text>
+                    <Space direction="vertical" style={{ width: '100%' }} size="small">
+                        {statusRows.map((status) => {
+                            const percentage = totalCount > 0 ? Math.round((status.count / totalCount) * 100) : 0;
+                            return (
+                                <Tooltip 
+                                    key={status.label}
+                                    title={`${status.count} issues • ${percentage}% of total`}
+                                >
+                                    <div
+                                        style={{
+                                            padding: '10px 0',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s ease',
+                                            borderRadius: 4,
+                                            paddingLeft: 8,
+                                            paddingRight: 8,
+                                            marginLeft: -8,
+                                            marginRight: -8,
+                                            ':hover': {
+                                                backgroundColor: '#fafafa'
+                                            }
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#fafafa';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = 'transparent';
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                                            <span style={{ color: status.color, fontSize: 12, fontWeight: 600 }}>
+                                                {status.icon}
+                                            </span>
+                                            <Text style={{ fontSize: 12, fontWeight: 500, color: '#262626', minWidth: 80 }}>
+                                                {status.label}
+                                            </Text>
+                                            <Text strong style={{ fontSize: 12, color: status.textColor, minWidth: 30 }}>
+                                                {status.count}
+                                            </Text>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{
+                                                    height: '4px',
+                                                    backgroundColor: '#f0f0f0',
+                                                    borderRadius: 2,
+                                                    overflow: 'hidden'
+                                                }}>
+                                                    <div style={{
+                                                        height: '100%',
+                                                        backgroundColor: status.color,
+                                                        width: `${percentage}%`,
+                                                        transition: 'width 0.3s ease'
+                                                    }}></div>
+                                                </div>
+                                            </div>
+                                            <Text type="secondary" style={{ fontSize: 11, minWidth: 30, textAlign: 'right' }}>
+                                                {percentage}%
+                                            </Text>
+                                        </div>
+                                    </div>
+                                </Tooltip>
+                            );
+                        })}
+                    </Space>
+                </div>
+
+                {/* Divider */}
+                <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
+
+                {/* SECTION 3: Key Metrics */}
+                <div>
+                    <Text strong style={{ fontSize: 12, color: '#262626', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 10 }}>
+                        Key Metrics
+                    </Text>
+                    <Row gutter={[10, 10]}>
+                        {metrics.map((metric) => {
+                            const Icon = metric.icon;
+                            return (
+                                <Col xs={24} sm={8} key={metric.label}>
+                                    <div
+                                        style={{
+                                            padding: '10px 12px',
+                                            backgroundColor: '#fafafa',
+                                            borderRadius: 8,
+                                            border: '1px solid #f0f0f0',
+                                            transition: 'all 0.2s ease'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                                            e.currentTarget.style.borderColor = '#d9d9d9';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.backgroundColor = '#fafafa';
+                                            e.currentTarget.style.borderColor = '#f0f0f0';
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                                            <Icon style={{ color: metric.color, fontSize: 13 }} />
+                                            <Text type="secondary" style={{ fontSize: 10, fontWeight: 500 }}>
+                                                {metric.label}
+                                            </Text>
+                                        </div>
+                                        <div style={{ fontSize: 18, fontWeight: 700, color: metric.color, lineHeight: 1 }}>
+                                            {metric.value}
+                                        </div>
+                                    </div>
+                                </Col>
+                            );
+                        })}
+                    </Row>
+                </div>
+
+            </Space>
         </Card>
     );
 };
 
 export default StatusOverview;
+

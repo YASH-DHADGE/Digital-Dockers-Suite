@@ -238,6 +238,7 @@ const Header = ({ onMenuClick }) => {
                                 <>
                                     <Button type="text" onClick={() => navigate('/dashboard/backlog')}>Backlog</Button>
                                     <Button type="text" onClick={() => navigate('/dashboard/tasks')}>Board</Button>
+                                    <Button type="text" onClick={() => navigate('/dashboard/spaces')}>📝 Spaces</Button>
                                     <Button type="text" onClick={() => navigate('/dashboard/organization')}>People</Button>
                                 </>
                             )}

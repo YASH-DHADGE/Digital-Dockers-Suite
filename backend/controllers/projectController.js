@@ -1,6 +1,8 @@
 const asyncHandler = require('express-async-handler');
 const Project = require('../models/Project');
 const User = require('../models/User');
+const Task = require('../models/Task');
+const Sprint = require('../models/Sprint');
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -55,20 +57,30 @@ const getProjectById = asyncHandler(async (req, res) => {
 // @desc    Get project statistics for dashboard
 // @route   GET /api/projects/:id/stats
 // @access  Private
-const Task = require('../models/Task');
-const Sprint = require('../models/Sprint');
-
 const getProjectStats = asyncHandler(async (req, res) => {
     const projectId = req.params.id;
+    console.log(`\n📊 Loading stats for project: ${projectId}`);
 
     // Get active sprint
     const activeSprint = await Sprint.findOne({
         project: projectId,
         status: 'active'
     });
+    
+    if (activeSprint) {
+        console.log(`✅ Active Sprint: ${activeSprint.name} (${activeSprint._id})`);
+    } else {
+        console.log(`⚠️ No active sprint found for this project`);
+    }
 
     // Get all tasks for this project
     const tasks = await Task.find({ project: projectId });
+    
+    // If no tasks found with projectId, try alternative filtering (fallback)
+    if (tasks.length === 0) {
+        console.warn(`No tasks found for project ${projectId}. Checking database state...`);
+    }
+    
     const sprintTasks = activeSprint
         ? tasks.filter(t => t.sprint && t.sprint.toString() === activeSprint._id.toString())
         : [];
@@ -77,6 +89,9 @@ const getProjectStats = asyncHandler(async (req, res) => {
     const totalSprintPoints = sprintTasks.reduce((acc, t) => acc + (t.storyPoints || 0), 0);
     const doneSprintPoints = sprintTasks
         .filter(t => t.status === 'done')
+        .reduce((acc, t) => acc + (t.storyPoints || 0), 0);
+    const inProgressSprintPoints = sprintTasks
+        .filter(t => t.status === 'in_progress')
         .reduce((acc, t) => acc + (t.storyPoints || 0), 0);
 
     const issuesDone = sprintTasks.filter(t => t.status === 'done').length;
@@ -106,6 +121,10 @@ const getProjectStats = asyncHandler(async (req, res) => {
         review: tasks.filter(t => t.status === 'review').length,
         done: tasks.filter(t => t.status === 'done').length
     };
+    
+    // Ensure we have valid counts
+    const totalIssuesCount = Object.values(statusBreakdown).reduce((a, b) => a + b, 0);
+    console.log(`Project ${projectId}: Found ${tasks.length} total tasks, breakdown:`, statusBreakdown, 'total:', totalIssuesCount);
 
     // Workload by assignee
     const workload = [];
@@ -127,11 +146,14 @@ const getProjectStats = asyncHandler(async (req, res) => {
 
     res.json({
         sprintProgress: totalSprintPoints > 0 ? Math.round((doneSprintPoints / totalSprintPoints) * 100) : 0,
-        issuesDone,
+        issuesDone: issuesDone, // Include sprint-specific done count as fallback
         daysRemaining,
         velocity,
         statusBreakdown,
         workload,
+        totalStoryPoints: totalSprintPoints,
+        completedStoryPoints: doneSprintPoints,
+        inProgressStoryPoints: inProgressSprintPoints,
         activeSprint: activeSprint ? {
             _id: activeSprint._id,
             name: activeSprint.name,
@@ -140,9 +162,45 @@ const getProjectStats = asyncHandler(async (req, res) => {
     });
 });
 
+// Get work types distribution for a project
+const getWorkTypes = asyncHandler(async (req, res) => {
+    const projectId = req.params.id;
+
+    // Get all tasks for this project
+    const tasks = await Task.find({ project: projectId });
+
+    // Group by issue type
+    const typeMap = {
+        'task': 0,
+        'epic': 0,
+        'story': 0,
+        'bug': 0,
+        'subtask': 0
+    };
+
+    tasks.forEach(task => {
+        const type = task.issueType || 'task';
+        if (typeMap.hasOwnProperty(type)) {
+            typeMap[type]++;
+        }
+    });
+
+    // Calculate totals and percentages
+    const total = Object.values(typeMap).reduce((a, b) => a + b, 0);
+    const workTypes = Object.entries(typeMap).map(([type, count]) => ({
+        type: type.charAt(0).toUpperCase() + type.slice(1),
+        rawType: type,
+        count,
+        percentage: total > 0 ? Math.round((count / total) * 100) : 0
+    }));
+
+    res.json(workTypes);
+});
+
 module.exports = {
     createProject,
     getProjects,
     getProjectById,
-    getProjectStats
+    getProjectStats,
+    getWorkTypes
 };

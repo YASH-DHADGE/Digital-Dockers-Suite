@@ -19,6 +19,8 @@ import { useState, useEffect, useRef } from 'react';
 import taskService from '../../services/taskService';
 import userService from '../../services/userService';
 import { useAuth } from '../../context/AuthContext';
+import SubTaskPanel from '../SubTaskPanel';
+import WorkLogPanel from '../work-logs/WorkLogPanel';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -334,15 +336,6 @@ const IssueDetailDrawer = ({ open, onClose, issue }) => {
                     size="small"
                     style={{ width: 120 }}
                     disabled={loadingField === 'status'}
-                    optionLabelRender={(option) => {
-                        const isValid = isValidStatusTransition(currentIssue.status, option.data.value);
-                        return (
-                            <Space>
-                                {option.data.label}
-                                {isValid && <CheckOutlined style={{ color: '#52c41a' }} />}
-                            </Space>
-                        );
-                    }}
                 />
             )
         },
@@ -471,79 +464,6 @@ const IssueDetailDrawer = ({ open, onClose, issue }) => {
                     {currentIssue.title}
                 </Title>
 
-                {/* AI Hooks - Hackathon Differentiator */}
-                <Card 
-                    size="small" 
-                    style={{ marginBottom: 20, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderColor: 'transparent' }}
-                    styles={{ body: { padding: '12px 16px' } }}
-                >
-                    <div style={{ color: 'white', marginBottom: 12 }}>
-                        <Space>
-                            <RobotOutlined />
-                            <Text strong style={{ color: 'white' }}>AI Assistant</Text>
-                        </Space>
-                    </div>
-                    <Space wrap style={{ width: '100%' }}>
-                        <Button 
-                            size="small" 
-                            type="default"
-                            icon={aiLoading ? <LoadingOutlined /> : <BulbOutlined />}
-                            onClick={handleAISummarize}
-                            loading={aiLoading}
-                        >
-                            Summarize
-                        </Button>
-                        <Button 
-                            size="small" 
-                            type="default"
-                            icon={aiLoading ? <LoadingOutlined /> : <CheckOutlined />}
-                            onClick={handleAISuggestAction}
-                            loading={aiLoading}
-                        >
-                            Suggest Action
-                        </Button>
-                        <Button 
-                            size="small" 
-                            type="default"
-                            icon={aiLoading ? <LoadingOutlined /> : <ExclamationCircleOutlined />}
-                            onClick={handleAIDetectRisk}
-                            loading={aiLoading}
-                        >
-                            Detect Risk
-                        </Button>
-                    </Space>
-
-                    {/* AI Insights Display */}
-                    {aiInsights && (
-                        <div style={{ marginTop: 12, padding: '12px', background: 'rgba(255,255,255,0.1)', borderRadius: 4, color: 'white', fontSize: 12 }}>
-                            {aiInsights.summary && (
-                                <div style={{ marginBottom: 8 }}>
-                                    <Text strong style={{ color: 'white' }}>Summary:</Text>
-                                    <div style={{ marginTop: 4, color: 'rgba(255,255,255,0.9)' }}>{aiInsights.summary}</div>
-                                </div>
-                            )}
-                            {aiInsights.nextAction && (
-                                <div style={{ marginBottom: 8 }}>
-                                    <Text strong style={{ color: 'white' }}>Suggested Action:</Text>
-                                    <div style={{ marginTop: 4, color: 'rgba(255,255,255,0.9)' }}>{aiInsights.nextAction}</div>
-                                </div>
-                            )}
-                            {aiInsights.risks && (
-                                <div>
-                                    <Text strong style={{ color: 'white' }}>Risk Assessment:</Text>
-                                    <div style={{ marginTop: 4 }}>
-                                        {aiInsights.risks.map((risk, idx) => (
-                                            <div key={idx} style={{ color: 'rgba(255,255,255,0.9)', marginBottom: 4 }}>
-                                                {risk}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </Card>
-
                 <Space style={{ marginBottom: 20 }} wrap>
                     <Button icon={<PaperClipOutlined />} size="small">Attach</Button>
                     <Button icon={<LinkOutlined />} size="small">Link Issue</Button>
@@ -626,6 +546,31 @@ const IssueDetailDrawer = ({ open, onClose, issue }) => {
                             },
                             {
                                 key: '2',
+                                label: 'Sub-Tasks',
+                                children: (
+                                    <SubTaskPanel
+                                        parentTaskId={currentIssue._id}
+                                        parentTask={currentIssue}
+                                        onTaskUpdate={(updatedIssue) => {
+                                            setCurrentIssue(updatedIssue);
+                                        }}
+                                    />
+                                )
+                            },
+                            {
+                                key: '3',
+                                label: 'Time Logs',
+                                children: (
+                                    <WorkLogPanel 
+                                        workItemId={currentIssue._id}
+                                        onTimeUpdated={() => {
+                                            // Refresh issue data if needed
+                                        }}
+                                    />
+                                )
+                            },
+                            {
+                                key: '4',
                                 label: 'History',
                                 children: (
                                     (currentIssue.history && currentIssue.history.length > 0) ?

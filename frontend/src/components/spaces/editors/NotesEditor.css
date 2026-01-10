@@ -1,0 +1,53 @@
+/* Editor specific styles */
+.notes-editor-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.whiteboard-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.mindmap-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ant Input overrides for better UX */
+.notes-editor-container .ant-btn,
+.whiteboard-container .ant-btn,
+.mindmap-container .ant-btn {
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.notes-editor-container .ant-btn-primary {
+  background: #0052cc;
+  border-color: #0052cc;
+}
+
+.notes-editor-container .ant-btn-primary:hover {
+  background: #0747a6;
+  border-color: #0747a6;
+}
+
+.whiteboard-container .ant-btn-primary {
+  background: #0052cc;
+  border-color: #0052cc;
+}
+
+.whiteboard-container .ant-btn-primary:hover {
+  background: #0747a6;
+  border-color: #0747a6;
+}
+
+.mindmap-container .ant-btn-primary {
+  background: #0052cc;
+  border-color: #0052cc;
+}
+
+.mindmap-container .ant-btn-primary:hover {
+  background: #0747a6;
+  border-color: #0747a6;
+}

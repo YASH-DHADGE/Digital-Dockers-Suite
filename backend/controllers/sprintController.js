@@ -129,14 +129,21 @@ const getBurndown = asyncHandler(async (req, res) => {
         throw new Error('Sprint not found');
     }
 
+    console.log(`📊 Getting burndown for sprint: ${sprint.name} (${sprint._id})`);
+
     // Get tasks in this sprint
     const tasks = await Task.find({ sprint: sprint._id });
+    console.log(`📋 Found ${tasks.length} tasks in sprint`);
+    
     const totalPoints = tasks.reduce((acc, t) => acc + (t.storyPoints || 0), 0);
+    console.log(`📌 Total story points: ${totalPoints}`);
 
     // Generate burndown data
     const startDate = new Date(sprint.startDate || sprint.createdAt);
     const endDate = new Date(sprint.endDate || new Date());
     const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) || 1;
+
+    console.log(`📅 Sprint duration: ${totalDays} days (${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()})`);
 
     const burndownData = {
         labels: [],
@@ -154,6 +161,7 @@ const getBurndown = asyncHandler(async (req, res) => {
 
     // Calculate actual remaining points per day based on completed tasks
     const completedTasks = tasks.filter(t => t.status === 'done' && t.completedAt);
+    console.log(`✅ Completed tasks: ${completedTasks.length}`);
     let remainingPoints = totalPoints;
 
     for (let i = 0; i <= totalDays; i++) {
@@ -176,9 +184,13 @@ const getBurndown = asyncHandler(async (req, res) => {
     }
 
     res.json({
-        ...burndownData,
-        totalPoints,
-        sprintName: sprint.name
+        success: true,
+        data: {
+            ...burndownData,
+            totalPoints,
+            sprintName: sprint.name,
+            completionPercentage: totalPoints > 0 ? Math.round(((totalPoints - (burndownData.actual[burndownData.actual.length - 1] || totalPoints)) / totalPoints) * 100) : 0
+        }
     });
 });
 

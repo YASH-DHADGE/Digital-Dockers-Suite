@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Meeting = require('../models/Meeting');
 const User = require('../models/User');
+const Notification = require('../models/Notification');
 const { createCalendarEventWithMeet, getCalendarAuthUrl, refreshAccessToken } = require('../services/googleCalendarService');
 
 // Generate a Google Meet-like link (placeholder for when Google API is not configured)
@@ -137,6 +138,52 @@ const scheduleMeeting = asyncHandler(async (req, res) => {
     });
 
     await meeting.populate('createdBy', 'fullName email');
+
+    // Send notifications to participants
+    if (processedParticipants && processedParticipants.length > 0) {
+        try {
+            const notificationHandler = req.app.get('notificationHandler');
+            if (notificationHandler) {
+                const notificationService = notificationHandler.getNotificationService();
+                
+                for (const participant of processedParticipants) {
+                    if (participant.user) {
+                        await notificationService.createNotification({
+                            recipient: participant.user,
+                            sender: req.user._id,
+                            type: 'MEETING_SCHEDULED',
+                            title: 'Meeting Scheduled',
+                            description: `You're invited to: ${title}`,
+                            entityType: 'Meeting',
+                            entityId: meeting._id,
+                            priority: 'high',
+                            metadata: {
+                                meetingTitle: title,
+                                scheduledAt: new Date(scheduledAt),
+                                meetLink: meetLink,
+                                duration: duration || 60
+                            }
+                        });
+                    }
+                }
+            }
+        } catch (notifError) {
+            console.error('Error sending meeting notification:', notifError.message);
+        }
+    }
+
+    // Broadcast meeting creation
+    try {
+        const io = req.app.get('io');
+        io.emit('meeting:scheduled', {
+            meetingId: meeting._id,
+            title: meeting.title,
+            scheduledAt: meeting.scheduledAt,
+            participants: meeting.participants
+        });
+    } catch (error) {
+        console.error('Error broadcasting:', error.message);
+    }
 
     res.status(201).json(meeting);
 });

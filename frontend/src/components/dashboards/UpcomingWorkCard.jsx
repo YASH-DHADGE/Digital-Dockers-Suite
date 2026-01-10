@@ -1,18 +1,10 @@
-import { Card, List, Tag, Typography, Empty, Tabs, Alert } from 'antd';
-import { CalendarOutlined, WarningOutlined } from '@ant-design/icons';
-import { formatDistanceToNow, differenceInDays, parseISO } from 'date-fns';
+import { Card, Tabs, Typography, Empty, Badge } from 'antd';
+import { CalendarOutlined } from '@ant-design/icons';
+import { differenceInDays, parseISO } from 'date-fns';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
-    const formatTime = (date) => {
-        try {
-            return formatDistanceToNow(new Date(date), { addSuffix: true });
-        } catch {
-            return 'soon';
-        }
-    };
-
     const getDaysUntilDue = (dueDate) => {
         try {
             return differenceInDays(parseISO(dueDate), new Date());
@@ -22,145 +14,130 @@ const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
     };
 
     const getUrgencyColor = (daysUntil) => {
-        if (daysUntil <= 0) return { bg: '#fee', color: '#ff5630', text: 'OVERDUE' };
-        if (daysUntil <= 1) return { bg: '#fee', color: '#ff5630', text: `${daysUntil}d` };
-        if (daysUntil <= 3) return { bg: '#fef3c7', color: '#d97706', text: `${daysUntil}d` };
-        if (daysUntil <= 7) return { bg: '#fef3c7', color: '#d97706', text: `${daysUntil}d` };
-        return { bg: '#dbeafe', color: '#0052cc', text: `${daysUntil}d` };
+        if (daysUntil <= 0) return '#ff5630';
+        if (daysUntil <= 1) return '#ff5630';
+        if (daysUntil <= 3) return '#ffab00';
+        if (daysUntil <= 7) return '#ffab00';
+        return '#0052cc';
     };
+
+    const TaskRow = ({ task, showDueDate = true }) => (
+        <div
+            style={{
+                padding: '6px 0',
+                borderBottom: '1px solid #f0f0f0',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                borderRadius: '4px',
+                paddingLeft: '6px',
+                paddingRight: '6px',
+                marginLeft: '-6px',
+                marginRight: '-6px'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9f9f9'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+            <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Text 
+                        style={{ 
+                            fontSize: '11px', 
+                            fontWeight: 600, 
+                            color: '#0052cc',
+                            minWidth: '55px',
+                            flexShrink: 0
+                        }}
+                    >
+                        {task.key || 'TASK'}
+                    </Text>
+                    <Text 
+                        ellipsis 
+                        style={{ fontSize: '12px', color: '#262626', flex: 1 }}
+                    >
+                        {task.title}
+                    </Text>
+                </div>
+            </div>
+            {showDueDate && task.dueDate && (
+                <Badge
+                    count={getDaysUntilDue(task.dueDate)}
+                    style={{
+                        backgroundColor: getUrgencyColor(getDaysUntilDue(task.dueDate)),
+                        color: '#fff',
+                        fontSize: '9px',
+                        fontWeight: 700,
+                        minWidth: '24px',
+                        height: '18px',
+                        lineHeight: '18px',
+                        borderRadius: '3px',
+                        flexShrink: 0
+                    }}
+                    showZero
+                />
+            )}
+        </div>
+    );
 
     const tabItems = [
         {
             key: 'due_soon',
-            label: `📅 Due Soon (${upcomingTasks?.length || 0})`,
+            label: (
+                <span style={{ fontSize: '12px', fontWeight: 500 }}>
+                    Due Soon ({upcomingTasks?.length || 0})
+                </span>
+            ),
             children: (
-                <div style={{ marginTop: 12 }}>
+                <div style={{ marginTop: 6 }}>
                     {upcomingTasks && upcomingTasks.length > 0 ? (
                         <div>
-                            {upcomingTasks.map((task, idx) => {
-                                const daysUntil = getDaysUntilDue(task.dueDate);
-                                const urgency = getUrgencyColor(daysUntil);
-                                return (
-                                    <div
-                                        key={idx}
-                                        className="upcoming-item"
-                                        style={{
-                                            padding: '12px 0',
-                                            borderBottom: idx < upcomingTasks.length - 1 ? '1px solid #eaeef2' : 'none',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            borderRadius: '6px',
-                                            marginLeft: '-8px',
-                                            marginRight: '-8px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '8px'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f6f8fa'}
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                    >
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                                            <Tag style={{
-                                                margin: 0,
-                                                background: '#dbeafe',
-                                                color: '#0052cc',
-                                                border: 'none',
-                                                fontSize: '11px',
-                                                fontWeight: '600',
-                                                padding: '2px 8px'
-                                            }}>
-                                                {task.key || 'TASK'}
-                                            </Tag>
-                                            <Text ellipsis style={{ maxWidth: 150, fontSize: '13px', fontWeight: '500' }}>
-                                                {task.title}
-                                            </Text>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                                            <div style={{
-                                                background: urgency.bg,
-                                                color: urgency.color,
-                                                padding: '4px 8px',
-                                                borderRadius: '4px',
-                                                fontSize: '11px',
-                                                fontWeight: '600'
-                                            }}>
-                                                {urgency.text}
-                                            </div>
-                                            <Text type="secondary" style={{ fontSize: 11 }}>
-                                                {formatTime(task.dueDate)}
-                                            </Text>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                            {upcomingTasks.map((task, idx) => (
+                                <TaskRow key={idx} task={task} showDueDate={true} />
+                            ))}
                         </div>
                     ) : (
-                        <Empty description="No upcoming tasks" size="small" style={{ padding: '20px 0' }} />
+                        <div style={{ 
+                            textAlign: 'center', 
+                            padding: '12px 0',
+                            color: '#8c8c8c'
+                        }}>
+                            <CalendarOutlined style={{ fontSize: '20px', marginBottom: 6, opacity: 0.35, display: 'block' }} />
+                            <Text type="secondary" style={{ fontSize: '11px', display: 'block' }}>
+                                No upcoming issues
+                            </Text>
+                        </div>
                     )}
                 </div>
             )
         },
         {
-            key: 'unscheduled',
-            label: `⚠️ No Due Date (${unscheduledTasks?.length || 0})`,
+            key: 'no_due_date',
+            label: (
+                <span style={{ fontSize: '12px', fontWeight: 500 }}>
+                    No Due Date ({unscheduledTasks?.length || 0})
+                </span>
+            ),
             children: (
-                <div style={{ marginTop: 12 }}>
+                <div style={{ marginTop: 6 }}>
                     {unscheduledTasks && unscheduledTasks.length > 0 ? (
-                        <>
-                            <Alert
-                                message="Tasks without due dates need scheduling"
-                                type="warning"
-                                showIcon
-                                style={{ marginBottom: 16 }}
-                            />
-                            <div>
-                                {unscheduledTasks.map((task, idx) => (
-                                    <div
-                                        key={idx}
-                                        style={{
-                                            padding: '12px 0',
-                                            borderBottom: idx < unscheduledTasks.length - 1 ? '1px solid #eaeef2' : 'none',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s ease',
-                                            borderRadius: '6px',
-                                            marginLeft: '-8px',
-                                            marginRight: '-8px',
-                                            paddingLeft: '8px',
-                                            paddingRight: '8px'
-                                        }}
-                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f6f8fa'}
-                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                                    >
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                                            <Tag style={{
-                                                margin: 0,
-                                                background: '#dbeafe',
-                                                color: '#0052cc',
-                                                border: 'none',
-                                                fontSize: '11px',
-                                                fontWeight: '600',
-                                                padding: '2px 8px'
-                                            }}>
-                                                {task.key || 'TASK'}
-                                            </Tag>
-                                            <Text ellipsis style={{ maxWidth: 150, fontSize: '13px', fontWeight: '500' }}>
-                                                {task.title}
-                                            </Text>
-                                        </div>
-                                        <Tag style={{
-                                            background: '#f3f4f6',
-                                            color: '#4b5563',
-                                            border: 'none',
-                                            fontSize: '11px',
-                                            fontWeight: '600'
-                                        }}>
-                                            {task.status?.replace('_', ' ').toUpperCase() || 'TODO'}
-                                        </Tag>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
+                        <div>
+                            {unscheduledTasks.map((task, idx) => (
+                                <TaskRow key={idx} task={task} showDueDate={false} />
+                            ))}
+                        </div>
                     ) : (
-                        <Empty description="All tasks scheduled" size="small" style={{ padding: '20px 0' }} />
+                        <div style={{ 
+                            textAlign: 'center', 
+                            padding: '12px 0',
+                            color: '#8c8c8c'
+                        }}>
+                            <CalendarOutlined style={{ fontSize: '20px', marginBottom: 6, opacity: 0.35, display: 'block' }} />
+                            <Text type="secondary" style={{ fontSize: '11px', display: 'block' }}>
+                                All tasks scheduled
+                            </Text>
+                        </div>
                     )}
                 </div>
             )
@@ -169,16 +146,28 @@ const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
 
     return (
         <Card
-            className="upcoming-card"
             title={
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <CalendarOutlined style={{ color: '#0052cc', fontSize: 16 }} />
-                    <span style={{ fontSize: 14, fontWeight: '600' }}>Upcoming & Unscheduled Work</span>
+                    <CalendarOutlined style={{ fontSize: 13 }} />
+                    <Text strong style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        Upcoming Work
+                    </Text>
                 </div>
             }
-            hoverable
+            style={{
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                borderRadius: 8,
+                border: '1px solid #f0f0f0'
+            }}
+            bodyStyle={{ padding: '10px' }}
         >
-            <Tabs items={tabItems} size="small" />
+            <Tabs 
+                items={tabItems} 
+                size="small"
+                tabBarStyle={{
+                    marginBottom: '8px'
+                }}
+            />
         </Card>
     );
 };

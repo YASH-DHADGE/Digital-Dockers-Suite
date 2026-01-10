@@ -39,7 +39,7 @@ const BacklogPage = () => {
             loadBacklogIssues();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentProject, activeSprint]);
+    }, [currentProject, activeSprint, sprints]);
 
     const loadBacklogIssues = async () => {
         setLoading(true);
@@ -51,8 +51,8 @@ const BacklogPage = () => {
             setIssues(data);
             
             // Separate into backlog and sprint issues
-            const backlog = data.filter(issue => !issue.sprintId);
-            const sprint = data.filter(issue => issue.sprintId === activeSprint?._id);
+            const backlog = data.filter(issue => !issue.sprint);
+            const sprint = data.filter(issue => issue.sprint?._id === activeSprint?._id);
             
             setBacklogIssues(backlog);
             setSprintIssues(sprint);
@@ -84,15 +84,15 @@ const BacklogPage = () => {
         // Optimistic update
         if (sourceSection === 'backlog' && destSection === 'sprint') {
             setBacklogIssues(prev => prev.filter(i => i._id !== draggableId));
-            setSprintIssues(prev => [...prev, { ...draggedIssue, sprintId: newSprintId }]);
+            setSprintIssues(prev => [...prev, { ...draggedIssue, sprint: activeSprint }]);
         } else if (sourceSection === 'sprint' && destSection === 'backlog') {
             setSprintIssues(prev => prev.filter(i => i._id !== draggableId));
-            setBacklogIssues(prev => [...prev, { ...draggedIssue, sprintId: null }]);
+            setBacklogIssues(prev => [...prev, { ...draggedIssue, sprint: null }]);
         }
 
         // API call
         try {
-            await taskService.updateTask(draggableId, { sprintId: newSprintId });
+            await taskService.updateTask(draggableId, { sprint: newSprintId });
             message.success('Issue moved successfully');
         } catch (error) {
             console.error('Failed to move issue:', error);

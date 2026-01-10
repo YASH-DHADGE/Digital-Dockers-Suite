@@ -267,3 +267,60 @@
 :global(.ant-spin-spinning) {
     background: rgba(255, 255, 255, 0.9);
 }
+/* Month-by-Month Progress Roadmap */
+.roadmap-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.roadmap-divider h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #262626;
+}
+
+.months-grid {
+    margin-bottom: 24px;
+}
+
+/* Responsive Grid */
+@media (max-width: 1200px) {
+    .months-grid :global(.ant-col) {
+        flex: 0 0 25% !important;
+        max-width: 25%;
+    }
+}
+
+@media (max-width: 992px) {
+    .months-grid :global(.ant-col) {
+        flex: 0 0 33.333% !important;
+        max-width: 33.333%;
+    }
+}
+
+@media (max-width: 768px) {
+    .months-grid :global(.ant-col) {
+        flex: 0 0 50% !important;
+        max-width: 50%;
+    }
+}
+
+@media (max-width: 576px) {
+    .months-grid :global(.ant-col) {
+        flex: 0 0 100% !important;
+        max-width: 100%;
+    }
+
+    .roadmap-divider {
+        margin: 24px 0 16px;
+    }
+
+    .roadmap-divider h2 {
+        font-size: 18px;
+    }
+}

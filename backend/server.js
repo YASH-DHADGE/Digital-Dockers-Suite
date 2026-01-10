@@ -35,6 +35,11 @@ const io = new Server(server, {
 });
 
 const Message = require('./models/Message');
+const WebSocketNotificationHandler = require('./websocket/notificationHandler');
+
+// Initialize Notification WebSocket Handler
+const notificationHandler = new WebSocketNotificationHandler(io);
+notificationHandler.initialize();
 
 // Socket.io Logic
 io.on('connection', (socket) => {
@@ -70,8 +75,9 @@ io.on('connection', (socket) => {
     });
 });
 
-// Make io accessible in routes if needed (e.g. for notifications)
+// Make io and notification handler accessible in routes
 app.set('io', io);
+app.set('notificationHandler', notificationHandler);
 
 // ... Middlewares ...
 
@@ -96,6 +102,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/meetings', require('./routes/meetingRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/work-items', require('./routes/subtaskRoutes'));
 app.use('/api/emails', require('./routes/emailRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/documents', require('./routes/documentRoutes'));
@@ -107,9 +114,17 @@ app.use('/api/insights', require('./routes/insightsRoutes'));
 app.use('/api/rag', require('./routes/ragRoutes'));
 app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/sprints', require('./routes/sprintRoutes'));
+app.use('/api/sprints', require('./routes/burndownRoutes'));
+app.use('/api/burndown', require('./routes/burndownRoutes'));
+app.use('/api/work-items', require('./routes/workLogRoutes'));
+app.use('/api/work-logs', require('./routes/workLogRoutes'));
+app.use('/api/users', require('./routes/workLogRoutes'));
+app.use('/api/reports', require('./routes/workLogRoutes'));
 app.use('/api/epics', require('./routes/epicRoutes'));
 app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/chatbot', require('./routes/chatbotRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/spaces', require('./routes/spaceRoutes'));
 
 const { errorHandler } = require('./middlewares/errorMiddleware');
 app.use(errorHandler);

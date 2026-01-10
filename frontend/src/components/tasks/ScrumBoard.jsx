@@ -26,6 +26,7 @@ const ScrumBoard = () => {
     const [selectedSprint, setSelectedSprint] = useState(null);
     const [tasks, setTasks] = useState({});
     const [loading, setLoading] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [sprintMetrics, setSprintMetrics] = useState({
         total: 0,
         completed: 0,
@@ -70,19 +71,24 @@ const ScrumBoard = () => {
         if (selectedSprint && currentProject) {
             loadSprintTasks();
         }
-    }, [selectedSprint, currentProject]);
+    }, [selectedSprint, currentProject, refreshTrigger]);
+
+    /**
+     * Reload when sprints data changes (when tasks are created/updated)
+     */
+    useEffect(() => {
+        if (selectedSprint && sprints.length > 0) {
+            // Auto-reload tasks when sprint data updates
+            loadSprintTasks();
+        }
+    }, [sprints]);
 
     const loadSprintTasks = async () => {
         setLoading(true);
         try {
-            // Fetch all tasks for the project
-            const allTasks = await taskService.getTasksByProject(currentProject._id);
+            // Fetch tasks for the selected sprint
+            const sprintTasks = await taskService.getTasksBySprint(selectedSprint);
             
-            // Filter tasks by selected sprint
-            const sprintTasks = allTasks.filter(
-                task => task.sprintId === selectedSprint
-            );
-
             // Group tasks by status
             const groupedTasks = {
                 TODO: [],
@@ -91,7 +97,7 @@ const ScrumBoard = () => {
             };
 
             sprintTasks.forEach(task => {
-                const status = task.status.toUpperCase();
+                const status = task.status?.toUpperCase() || 'TODO';
                 if (groupedTasks[status]) {
                     groupedTasks[status].push(task);
                 }
