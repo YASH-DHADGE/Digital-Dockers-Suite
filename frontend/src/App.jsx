@@ -28,8 +28,6 @@ import ChatPage from './components/chat/ChatPage';
 import OrgGraph from './components/org/OrgGraph';
 import ProjectsListPage from './pages/ProjectsListPage';
 import TeamManagement from './components/admin/TeamManagement';
-import SlideGeneratorPage from './pages/apps/SlideGeneratorPage';
-import PresentationViewer from './pages/apps/PresentationViewer';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -87,8 +85,6 @@ function App() {
                   <Route path="chat" element={<ChatPage />} />
                   <Route path="organization" element={<OrgGraph />} />
                   <Route path="projects" element={<ProjectsListPage />} />
-                  <Route path="slide-generator" element={<SlideGeneratorPage />} />
-                  <Route path="presentations/:id" element={<PresentationViewer />} />
                   <Route path="team-management" element={
                     <ProtectedRoute roles={['admin']}>
                       <TeamManagement />

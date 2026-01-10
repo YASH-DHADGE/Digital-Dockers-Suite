@@ -88,13 +88,13 @@ const LandingPage = () => {
                                 variant="h1"
                                 sx={{
                                     fontWeight: 800,
-                                    fontSize: { xs: '3rem', md: '5rem' },
+                                    fontSize: { xs: '2.5rem', md: '4.5rem' },
                                     letterSpacing: '-0.02em',
                                     mb: 2,
-                                    background: 'linear-gradient(135deg, #0f172a 0%, #4f46e5 50%, #ec4899 100%)',
+                                    background: 'linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #f0abfc 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
-                                    display: 'inline-block'
+                                    textShadow: '0 4px 30px rgba(165, 180, 252, 0.3)',
                                 }}
                             >
                                 Digital Dockers
@@ -107,13 +107,15 @@ const LandingPage = () => {
                             transition={{ duration: 0.8, delay: 0.2 }}
                         >
                             <Typography
-                                variant="h4"
-                                color="text.secondary"
+                                variant="h5"
                                 sx={{
                                     mb: 6,
-                                    fontSize: { xs: '1.2rem', md: '1.5rem' },
+                                    fontSize: { xs: '1.1rem', md: '1.4rem' },
                                     fontWeight: 400,
-                                    lineHeight: 1.5
+                                    lineHeight: 1.6,
+                                    color: 'rgba(255, 255, 255, 0.8)',
+                                    maxWidth: 600,
+                                    mx: 'auto'
                                 }}
                             >
                                 The AI-powered workspace that unifies communication, tasks, and insights into one seamless dock.

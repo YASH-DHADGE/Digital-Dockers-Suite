@@ -127,7 +127,6 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/spaces', require('./routes/spaceRoutes'));
 app.use('/api/n8n', require('./routes/n8nRoutes'));
 app.use('/api/teams', require('./routes/teamRoutes'));
-app.use('/api/presentations', require('./routes/presentationRoutes'));
 
 const { errorHandler } = require('./middlewares/errorMiddleware');
 app.use(errorHandler);
