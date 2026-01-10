@@ -17,6 +17,7 @@ import { useThemeMode } from '../../context/ThemeContext';
 import { useProject } from '../../context/ProjectContext';
 import CreateModal from './CreateModal';
 import NotificationsDropdown from './NotificationsDropdown';
+import HeaderCalendarDropdown from './HeaderCalendarDropdown';
 import searchService from '../../services/searchService';
 import debounce from 'lodash/debounce';
 
@@ -277,6 +278,7 @@ const Header = ({ onMenuClick }) => {
                     <Space size={isMobile ? 'small' : 'large'}>
                         {!isMobile && (
                             <>
+                                <HeaderCalendarDropdown />
                                 <NotificationsDropdown />
                                 <QuestionCircleOutlined
                                     style={{ fontSize: 20, cursor: 'pointer', color: '#6B778C' }}

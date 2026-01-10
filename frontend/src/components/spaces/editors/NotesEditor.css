@@ -1,53 +1,338 @@
-/* Editor specific styles */
+/* Notion-like Notes Editor Styles */
+
 .notes-editor-container {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  background: #ffffff;
 }
 
-.whiteboard-container {
+/* Header Section */
+.notes-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+  border-bottom: 1px solid #e9ecef;
+  border-radius: 12px 12px 0 0;
 }
 
-.mindmap-container {
+.notes-header-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
-/* Ant Input overrides for better UX */
-.notes-editor-container .ant-btn,
-.whiteboard-container .ant-btn,
-.mindmap-container .ant-btn {
-  border-radius: 4px;
+.notes-header-icon {
+  font-size: 24px;
+  color: #5865f2;
+}
+
+.notes-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  letter-spacing: -0.3px;
+}
+
+.notes-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.active-users {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(88, 101, 242, 0.1);
+  border-radius: 6px;
   font-size: 12px;
+  font-weight: 600;
+  color: #5865f2;
 }
 
-.notes-editor-container .ant-btn-primary {
-  background: #0052cc;
-  border-color: #0052cc;
+.user-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
-.notes-editor-container .ant-btn-primary:hover {
-  background: #0747a6;
-  border-color: #0747a6;
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
-.whiteboard-container .ant-btn-primary {
-  background: #0052cc;
-  border-color: #0052cc;
+/* Toolbar Styles */
+.notes-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-.whiteboard-container .ant-btn-primary:hover {
-  background: #0747a6;
-  border-color: #0747a6;
+.notes-toolbar:focus-within {
+  border-color: #5865f2;
+  box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.1);
 }
 
-.mindmap-container .ant-btn-primary {
-  background: #0052cc;
-  border-color: #0052cc;
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.mindmap-container .ant-btn-primary:hover {
-  background: #0747a6;
-  border-color: #0747a6;
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.toolbar-btn:active {
+  background: #e5e7eb;
+  transform: scale(0.95);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: #e5e7eb;
+}
+
+.save-btn {
+  margin-left: auto;
+  background: linear-gradient(135deg, #5865f2 0%, #7c3aed 100%);
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(88, 101, 242, 0.25);
+}
+
+.save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.35);
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Editor Textarea */
+.notes-editor {
+  flex: 1;
+  width: 100%;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1f2937;
+  resize: none;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.notes-editor::placeholder {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.notes-editor:focus {
+  outline: none;
+  border-color: #5865f2;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 4px rgba(88, 101, 242, 0.1);
+}
+
+/* Footer Styles */
+.notes-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  border-radius: 0 0 8px 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.notes-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.stat-divider {
+  color: #e5e7eb;
+}
+
+.notes-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.unsaved-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #f59e0b;
+  font-weight: 600;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 49%, 100% {
+    opacity: 1;
+  }
+  50%, 99% {
+    opacity: 0.5;
+  }
+}
+
+.offline-indicator {
+  padding: 4px 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 4px;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.typing-user {
+  font-weight: 500;
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dots span {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: typing-bounce 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+/* Ant Design overrides */
+.notes-editor-container .ant-btn {
+  border-radius: 6px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .notes-header {
+    padding: 16px;
+  }
+
+  .notes-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar-group {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .save-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .notes-footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .notes-stats {
+    width: 100%;
+    flex-wrap: wrap;
+  }
 }

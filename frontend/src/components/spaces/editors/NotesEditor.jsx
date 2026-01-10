@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Space, Divider, message } from 'antd';
-import { SaveOutlined, BoldOutlined, ItalicOutlined, UnorderedListOutlined, OrderedListOutlined } from '@ant-design/icons';
+import { Button, Space, Divider, message, Tooltip } from 'antd';
+import { SaveOutlined, BoldOutlined, ItalicOutlined, UnorderedListOutlined, OrderedListOutlined, StrikethroughOutlined, FileMarkdownOutlined } from '@ant-design/icons';
+import { Heading2, Quote, Code } from 'lucide-react';
 import './NotesEditor.css';
 
 /**
@@ -64,91 +65,145 @@ const NotesEditor = ({
     {
       icon: <BoldOutlined />,
       title: 'Bold',
-      action: () => insertMarkdown('**', '**')
+      action: () => insertMarkdown('**', '**'),
+      shortcut: 'Ctrl+B'
     },
     {
       icon: <ItalicOutlined />,
       title: 'Italic',
-      action: () => insertMarkdown('*', '*')
+      action: () => insertMarkdown('_', '_'),
+      shortcut: 'Ctrl+I'
+    },
+    {
+      icon: <StrikethroughOutlined />,
+      title: 'Strikethrough',
+      action: () => insertMarkdown('~~', '~~'),
+      shortcut: 'Ctrl+Shift+X'
+    },
+    {
+      icon: <Heading2 size={16} />,
+      title: 'Heading',
+      action: () => insertMarkdown('\n## ', '\n'),
+      shortcut: 'Ctrl+Alt+1'
     },
     {
       icon: <UnorderedListOutlined />,
       title: 'Bullet List',
-      action: () => insertMarkdown('\n- ', '')
+      action: () => insertMarkdown('\n- ', ''),
+      shortcut: 'Ctrl+Shift+9'
     },
     {
       icon: <OrderedListOutlined />,
       title: 'Numbered List',
-      action: () => insertMarkdown('\n1. ', '')
+      action: () => insertMarkdown('\n1. ', ''),
+      shortcut: 'Ctrl+Shift+0'
+    },
+    {
+      icon: <Quote size={16} />,
+      title: 'Quote',
+      action: () => insertMarkdown('\n> ', '\n'),
+      shortcut: 'Ctrl+Shift+B'
+    },
+    {
+      icon: <Code size={16} />,
+      title: 'Code Block',
+      action: () => insertMarkdown('```\n', '\n```'),
+      shortcut: 'Ctrl+Alt+C'
     }
   ];
 
   return (
     <div className="notes-editor-container">
-      <div className="notes-toolbar">
-        <Space size="small">
-          {formatters.map((formatter, idx) => (
-            <Button
-              key={idx}
-              type="text"
-              size="small"
-              icon={formatter.icon}
-              title={formatter.title}
-              onClick={formatter.action}
-            />
-          ))}
-        </Space>
-
-        <Divider type="vertical" />
-
-        <Space size="small">
-          <Button
-            type="primary"
-            size="small"
-            icon={<SaveOutlined />}
-            loading={isSaving}
-            disabled={!isEditing || !isConnected}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-
+      {/* Header with title */}
+      <div className="notes-header">
+        <div className="notes-header-left">
+          <FileMarkdownOutlined className="notes-header-icon" />
+          <h2 className="notes-title">Notes</h2>
+        </div>
+        <div className="notes-header-right">
           {isConnected && activeUsers && (
-            <span className="collaborators">
-              👥 {activeUsers.length} editing
-            </span>
+            <div className="active-users">
+              <span className="user-dot"></span>
+              <span className="user-count">{activeUsers.length} editing</span>
+            </div>
           )}
-        </Space>
+        </div>
       </div>
 
+      {/* Formatting toolbar - Notion style */}
+      <div className="notes-toolbar">
+        <div className="toolbar-group">
+          {formatters.map((formatter, idx) => (
+            <Tooltip key={idx} title={`${formatter.title} (${formatter.shortcut})`} placement="bottom">
+              <button
+                className="toolbar-btn"
+                onClick={formatter.action}
+                title={formatter.title}
+              >
+                {formatter.icon}
+              </button>
+            </Tooltip>
+          ))}
+        </div>
+
+        <div className="toolbar-divider"></div>
+
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          loading={isSaving}
+          disabled={!isEditing || !isConnected}
+          onClick={handleSave}
+          className="save-btn"
+        >
+          {isSaving ? 'Saving...' : 'Save'}
+        </Button>
+      </div>
+
+      {/* Main editor textarea */}
       <textarea
         className="notes-editor"
         value={text}
         onChange={handleChange}
-        placeholder="Start typing your notes... You can use Markdown syntax!"
-        style={{
-          width: '100%',
-          minHeight: '500px',
-          padding: '16px',
-          fontFamily: 'monospace',
-          fontSize: '14px',
-          border: '1px solid #d9d9d9',
-          borderRadius: '4px',
-          resize: 'none'
-        }}
+        placeholder="# Start typing...\n\nUse markdown formatting to style your notes. Type / for more options."
+        spellCheck="true"
       />
 
+      {/* Footer with stats */}
       <div className="notes-footer">
-        <span className="char-count">{text.length} characters</span>
-        <span className="line-count">{text.split('\n').length} lines</span>
-        {isEditing && <span className="unsaved-indicator">● Unsaved changes</span>}
+        <div className="notes-stats">
+          <span className="stat-item">
+            <span className="stat-label">Characters:</span>
+            <span className="stat-value">{text.length.toLocaleString()}</span>
+          </span>
+          <span className="stat-divider">•</span>
+          <span className="stat-item">
+            <span className="stat-label">Words:</span>
+            <span className="stat-value">{text.trim().split(/\s+/).filter(w => w).length}</span>
+          </span>
+          <span className="stat-divider">•</span>
+          <span className="stat-item">
+            <span className="stat-label">Lines:</span>
+            <span className="stat-value">{text.split('\n').length}</span>
+          </span>
+        </div>
+
+        <div className="notes-status">
+          {isEditing && <span className="unsaved-indicator">● Unsaved changes</span>}
+          {!isConnected && <span className="offline-indicator">🔌 Offline</span>}
+        </div>
       </div>
 
       {/* Typing indicators */}
-      {typingUsers.size > 0 && (
+      {typingUsers && typingUsers.size > 0 && (
         <div className="typing-indicator">
+          <span className="typing-user">
+            {Array.from(typingUsers).slice(0, 2).join(', ')} {typingUsers.size > 1 ? 'are' : 'is'} typing...
+          </span>
           <span className="typing-dots">
-            {Array.from(typingUsers).slice(0, 3).join(', ')} typing...
+            <span></span>
+            <span></span>
+            <span></span>
           </span>
         </div>
       )}

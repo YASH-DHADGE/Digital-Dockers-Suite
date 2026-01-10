@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { analyzeTask } = require('../services/openaiService');
 const { createTaskCalendarEvent, updateTaskCalendarEvent, deleteTaskCalendarEvent, refreshAccessToken } = require('../services/googleCalendarService');
+const WorkloadBalancingService = require('../services/workloadBalancingService');
 const Project = require('../models/Project');
 
 // @desc    Create new task
@@ -12,7 +13,7 @@ const Project = require('../models/Project');
 const createTask = asyncHandler(async (req, res) => {
     const {
         title, description, deadline, assignedTo, priority,
-        projectId, sprintId, epicId, issueType, storyPoints, parentTaskId, status
+        projectId, sprintId, epicId, issueType, storyPoints, parentTaskId, status, estimatedTime
     } = req.body;
 
     if (!title) {
@@ -45,6 +46,7 @@ const createTask = asyncHandler(async (req, res) => {
         assignedBy: req.user._id,
         reporter: req.user._id,
         dueDate: deadline,
+        estimatedTime: estimatedTime || 5, // Default 5 hours if not provided
 
         // Jira Fields
         key: issueKey,
@@ -156,6 +158,33 @@ const createTask = asyncHandler(async (req, res) => {
     const io = req.app.get('io');
     if (io && task.project) {
         io.to(`project:${task.project}`).emit('task:created', task);
+    }
+
+    // ============================================================================
+    // AUTOMATIC WORKLOAD REBALANCING
+    // ============================================================================
+    // After task creation, trigger automatic workload rebalancing if task is assigned
+    if (task.assignedTo && task.assignedTo.length > 0) {
+        try {
+            console.log('🔄 Triggering automatic workload rebalancing after task creation...');
+            const rebalanceResults = await WorkloadBalancingService.rebalanceTeamWorkload(task.project);
+            
+            if (rebalanceResults.rebalanced > 0) {
+                // Emit socket event for workload rebalancing
+                if (io) {
+                    io.emit('workload:rebalanced', {
+                        message: `${rebalanceResults.rebalanced} tasks were automatically rebalanced`,
+                        reassignments: rebalanceResults.reassignments,
+                        timestamp: new Date(),
+                        triggeredBy: 'auto-balance'
+                    });
+                }
+                console.log(`✅ Auto-rebalancing complete: ${rebalanceResults.rebalanced} tasks reassigned`);
+            }
+        } catch (error) {
+            console.error('Workload rebalancing error:', error.message);
+            // Don't fail the request due to rebalancing errors
+        }
     }
 
     res.status(201).json(task);
@@ -322,6 +351,33 @@ const updateTask = asyncHandler(async (req, res) => {
                     console.error(`Failed to update calendar event:`, error.message);
                 }
             }
+        }
+    }
+
+    // ============================================================================
+    // AUTOMATIC WORKLOAD REBALANCING
+    // ============================================================================
+    // If task assignment changed, trigger automatic workload rebalancing
+    if (req.body.assignedTo && changes.assignedTo) {
+        try {
+            console.log('🔄 Triggering automatic workload rebalancing...');
+            const rebalanceResults = await WorkloadBalancingService.rebalanceTeamWorkload(updatedTask.project);
+            
+            if (rebalanceResults.rebalanced > 0) {
+                // Emit socket event for workload rebalancing
+                if (io) {
+                    io.emit('workload:rebalanced', {
+                        message: `${rebalanceResults.rebalanced} tasks were automatically rebalanced`,
+                        reassignments: rebalanceResults.reassignments,
+                        timestamp: new Date(),
+                        triggeredBy: 'auto-balance'
+                    });
+                }
+                console.log(`✅ Auto-rebalancing complete: ${rebalanceResults.rebalanced} tasks reassigned`);
+            }
+        } catch (error) {
+            console.error('Workload rebalancing error:', error.message);
+            // Don't fail the request due to rebalancing errors
         }
     }
 
