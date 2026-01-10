@@ -43,7 +43,9 @@ const userSchema = mongoose.Schema({
         avatar: String,
         bio: String,
         skills: [String],
-        timezone: String
+        timezone: String,
+        capacityHoursPerSprint: { type: Number, default: 40 }, // Hours per sprint (default 40)
+        isOnLeave: { type: Boolean, default: false }
     },
     preferences: {
         language: { type: String, default: 'en' },

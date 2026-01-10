@@ -29,6 +29,7 @@ import ChatPage from './components/chat/ChatPage';
 import OrgGraph from './components/org/OrgGraph';
 import ProjectsListPage from './pages/ProjectsListPage';
 import Spaces from './components/spaces/Spaces';
+import CalendarWorkPlanner from './components/CalendarWorkPlanner';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -88,6 +89,7 @@ function App() {
                   <Route path="organization" element={<OrgGraph />} />
                   <Route path="projects" element={<ProjectsListPage />} />
                   <Route path="spaces" element={<Spaces />} />
+                  <Route path="work-planner" element={<CalendarWorkPlanner />} />
                 </Route>
 
                 {/* Fallback */}

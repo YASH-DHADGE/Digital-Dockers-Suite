@@ -125,6 +125,8 @@ app.use('/api/activity', require('./routes/activityRoutes'));
 app.use('/api/chatbot', require('./routes/chatbotRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/spaces', require('./routes/spaceRoutes'));
+app.use('/api/workload', require('./routes/workloadRoutes'));
+app.use('/api/reassignment', require('./routes/reassignmentRoutes'));
 
 const { errorHandler } = require('./middlewares/errorMiddleware');
 app.use(errorHandler);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Row, Col, Card, Typography, List, Avatar, Progress, Tag, Spin, Empty, message, Alert } from 'antd';
+import { Row, Col, Card, Typography, List, Avatar, Progress, Tag, Spin, Empty, message, Alert, Modal } from 'antd';
 import { RiseOutlined, FireOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement } from 'chart.js';
 import { Doughnut, Line } from 'react-chartjs-2';
@@ -11,6 +11,7 @@ import UpcomingWorkCard from './UpcomingWorkCard';
 import StatusOverview from './StatusOverview';
 import TypesOfWorkCard from './TypesOfWorkCard';
 import SprintBurndownChart from '../charts/SprintBurndownChart';
+import SmartReassignmentDashboard from './SmartReassignmentDashboard';
 import './dashboard.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement);
@@ -26,6 +27,8 @@ const ProjectDashboard = () => {
     const [upcomingData, setUpcomingData] = useState(null);
     const [burndownData, setBurndownData] = useState(null);
     const [assignedToMe, setAssignedToMe] = useState([]);
+    // Smart Reassignment modal state
+    const [showReassignmentModal, setShowReassignmentModal] = useState(false);
 
     useEffect(() => {
         if (currentProject?._id) {
@@ -290,7 +293,10 @@ const ProjectDashboard = () => {
                                         </Typography.Text>
                                         <div style={{ fontSize: '12px', color: '#626f86', marginTop: 2 }}>
                                             Monitor the capacity of your team.{' '}
-                                            <a href="#" style={{ color: '#0052cc', textDecoration: 'none', fontWeight: 500 }}>
+                                            <a href="#" onClick={(e) => {
+                                                e.preventDefault();
+                                                setShowReassignmentModal(true);
+                                            }} style={{ color: '#0052cc', textDecoration: 'none', fontWeight: 500 }}>
                                                 Reassign work items to get the right balance
                                             </a>
                                         </div>
@@ -418,6 +424,34 @@ const ProjectDashboard = () => {
                     )}
                 </Col>
             </Row>
+
+            {/* Smart Reassignment Modal */}
+            <Modal
+                title="Smart Reassignment Assistant"
+                open={showReassignmentModal}
+                onCancel={() => setShowReassignmentModal(false)}
+                width={1200}
+                footer={[
+                    <button 
+                        key="close" 
+                        onClick={() => setShowReassignmentModal(false)}
+                        style={{
+                            padding: '8px 16px',
+                            backgroundColor: '#f0f0f0',
+                            border: '1px solid #d9d9d9',
+                            borderRadius: 6,
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            fontWeight: 500
+                        }}
+                    >
+                        Close
+                    </button>
+                ]}
+                bodyStyle={{ padding: 0 }}
+            >
+                <SmartReassignmentDashboard sprintId={stats?.activeSprint?._id} />
+            </Modal>
         </div>
     );
 };
