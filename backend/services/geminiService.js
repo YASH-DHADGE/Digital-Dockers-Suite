@@ -1,9 +1,9 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+/**
+ * Mistral AI Service for DockerBot (Main Application Chatbot)
+ * Migrated from Gemini to Mistral AI
+ */
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-
-// System context for the chatbot - Enhanced with more detailed instructions
+// System context for the chatbot - DockerBot Assistant
 const SYSTEM_CONTEXT = `You are DockerBot, an intelligent AI assistant for the Digital Dockers Suite - a workplace productivity platform similar to Jira/Asana.
 
 ## YOUR CORE RESPONSIBILITIES:
@@ -81,81 +81,95 @@ const formatDateTime = (date) => {
 };
 
 /**
- * Generate a response using Gemini AI
+ * Generate a response using Mistral AI
  * @param {string} userMessage - The user's message
  * @param {object} userContext - Context about the user's data
  * @returns {Promise<string>} - The AI response
  */
 const generateResponse = async (userMessage, userContext = {}) => {
     try {
-        if (!process.env.GEMINI_API_KEY) {
+        const apiKey = process.env.MISTRAL_API_KEY;
+
+        if (!apiKey) {
+            console.log('No Mistral API key, using fallback responses');
             return getFallbackResponse(userMessage, userContext);
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
         // Build comprehensive context from user data
-        let contextPrompt = SYSTEM_CONTEXT;
+        let contextContent = SYSTEM_CONTEXT;
 
         // User info
         if (userContext.user) {
-            contextPrompt += `\n\n---\n## CURRENT USER DATA:\n`;
-            contextPrompt += `**User:** ${userContext.user.fullName} (Role: ${userContext.user.role}, Email: ${userContext.user.email})\n`;
+            contextContent += `\n\n---\n## CURRENT USER DATA:\n`;
+            contextContent += `**User:** ${userContext.user.fullName} (Role: ${userContext.user.role}, Email: ${userContext.user.email})\n`;
         }
 
         // Tasks - detailed info
         if (userContext.tasks && userContext.tasks.length > 0) {
-            contextPrompt += `\n### Pending Tasks (${userContext.tasks.length} total):\n`;
+            contextContent += `\n### Pending Tasks (${userContext.tasks.length} total):\n`;
             userContext.tasks.forEach((task, i) => {
                 const projectInfo = task.project ? `[${task.project.key || task.project.name}]` : '';
                 const dueInfo = task.dueDate ? `Due: ${formatDateTime(task.dueDate)}` : 'No due date';
-                contextPrompt += `${i + 1}. ${projectInfo} **${task.title}**\n`;
-                contextPrompt += `   - Status: ${task.status} | Priority: ${task.priority || 'medium'} | ${dueInfo}\n`;
+                contextContent += `${i + 1}. ${projectInfo} **${task.title}**\n`;
+                contextContent += `   - Status: ${task.status} | Priority: ${task.priority || 'medium'} | ${dueInfo}\n`;
             });
         } else {
-            contextPrompt += `\n### Tasks: No pending tasks found.\n`;
+            contextContent += `\n### Tasks: No pending tasks found.\n`;
         }
 
         // Meetings - detailed info with time
         if (userContext.meetings && userContext.meetings.length > 0) {
-            contextPrompt += `\n### Upcoming Meetings (${userContext.meetings.length} total):\n`;
+            contextContent += `\n### Upcoming Meetings (${userContext.meetings.length} total):\n`;
             userContext.meetings.forEach((meeting, i) => {
                 const meetingTime = formatDateTime(meeting.scheduledAt || meeting.createdAt);
-                contextPrompt += `${i + 1}. **${meeting.title}** - ${meetingTime}\n`;
+                contextContent += `${i + 1}. **${meeting.title}** - ${meetingTime}\n`;
                 if (meeting.description) {
-                    contextPrompt += `   - ${meeting.description.substring(0, 100)}...\n`;
+                    contextContent += `   - ${meeting.description.substring(0, 100)}...\n`;
                 }
             });
         } else {
-            contextPrompt += `\n### Meetings: No upcoming meetings scheduled.\n`;
+            contextContent += `\n### Meetings: No upcoming meetings scheduled.\n`;
         }
 
         // Projects
         if (userContext.projects && userContext.projects.length > 0) {
-            contextPrompt += `\n### User's Projects: ${userContext.projects.map(p => `${p.name} (${p.key})`).join(', ')}\n`;
+            contextContent += `\n### User's Projects: ${userContext.projects.map(p => `${p.name} (${p.key})`).join(', ')}\n`;
         }
 
-        contextPrompt += `\n---\nNow answer the user's question using the above data:\n`;
+        contextContent += `\n---\nNow answer the user's question using the above data:\n`;
 
-        const chat = model.startChat({
-            history: [
-                {
-                    role: 'user',
-                    parts: [{ text: contextPrompt }],
-                },
-                {
-                    role: 'model',
-                    parts: [{ text: 'Understood! I am DockerBot and I have access to this user\'s tasks, meetings, and projects. I will use this data to give personalized, helpful responses. Ready to assist!' }],
-                },
-            ],
+        // Build messages for Mistral
+        const messages = [
+            { role: 'system', content: contextContent },
+            { role: 'user', content: userMessage }
+        ];
+
+        // Call Mistral API
+        const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'mistral-small-latest',
+                messages: messages,
+                temperature: 0.7,
+                max_tokens: 500
+            })
         });
 
-        const result = await chat.sendMessage(userMessage);
-        const response = result.response;
-        return response.text();
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Mistral API Error:', errorText);
+            throw new Error('Mistral API request failed');
+        }
+
+        const data = await response.json();
+        return data.choices[0]?.message?.content || getFallbackResponse(userMessage, userContext);
 
     } catch (error) {
-        console.error('Gemini API Error:', error);
+        console.error('Mistral AI Error:', error);
         return getFallbackResponse(userMessage, userContext);
     }
 };

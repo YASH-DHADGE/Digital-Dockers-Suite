@@ -89,8 +89,9 @@ function App() {
                   <Route path="projects" element={<ProjectsListPage />} />
                   <Route path="spaces" element={<Spaces />} />
                   <Route path="work-planner" element={<CalendarWorkPlanner />} />
-                  <Route path="slide-generator" element={<SlideGeneratorPage />} />
-                  <Route path="presentations/:id" element={<PresentationViewer />} />
+                  {/* TODO: Add SlideGeneratorPage and PresentationViewer when implemented */}
+                  {/* <Route path="slide-generator" element={<SlideGeneratorPage />} /> */}
+                  {/* <Route path="presentations/:id" element={<PresentationViewer />} /> */}
                   <Route path="team-management" element={
                     <ProtectedRoute roles={['admin']}>
                       <TeamManagement />

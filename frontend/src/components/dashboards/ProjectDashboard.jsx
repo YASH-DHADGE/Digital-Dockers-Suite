@@ -432,8 +432,8 @@ const ProjectDashboard = () => {
                 onCancel={() => setShowReassignmentModal(false)}
                 width={1200}
                 footer={[
-                    <button 
-                        key="close" 
+                    <button
+                        key="close"
                         onClick={() => setShowReassignmentModal(false)}
                         style={{
                             padding: '8px 16px',
@@ -453,10 +453,6 @@ const ProjectDashboard = () => {
                 <SmartReassignmentDashboard sprintId={stats?.activeSprint?._id} />
             </Modal>
         </div>
-
-                </Col >
-            </Row >
-        </div >
     );
 };
 
