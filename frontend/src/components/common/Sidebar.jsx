@@ -14,7 +14,6 @@ import {
     BarChartOutlined,
     UsergroupAddOutlined,
     MailOutlined,
-    SlidersOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -73,7 +72,6 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
                 { key: '/dashboard/meetings', icon: <MessageOutlined />, label: 'Meetings', hidden: !hasAccess(['project_manager', 'technical_lead']) },
                 { key: '/dashboard/documents', icon: <FileTextOutlined />, label: 'Documents' },
                 { key: '/dashboard/email-generator', icon: <MailOutlined />, label: 'AI Email' },
-                { key: '/dashboard/slide-generator', icon: <SlidersOutlined />, label: 'AI Slides' },
                 { key: '/dashboard/chat', icon: <MessageOutlined />, label: 'Chat' },
                 { key: '/dashboard/organization', icon: <ApartmentOutlined />, label: 'Team' },
                 { key: '/dashboard/wellness', icon: <HeartOutlined />, label: 'Wellness' },

@@ -30,8 +30,6 @@ import ProjectsListPage from './pages/ProjectsListPage';
 import Spaces from './components/spaces/Spaces';
 import CalendarWorkPlanner from './components/CalendarWorkPlanner';
 import TeamManagement from './components/admin/TeamManagement';
-import SlideGeneratorPage from './pages/apps/SlideGeneratorPage';
-import PresentationViewer from './pages/apps/PresentationViewer';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles = [] }) => {

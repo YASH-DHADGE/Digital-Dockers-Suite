@@ -129,7 +129,6 @@ app.use('/api/workload', require('./routes/workloadRoutes'));
 app.use('/api/reassignment', require('./routes/reassignmentRoutes'));
 app.use('/api/n8n', require('./routes/n8nRoutes'));
 app.use('/api/teams', require('./routes/teamRoutes'));
-app.use('/api/presentations', require('./routes/presentationRoutes'));
 
 const { errorHandler } = require('./middlewares/errorMiddleware');
 app.use(errorHandler);
