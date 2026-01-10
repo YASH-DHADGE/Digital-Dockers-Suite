@@ -31,7 +31,7 @@ const MeetingsPage = () => {
 
     useEffect(() => {
         fetchMeetings();
-         
+
     }, [user]);
 
     const fetchMeetings = async () => {
@@ -259,20 +259,62 @@ const MeetingsPage = () => {
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
                 <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 600 }}>Meetings</Typography>
+                    <Typography variant="h4" sx={{
+                        fontWeight: 700,
+                        background: 'linear-gradient(135deg, #4f46e5, #818cf8)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent'
+                    }}>
+                        Meetings
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">Schedule, join, and review meeting transcripts</Typography>
                 </Box>
                 {canScheduleMeetings && (
-                    <Button variant="contained" startIcon={<Add />} onClick={() => setScheduleModalOpen(true)}>
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => setScheduleModalOpen(true)}
+                        sx={{
+                            background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                            boxShadow: '0 4px 14px rgba(79, 70, 229, 0.4)',
+                            '&:hover': {
+                                boxShadow: '0 6px 20px rgba(79, 70, 229, 0.5)'
+                            }
+                        }}
+                    >
                         Schedule Meeting
                     </Button>
                 )}
             </Box>
 
-            <Paper elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)} sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
+            <Paper elevation={0} sx={{
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 3,
+                overflow: 'hidden',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.06)'
+            }}>
+                <Tabs
+                    value={activeTab}
+                    onChange={(e, v) => setActiveTab(v)}
+                    sx={{
+                        borderBottom: 1,
+                        borderColor: 'divider',
+                        px: 2,
+                        '& .MuiTab-root': {
+                            fontWeight: 600,
+                            textTransform: 'none'
+                        },
+                        '& .Mui-selected': {
+                            color: '#4f46e5 !important'
+                        },
+                        '& .MuiTabs-indicator': {
+                            backgroundColor: '#4f46e5'
+                        }
+                    }}
+                >
                     <Tab label={'Upcoming (' + upcomingMeetings.length + ')'} />
                     <Tab label={'Past Meetings (' + pastMeetings.length + ')'} />
                 </Tabs>

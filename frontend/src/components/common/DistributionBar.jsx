@@ -13,8 +13,8 @@ const DistributionBar = ({ label, icon: Icon, count, total, percentage, color, o
                 display: 'flex',
                 alignItems: 'center',
                 gap: 12,
-                paddingLeft: 16,
-                paddingRight: 16,
+                paddingLeft: 20,
+                paddingRight: 20,
                 paddingTop: 12,
                 paddingBottom: 12,
                 borderBottom: '1px solid #f0f0f0',
@@ -22,9 +22,7 @@ const DistributionBar = ({ label, icon: Icon, count, total, percentage, color, o
                 transition: 'background 0.2s',
                 borderRadius: '4px',
                 marginLeft: '-4px',
-                marginRight: '-4px',
-                paddingLeft: '20px',
-                paddingRight: '20px'
+                marginRight: '-4px'
             }}
             onMouseEnter={(e) => onClick && (e.currentTarget.style.backgroundColor = '#f6f8fa')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}

@@ -22,7 +22,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: function(origin, callback) {
+        origin: function (origin, callback) {
             // Allow localhost on any port during development
             if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
                 callback(null, true);
@@ -127,6 +127,9 @@ app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/spaces', require('./routes/spaceRoutes'));
 app.use('/api/workload', require('./routes/workloadRoutes'));
 app.use('/api/reassignment', require('./routes/reassignmentRoutes'));
+app.use('/api/n8n', require('./routes/n8nRoutes'));
+app.use('/api/teams', require('./routes/teamRoutes'));
+app.use('/api/presentations', require('./routes/presentationRoutes'));
 
 const { errorHandler } = require('./middlewares/errorMiddleware');
 app.use(errorHandler);

@@ -220,7 +220,7 @@ const ProjectDashboard = () => {
                     {/* Sprint Burndown Chart */}
                     {stats?.activeSprint && (
                         <div style={{ marginBottom: 24 }}>
-                            <SprintBurndownChart 
+                            <SprintBurndownChart
                                 sprintId={stats.activeSprint._id}
                                 sprintName={stats.activeSprint.name}
                             />
@@ -257,9 +257,9 @@ const ProjectDashboard = () => {
                                 <div className="ant-card-body">
                                     <div className="chart-container">
                                         {sprintVelocityData ? (
-                                            <Line 
-                                                data={sprintVelocityData} 
-                                                options={{ 
+                                            <Line
+                                                data={sprintVelocityData}
+                                                options={{
                                                     maintainAspectRatio: false,
                                                     responsive: true,
                                                     plugins: {
@@ -273,7 +273,7 @@ const ProjectDashboard = () => {
                                                             beginAtZero: true
                                                         }
                                                     }
-                                                }} 
+                                                }}
                                             />
                                         ) : (
                                             <Empty description="No sprint data" />
@@ -345,13 +345,13 @@ const ProjectDashboard = () => {
                                                 >
                                                     {/* Assignee Column */}
                                                     <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-                                                        <Avatar 
+                                                        <Avatar
                                                             size={32}
                                                             style={{ backgroundColor: '#0052cc', fontSize: '12px', fontWeight: 700, flexShrink: 0 }}
                                                         >
                                                             {item.name?.[0]?.toUpperCase()}
                                                         </Avatar>
-                                                        <Text 
+                                                        <Text
                                                             ellipsis
                                                             style={{ fontSize: '13px', color: '#262626', fontWeight: 500 }}
                                                         >
@@ -377,8 +377,8 @@ const ProjectDashboard = () => {
                                                                 }}></div>
                                                             </div>
                                                         </div>
-                                                        <Text 
-                                                            strong 
+                                                        <Text
+                                                            strong
                                                             style={{ fontSize: '12px', color: '#262626', minWidth: 35, textAlign: 'right', flexShrink: 0 }}
                                                         >
                                                             {Math.round(percentage)}%
@@ -453,6 +453,10 @@ const ProjectDashboard = () => {
                 <SmartReassignmentDashboard sprintId={stats?.activeSprint?._id} />
             </Modal>
         </div>
+
+                </Col >
+            </Row >
+        </div >
     );
 };
 

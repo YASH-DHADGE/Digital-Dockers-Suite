@@ -24,7 +24,7 @@ const TasksPage = () => {
             <div className="tasks-page-header">
                 <div className="header-content">
                     <h1>Tasks & Board</h1>
-                    
+
                     {/* Board Type Selector */}
                     <div className="board-toggle-section">
                         <Segmented
@@ -56,7 +56,7 @@ const TasksPage = () => {
                                 borderRadius: '6px',
                             }}
                         />
-                        
+
                         {/* Info Text */}
                         <div className="toggle-info">
                             {boardType === 'kanban' ? (

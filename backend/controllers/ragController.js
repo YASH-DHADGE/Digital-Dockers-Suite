@@ -3,8 +3,10 @@ const Document = require('../models/Document');
 const DocumentAnalysis = require('../models/DocumentAnalysis');
 const { parseDocument, summarizeDocument, chatWithDocument } = require('../services/ragService');
 const fs = require('fs');
+const axios = require('axios');
+const FormData = require('form-data');
 
-// @desc    Analyze Document (Parse & Summarize)
+// @desc    Analyze Document (Parse & Summarize with n8n)
 // @route   POST /api/rag/analyze/:id
 // @access  Private
 const analyzeDocumentController = asyncHandler(async (req, res) => {
@@ -23,7 +25,7 @@ const analyzeDocumentController = asyncHandler(async (req, res) => {
         return res.status(200).json(analysis);
     }
 
-    // 3. Parse File
+    // 3. Parse File (Keep for Chat functionality)
     const filePath = document.file.filepath; // Assumes local path exists
 
     if (!fs.existsSync(filePath)) {
@@ -31,24 +33,62 @@ const analyzeDocumentController = asyncHandler(async (req, res) => {
         throw new Error('File not found on server storage');
     }
 
-    console.log(`Parsing document: ${filePath}`);
+    console.log(`Parsing document for chat context: ${filePath}`);
     const text = await parseDocument(filePath, document.file.mimetype);
 
-    // 4. Generate Summary
-    console.log('Generating summary...');
-    // If Text is empty?
-    if (!text || text.length < 50) {
-        res.status(400);
-        throw new Error('Document text is too short or could not be extracted.');
-    }
+    // 4. Generate Summary via n8n Webhook
+    console.log('Sending file to n8n for analysis...');
 
-    const summary = await summarizeDocument(text);
+    let summary = '';
+
+    try {
+        const formData = new FormData();
+        formData.append('file', fs.createReadStream(filePath));
+
+        const n8nResponse = await axios.post(
+            'https://rohan-2409.app.n8n.cloud/webhook-test/document-summary',
+            formData,
+            {
+                headers: {
+                    ...formData.getHeaders() // Important for multipart/form-data boundary
+                }
+            }
+        );
+
+        // Assuming n8n returns the summary directly as a JSON object or string
+        // Adjust based on actual n8n response structure. 
+        // If n8n returns { summary: "..." } or just "..."
+        if (typeof n8nResponse.data === 'object' && n8nResponse.data.summary) {
+            summary = n8nResponse.data.summary;
+        } else if (typeof n8nResponse.data === 'string') {
+            summary = n8nResponse.data;
+        } else {
+            // Fallback if structure is unknown, just dump the data stringified
+            summary = JSON.stringify(n8nResponse.data);
+        }
+
+        console.log('n8n Summary received successfully.');
+
+    } catch (error) {
+        console.error('n8n Webhook Error:', error.message);
+        // Fallback to local summary if n8n fails (optional, or could just throw)
+        // For now, let's try local if n8n fails, or better yet, just report the error to not break flow if local is desired.
+        // But the user *requested* n8n integration. So if it fails, maybe we should error.
+        // Let's fallback to local 'summarizeDocument' if n8n fails, for robustness.
+        console.log('Falling back to local Ollama summarization...');
+
+        if (!text || text.length < 50) {
+            res.status(400);
+            throw new Error('Document text is too short or could not be extracted.');
+        }
+        summary = await summarizeDocument(text);
+    }
 
     // 5. Save Analysis
     analysis = await DocumentAnalysis.create({
         document: id,
         user: req.user._id,
-        extractedText: text,
+        extractedText: text, // Needed for Chat
         summary: summary,
         analyzedAt: Date.now()
     });

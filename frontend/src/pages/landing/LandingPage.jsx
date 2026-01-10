@@ -34,22 +34,29 @@ const LandingPage = () => {
         <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', overflowX: 'hidden' }}>
             {/* Transparent Glass Header */}
             <AppBar position="fixed" elevation={0} sx={{
-                background: 'rgba(255,255,255,0.05)',
-                backdropFilter: 'blur(10px)',
-                borderBottom: '1px solid rgba(255,255,255,0.1)'
+                background: 'rgba(15, 23, 42, 0.85)',
+                backdropFilter: 'blur(16px)',
+                borderBottom: '1px solid rgba(255,255,255,0.08)'
             }}>
                 <Container maxWidth="lg">
                     <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Business sx={{ color: '#4f46e5', fontSize: 32 }} />
-                            <Typography variant="h6" fontWeight={700} sx={{ color: '#0f172a' }}>
+                            <Business sx={{ color: '#818cf8', fontSize: 32 }} />
+                            <Typography variant="h6" fontWeight={700} sx={{ color: '#ffffff' }}>
                                 Digital Dockers
                             </Typography>
                         </Box>
                         <Button
                             variant="outlined"
                             onClick={() => navigate('/login')}
-                            sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
+                            sx={{
+                                borderRadius: 2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                color: 'white',
+                                borderColor: 'rgba(255,255,255,0.3)',
+                                '&:hover': { borderColor: 'rgba(255,255,255,0.6)', bgcolor: 'rgba(255,255,255,0.1)' }
+                            }}
                         >
                             Sign In
                         </Button>
@@ -238,10 +245,14 @@ const LandingPage = () => {
             </Box>
 
             {/* Footer */}
-            <Box sx={{ py: 6, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'white' }}>
+            <Box sx={{
+                py: 6,
+                borderTop: '1px solid rgba(255,255,255,0.08)',
+                background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, #0f172a 100%)'
+            }}>
                 <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                        © 2024 Digital Dockers. Built with AI.
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                        © {new Date().getFullYear()} Digital Dockers. Built with AI.
                     </Typography>
                 </Container>
             </Box>

@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Email = require('../models/Email');
+const SentEmail = require('../models/SentEmail');
 const { generateEmailContent } = require('../services/openaiService');
 
 const { sendGmail, listGmailMessages } = require('../services/gmailService');
@@ -80,9 +81,43 @@ const getEmails = asyncHandler(async (req, res) => {
     res.status(200).json(emails);
 });
 
+// @desc    Get sent emails (n8n flow metadata)
+// @route   GET /api/emails/sent
+// @access  Private
+const getSentEmails = asyncHandler(async (req, res) => {
+    const limit = parseInt(req.query.limit) || 10;
+    const emails = await SentEmail.find({ user: req.user._id })
+        .sort({ sentAt: -1 })
+        .limit(limit);
+    res.json(emails);
+});
+
+// @desc    Log a sent email (n8n flow metadata)
+// @route   POST /api/emails/sent
+// @access  Private
+const logSentEmail = asyncHandler(async (req, res) => {
+    const { receiver, subject, sentAt } = req.body;
+
+    if (!receiver || !subject) {
+        res.status(400);
+        throw new Error('Please provide receiver and subject');
+    }
+
+    const email = await SentEmail.create({
+        user: req.user._id,
+        receiver,
+        subject,
+        sentAt: sentAt || Date.now()
+    });
+
+    res.status(201).json(email);
+});
+
 module.exports = {
     generateEmail,
     getEmails,
     sendEmail,
-    getInbox
+    getInbox,
+    getSentEmails,
+    logSentEmail
 };
