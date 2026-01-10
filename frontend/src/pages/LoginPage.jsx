@@ -163,14 +163,14 @@ const LoginPage = () => {
                     <Box sx={{
                         position: 'absolute', top: '20%', left: '20%', width: 300, height: 300,
                         background: 'linear-gradient(135deg, #ec4899, #8b5cf6)',
-                        filter: 'blur(80px)', borderRadius: '50%', opacity: 0.5,
-                        animation: 'float 10s infinite alternate'
+                        filter: 'blur(80px)', borderRadius: '50%',
+                        animation: 'float 12s infinite ease-in-out, subtleGlow 4s infinite ease-in-out'
                     }} />
                     <Box sx={{
                         position: 'absolute', bottom: '10%', right: '10%', width: 250, height: 250,
                         background: 'linear-gradient(135deg, #4f46e5, #06b6d4)',
-                        filter: 'blur(60px)', borderRadius: '50%', opacity: 0.4,
-                        animation: 'float 15s infinite alternate-reverse'
+                        filter: 'blur(60px)', borderRadius: '50%',
+                        animation: 'floatReverse 15s infinite ease-in-out, subtleGlow 5s infinite ease-in-out'
                     }} />
 
                     <Box sx={{ position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', p: 8 }}>

@@ -12,6 +12,8 @@ import {
     HeartOutlined,
     InboxOutlined,
     BarChartOutlined,
+    UsergroupAddOutlined,
+    MailOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -69,12 +71,25 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
             children: [
                 { key: '/dashboard/meetings', icon: <MessageOutlined />, label: 'Meetings', hidden: !hasAccess(['project_manager', 'technical_lead']) },
                 { key: '/dashboard/documents', icon: <FileTextOutlined />, label: 'Documents' },
+                { key: '/dashboard/email-generator', icon: <MailOutlined />, label: 'AI Email' },
                 { key: '/dashboard/chat', icon: <MessageOutlined />, label: 'Chat' },
                 { key: '/dashboard/organization', icon: <ApartmentOutlined />, label: 'Team' },
                 { key: '/dashboard/wellness', icon: <HeartOutlined />, label: 'Wellness' },
             ].filter(item => !item.hidden)
         },
         { type: 'divider' },
+        // Admin section - only visible to admins
+        ...(user?.role === 'admin' ? [
+            {
+                key: 'admin-group',
+                label: 'ADMIN',
+                type: 'group',
+                children: [
+                    { key: '/dashboard/team-management', icon: <UsergroupAddOutlined />, label: 'Team Management' },
+                ]
+            },
+            { type: 'divider' },
+        ] : []),
         { key: '/dashboard/settings', icon: <SettingOutlined />, label: 'Settings' }
     ];
 

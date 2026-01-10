@@ -110,8 +110,16 @@ const ChatPage = () => {
 
     const SidebarContent = (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography variant="h6" fontWeight={600}>Messages</Typography>
+            <Box sx={{
+                p: 2,
+                borderBottom: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.secondary.main}10 100%)`
+            }}>
+                <Typography variant="h6" fontWeight={700} sx={{ background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Messages</Typography>
                 {isMobile && <IconButton onClick={() => setMobileOpen(false)}><Close /></IconButton>}
             </Box>
             <List sx={{ flexGrow: 1, overflow: 'auto', p: 1 }}>
@@ -175,8 +183,27 @@ const ChatPage = () => {
             )}
 
             {/* Chat Area */}
-            <Paper sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', borderRadius: 3, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
-                <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', gap: 2, background: theme.palette.mode === 'light' ? '#fff' : 'rgba(255,255,255,0.05)' }}>
+            <Paper sx={{
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: 3,
+                overflow: 'hidden',
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
+            }}>
+                <Box sx={{
+                    p: 2,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    background: theme.palette.mode === 'light'
+                        ? 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)'
+                        : 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%)'
+                }}>
                     <Avatar sx={{ bgcolor: activeRoom === 'general' ? 'secondary.main' : 'primary.main' }}>
                         {activeRoom === 'general' ? <Group /> : dmUser?.fullName[0]}
                     </Avatar>
@@ -253,10 +280,14 @@ const ChatPage = () => {
                                 onClick={handleSend}
                                 disabled={!message.trim()}
                                 sx={{
-                                    bgcolor: 'primary.main',
+                                    background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
                                     color: 'white',
-                                    '&:hover': { bgcolor: 'primary.dark' },
-                                    '&.Mui-disabled': { bgcolor: 'action.disabledBackground' }
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                        transform: 'scale(1.05)',
+                                        boxShadow: `0 4px 12px ${theme.palette.primary.main}40`
+                                    },
+                                    '&.Mui-disabled': { bgcolor: 'action.disabledBackground', color: 'action.disabled' }
                                 }}
                             >
                                 <Send />
