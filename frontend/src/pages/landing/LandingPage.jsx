@@ -1,104 +1,252 @@
-import { Box, Button, Container, Grid, Typography, useTheme, useMediaQuery, AppBar, Toolbar } from '@mui/material';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Chat, People, ArrowForward, Business } from '@mui/icons-material';
-// eslint-disable-next-line no-unused-vars
-import { motion, useScroll, useTransform } from 'framer-motion';
-import GlassCard from '../../components/common/GlassCard';
+import { Box, Container, Typography, Button, Grid } from '@mui/material';
+import {
+    ArrowRight, ArrowDown, Sparkles, Zap, Brain, Mail,
+    CheckSquare, Presentation, MessageSquare, FileText, Video,
+    Users, TrendingUp, Shield, Star, Menu, X
+} from 'lucide-react';
+import { motion } from 'framer-motion';
+import './LandingPage.css';
 
 const LandingPage = () => {
     const navigate = useNavigate();
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const { scrollY } = useScroll();
-    const yHero = useTransform(scrollY, [0, 500], [0, 150]);
+    const [showMainContent, setShowMainContent] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [counters, setCounters] = useState({ aiEngines: 0, fasterWorkflows: 0, aiAssistant: 0 });
+    const [animated, setAnimated] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => setIsVisible(true), 500);
+    }, []);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const handleContinue = () => {
+        setShowMainContent(true);
+    };
+
+    const animateCounter = (key, target) => {
+        const duration = 2000;
+        const steps = 60;
+        const increment = target / steps;
+        let currentStep = 0;
+
+        const interval = setInterval(() => {
+            currentStep++;
+            const currentValue = Math.min(target, increment * currentStep);
+
+            setCounters(prev => ({
+                ...prev,
+                [key]: key === 'aiAssistant' ? '24/7' : currentValue.toFixed(1)
+            }));
+
+            if (currentStep >= steps) {
+                clearInterval(interval);
+                setCounters(prev => ({
+                    ...prev,
+                    [key]: key === 'aiAssistant' ? '24/7' : target.toFixed(1)
+                }));
+            }
+        }, duration / steps);
+    };
+
+    useEffect(() => {
+        if (showMainContent && !animated) {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    if (entries[0].isIntersecting) {
+                        setAnimated(true);
+                        const targets = [
+                            { key: 'aiEngines', target: 7, delay: 0 },
+                            { key: 'fasterWorkflows', target: 10, delay: 500 },
+                            { key: 'aiAssistant', target: 24, delay: 1000 }
+                        ];
+                        targets.forEach(({ key, target, delay }) => {
+                            setTimeout(() => animateCounter(key, target), delay);
+                        });
+                    }
+                },
+                { threshold: 0.5 }
+            );
+
+            const hero = document.getElementById('hero');
+            if (hero) observer.observe(hero);
+            return () => observer.disconnect();
+        }
+    }, [showMainContent, animated]);
 
     const features = [
-        {
-            icon: <Edit fontSize="large" sx={{ color: '#4f46e5' }} />,
-            title: 'AI Meeting Summaries',
-            description: 'Automatically transcribe and summarize your Google Meets. Never miss a detail.'
-        },
-        {
-            icon: <Chat fontSize="large" sx={{ color: '#ec4899' }} />,
-            title: 'Real-time Collaboration',
-            description: 'Instant chat and direct messaging for seamless team communication.'
-        },
-        {
-            icon: <People fontSize="large" sx={{ color: '#8b5cf6' }} />,
-            title: 'Visual Organization',
-            description: 'Interactive organization charts and task visualization for clear hierarchy.'
-        }
+        { icon: <Mail size={32} />, title: "AutoMail Engine", description: "AI-powered email generation and scheduling. Craft perfect emails in seconds.", color: "#3B82F6" },
+        { icon: <Brain size={32} />, title: "Emotion Analytics", description: "Detect emotional undertones in text. Understand sentiment to communicate better.", color: "#10B981" },
+        { icon: <CheckSquare size={32} />, title: "TaskPilot AI", description: "Smart task management with intelligent prioritization based on deadlines.", color: "#8B5CF6" },
+        { icon: <Presentation size={32} />, title: "SlideForge AI", description: "Generate stunning presentations in minutes. Transform ideas into slides.", color: "#F59E0B" },
+        { icon: <MessageSquare size={32} />, title: "SmartDock Assistant", description: "Your versatile AI companion for any task. Get instant answers.", color: "#EF4444" },
+        { icon: <FileText size={32} />, title: "DocSummary Engine", description: "Condense lengthy documents into actionable insights instantly.", color: "#06B6D4" },
+        { icon: <Video size={32} />, title: "Meeting Insights", description: "Transform meetings into structured summaries with action items.", color: "#8B5CF6" }
     ];
 
-    return (
-        <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', overflowX: 'hidden' }}>
-            {/* Transparent Glass Header */}
-            <AppBar position="fixed" elevation={0} sx={{
-                background: 'rgba(15, 23, 42, 0.85)',
-                backdropFilter: 'blur(16px)',
-                borderBottom: '1px solid rgba(255,255,255,0.08)'
-            }}>
-                <Container maxWidth="lg">
-                    <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Business sx={{ color: '#818cf8', fontSize: 32 }} />
-                            <Typography variant="h6" fontWeight={700} sx={{ color: '#ffffff' }}>
-                                Digital Dockers
-                            </Typography>
+    // StartPage (Splash)
+    if (!showMainContent) {
+        return (
+            <Box className="start-page">
+                <Box className="start-background">
+                    <Box className="floating-shapes">
+                        <Box className="shape shape-1" />
+                        <Box className="shape shape-2" />
+                        <Box className="shape shape-3" />
+                        <Box className="shape shape-4" />
+                    </Box>
+                </Box>
+
+                <Box className="start-content">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 30 }}
+                        transition={{ duration: 0.8 }}
+                        className="start-header"
+                    >
+                        <Box className="brand-logo">
+                            <Box className="logo-container">
+                                <Box className="logo-svg">
+                                    <Box className="logo-top" />
+                                    <Box className="logo-bottom" />
+                                </Box>
+                            </Box>
                         </Box>
-                        <Button
-                            variant="outlined"
-                            onClick={() => navigate('/login')}
-                            sx={{
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                color: 'white',
-                                borderColor: 'rgba(255,255,255,0.3)',
-                                '&:hover': { borderColor: 'rgba(255,255,255,0.6)', bgcolor: 'rgba(255,255,255,0.1)' }
-                            }}
-                        >
+
+                        <Typography variant="h1" className="brand-title">
+                            <span className="brand-main">Digital</span>
+                            <span className="brand-secondary">Dockers</span>
+                        </Typography>
+
+                        <Box className="brand-tagline">
+                            <Sparkles size={20} />
+                            <span>AI-Powered Productivity Suite</span>
+                            <Sparkles size={20} />
+                        </Box>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 20 }}
+                        transition={{ duration: 0.8, delay: 0.3 }}
+                        className="start-features"
+                    >
+                        <Box className="feature-item">
+                            <Box className="feature-icon"><Brain size={24} /></Box>
+                            <span>7 AI Engines</span>
+                        </Box>
+                        <Box className="feature-item">
+                            <Box className="feature-icon"><Zap size={24} /></Box>
+                            <span>10x Faster Workflows</span>
+                        </Box>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? 1 : 0.9 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                        className="start-actions"
+                    >
+                        <Button className="start-button primary" onClick={handleContinue}>
+                            Explore Features <ArrowDown size={20} />
+                        </Button>
+                        <Button className="start-button secondary" onClick={() => navigate('/login')}>
+                            Get Started
+                        </Button>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: isVisible ? 1 : 0 }}
+                        transition={{ duration: 0.8, delay: 0.8 }}
+                        className="start-scroll"
+                    >
+                        <Box className="scroll-indicator">
+                            <span>Scroll to explore</span>
+                            <ArrowDown size={16} className="scroll-arrow" />
+                        </Box>
+                    </motion.div>
+                </Box>
+            </Box>
+        );
+    }
+
+    // Main Landing Page
+    return (
+        <Box className="landing-page">
+            {/* Navbar */}
+            <Box component="nav" className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+                <Container maxWidth="lg" className="nav-container">
+                    <Box className="logo" onClick={() => setShowMainContent(false)} sx={{ cursor: 'pointer' }}>
+                        <Box className="logo-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                <path d="M16 2L2 10L16 18L30 10L16 2Z" fill="url(#gradient1)" />
+                                <path d="M2 10V22L16 30L30 22V10L16 18L2 10Z" fill="url(#gradient2)" />
+                                <defs>
+                                    <linearGradient id="gradient1" x1="2" y1="2" x2="30" y2="10" gradientUnits="userSpaceOnUse">
+                                        <stop stopColor="#4f46e5" />
+                                        <stop offset="1" stopColor="#ec4899" />
+                                    </linearGradient>
+                                    <linearGradient id="gradient2" x1="2" y1="10" x2="30" y2="22" gradientUnits="userSpaceOnUse">
+                                        <stop stopColor="#7c3aed" />
+                                        <stop offset="1" stopColor="#4f46e5" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                        </Box>
+                        <Typography className="logo-text">Digital Dockers</Typography>
+                    </Box>
+
+                    <Box className="nav-center">
+                        <a href="#hero" className="nav-link">Home</a>
+                        <a href="#features" className="nav-link">Features</a>
+                        <a href="#cta" className="nav-link">Contact</a>
+                    </Box>
+
+                    <Box className="nav-right">
+                        <Button className="signin-btn" onClick={() => navigate('/login')}>
                             Sign In
                         </Button>
-                    </Toolbar>
+                    </Box>
+
+                    <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+
+                    {isMobileMenuOpen && (
+                        <Box className="mobile-menu">
+                            <a href="#hero" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Home</a>
+                            <a href="#features" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Features</a>
+                            <a href="#cta" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>Contact</a>
+                            <Button className="mobile-signin-btn" onClick={() => navigate('/login')}>Sign In</Button>
+                        </Box>
+                    )}
                 </Container>
-            </AppBar>
+            </Box>
 
             {/* Hero Section */}
-            <Box
-                sx={{
-                    position: 'relative',
-                    minHeight: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    pt: { xs: 12, md: 0 }, // Add top padding on mobile to avoid overlap with header
-                    pb: 10,
-                    background: 'radial-gradient(ellipse at 50% 0%, rgba(79, 70, 229, 0.2) 0%, transparent 70%)'
-                }}
-            >
+            <Box id="hero" className="hero-section">
                 <Container maxWidth="lg">
-                    <Box sx={{ textAlign: 'center', maxWidth: 800, mx: 'auto', mb: 8 }}>
+                    <Box className="hero-content">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
                         >
-                            <Typography
-                                variant="h1"
-                                sx={{
-                                    fontWeight: 800,
-                                    fontSize: { xs: '2.5rem', md: '4.5rem' },
-                                    letterSpacing: '-0.02em',
-                                    mb: 2,
-                                    background: 'linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #f0abfc 100%)',
-                                    WebkitBackgroundClip: 'text',
-                                    WebkitTextFillColor: 'transparent',
-                                    textShadow: '0 4px 30px rgba(165, 180, 252, 0.3)',
-                                }}
-                            >
-                                Digital Dockers
-                            </Typography>
+                            <Box className="badge">
+                                <Sparkles size={16} />
+                                <span>AI-Powered Productivity Suite</span>
+                            </Box>
                         </motion.div>
 
                         <motion.div
@@ -106,139 +254,97 @@ const LandingPage = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
                         >
-                            <Typography
-                                variant="h5"
-                                sx={{
-                                    mb: 6,
-                                    fontSize: { xs: '1.1rem', md: '1.4rem' },
-                                    fontWeight: 400,
-                                    lineHeight: 1.6,
-                                    color: 'rgba(255, 255, 255, 0.8)',
-                                    maxWidth: 600,
-                                    mx: 'auto'
-                                }}
-                            >
-                                The AI-powered workspace that unifies communication, tasks, and insights into one seamless dock.
+                            <Typography variant="h1" className="hero-title">
+                                Digital Dockers
+                            </Typography>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                        >
+                            <Typography className="hero-subtitle">
+                                Supercharge your workflow with 7 AI engines. From intelligent emails to meeting insights, automate the mundane and focus on what truly matters.
                             </Typography>
                         </motion.div>
 
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
+                            transition={{ duration: 0.6, delay: 0.6 }}
                         >
-                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                    onClick={() => navigate('/login')}
-                                    endIcon={<ArrowForward />}
-                                    sx={{
-                                        py: 2,
-                                        px: 4,
-                                        fontSize: '1.1rem',
-                                        borderRadius: 3,
-                                        background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                                        boxShadow: '0 10px 20px -5px rgba(79, 70, 229, 0.4)'
-                                    }}
-                                >
-                                    Get Started
+                            <Box className="hero-buttons">
+                                <Button className="btn-primary" onClick={() => navigate('/login')}>
+                                    Get Started Free <ArrowRight size={20} />
                                 </Button>
-                                <Button
-                                    variant="outlined"
-                                    size="large"
-                                    sx={{
-                                        py: 2,
-                                        px: 4,
-                                        fontSize: '1.1rem',
-                                        borderRadius: 3,
-                                        color: 'text.primary',
-                                        borderColor: 'divider',
-                                        '&:hover': { bgcolor: 'rgba(255,255,255,0.5)' }
-                                    }}
-                                    onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}
-                                >
-                                    Learn More
+                                <Button className="btn-secondary" onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>
+                                    Explore Features
                                 </Button>
+                            </Box>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.8 }}
+                        >
+                            <Box className="hero-stats">
+                                <Box className="stat-item">
+                                    <span className="stat-number">{animated ? counters.aiEngines : '0'}</span>
+                                    <span className="stat-label">AI Engines</span>
+                                </Box>
+                                <Box className="stat-divider" />
+                                <Box className="stat-item">
+                                    <span className="stat-number">{animated ? counters.fasterWorkflows : '0'}x</span>
+                                    <span className="stat-label">Faster Workflows</span>
+                                </Box>
+                                <Box className="stat-divider" />
+                                <Box className="stat-item">
+                                    <span className="stat-number">{animated ? counters.aiAssistant : '0'}</span>
+                                    <span className="stat-label">AI Assistant</span>
+                                </Box>
                             </Box>
                         </motion.div>
                     </Box>
 
-                    {/* Dashboard Preview Image using Motion */}
-                    <motion.div style={{ y: yHero }}>
-                        <Box
-                            sx={{
-                                position: 'relative',
-                                width: '100%',
-                                maxWidth: 1000,
-                                mx: 'auto',
-                                borderRadius: 4,
-                                overflow: 'hidden',
-                                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                            }}
-                        >
-                            <Box
-                                component="img"
-                                src="/dashboard_preview.png"
-                                alt="Digital Dockers Dashboard"
-                                sx={{
-                                    width: '100%',
-                                    height: 'auto',
-                                    display: 'block',
-                                    transform: 'scale(1.0)',
-                                    transition: 'transform 0.5s ease',
-                                    '&:hover': { transform: 'scale(1.02)' }
-                                }}
-                            />
-
-                            {/* Glass Overlay Effect */}
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    inset: 0,
-                                    background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(15, 23, 42, 0.1) 100%)',
-                                    pointerEvents: 'none'
-                                }}
-                            />
-                        </Box>
-                    </motion.div>
+                    <Box className="hero-graphics">
+                        <Box className="floating-shape shape-1" />
+                        <Box className="floating-shape shape-2" />
+                        <Box className="floating-shape shape-3" />
+                    </Box>
                 </Container>
             </Box>
 
             {/* Features Section */}
-            <Box id="features" sx={{ py: 10, bgcolor: 'transparent' }}>
+            <Box id="features" className="features-section">
                 <Container maxWidth="lg">
-                    <Typography variant="h3" align="center" fontWeight={700} sx={{ mb: 8 }}>
-                        Why Digital Dockers?
-                    </Typography>
-                    <Grid container spacing={4}>
-                        {features.map((feature, idx) => (
-                            <Grid item xs={12} md={4} key={idx}>
+                    <Box className="section-header">
+                        <Typography variant="h2" className="section-title">7 AI Engines, One Platform</Typography>
+                        <Typography className="section-subtitle">
+                            Each engine is designed to handle a specific workflow, working together to create an unmatched productivity experience.
+                        </Typography>
+                    </Box>
+
+                    <Grid container spacing={3} className="features-grid">
+                        {features.map((feature, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={index}>
                                 <motion.div
-                                    initial={{ opacity: 0, y: 50 }}
+                                    initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5, delay: idx * 0.1 }}
+                                    transition={{ duration: 0.5, delay: index * 0.1 }}
                                     viewport={{ once: true }}
-                                    style={{ height: '100%' }}
                                 >
-                                    <GlassCard sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                                        <Box sx={{
-                                            p: 2,
-                                            borderRadius: 2,
-                                            bgcolor: 'rgba(79, 70, 229, 0.1)',
-                                            mb: 3,
-                                            display: 'inline-flex'
-                                        }}>
+                                    <Box
+                                        className="feature-card"
+                                        sx={{ borderTop: `4px solid ${feature.color}` }}
+                                    >
+                                        <Box className="feature-icon" sx={{ color: feature.color }}>
                                             {feature.icon}
                                         </Box>
-                                        <Typography variant="h5" fontWeight={600} gutterBottom>
-                                            {feature.title}
-                                        </Typography>
-                                        <Typography variant="body1" color="text.secondary">
-                                            {feature.description}
-                                        </Typography>
-                                    </GlassCard>
+                                        <Typography className="feature-title">{feature.title}</Typography>
+                                        <Typography className="feature-description">{feature.description}</Typography>
+                                    </Box>
                                 </motion.div>
                             </Grid>
                         ))}
@@ -246,16 +352,128 @@ const LandingPage = () => {
                 </Container>
             </Box>
 
+            {/* CTA Section */}
+            <Box id="cta" className="cta-section">
+                <Box className="cta-background">
+                    <Box className="floating-circle circle-1" />
+                    <Box className="floating-circle circle-2" />
+                    <Box className="floating-circle circle-3" />
+                </Box>
+
+                <Container maxWidth="lg">
+                    <Box className="cta-content">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8 }}
+                            viewport={{ once: true }}
+                        >
+                            <Box className="cta-badge">
+                                <Star size={20} />
+                                <span>Join the AI Revolution</span>
+                            </Box>
+
+                            <Typography variant="h2" className="cta-title">
+                                Ready to Transform Your <span className="highlight">Workflow?</span>
+                            </Typography>
+
+                            <Typography className="cta-subtitle">
+                                Join thousands of professionals who have already supercharged their productivity with Digital Dockers' AI-powered tools.
+                            </Typography>
+
+                            <Box className="cta-features">
+                                <Box className="cta-feature"><Zap size={24} /><span>Instant Setup</span></Box>
+                                <Box className="cta-feature"><Shield size={24} /><span>Enterprise Security</span></Box>
+                                <Box className="cta-feature"><TrendingUp size={24} /><span>Proven Results</span></Box>
+                            </Box>
+
+                            <Button className="cta-button-primary" onClick={() => navigate('/register')}>
+                                Get Started <ArrowRight size={20} />
+                            </Button>
+
+                            <Box className="cta-stats">
+                                <Box className="cta-stat">
+                                    <Users size={24} />
+                                    <Box>
+                                        <span className="cta-stat-number">10,000+</span>
+                                        <span className="cta-stat-label">Active Users</span>
+                                    </Box>
+                                </Box>
+                                <Box className="cta-stat">
+                                    <TrendingUp size={24} />
+                                    <Box>
+                                        <span className="cta-stat-number">98%</span>
+                                        <span className="cta-stat-label">Satisfaction Rate</span>
+                                    </Box>
+                                </Box>
+                                <Box className="cta-stat">
+                                    <Shield size={24} />
+                                    <Box>
+                                        <span className="cta-stat-number">100%</span>
+                                        <span className="cta-stat-label">Secure & Private</span>
+                                    </Box>
+                                </Box>
+                            </Box>
+
+                            <Box className="cta-testimonial">
+                                <Box className="testimonial-stars">
+                                    {[...Array(5)].map((_, i) => <Star key={i} size={16} fill="#FFD700" color="#FFD700" />)}
+                                </Box>
+                                <Typography>"Digital Dockers has revolutionized how I work. The AI engines are incredibly powerful."</Typography>
+                                <cite>- Sarah Johnson, Product Manager</cite>
+                            </Box>
+                        </motion.div>
+                    </Box>
+                </Container>
+            </Box>
+
             {/* Footer */}
-            <Box sx={{
-                py: 6,
-                borderTop: '1px solid rgba(255,255,255,0.08)',
-                background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.9) 0%, #0f172a 100%)'
-            }}>
-                <Container maxWidth="lg" sx={{ textAlign: 'center' }}>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)' }}>
-                        © {new Date().getFullYear()} Digital Dockers. Built with AI.
-                    </Typography>
+            <Box className="footer">
+                <Container maxWidth="lg">
+                    <Box className="footer-content">
+                        <Box className="footer-brand">
+                            <Box className="footer-logo">
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                    <path d="M16 2L2 10L16 18L30 10L16 2Z" fill="url(#footerGrad1)" />
+                                    <path d="M2 10V22L16 30L30 22V10L16 18L2 10Z" fill="url(#footerGrad2)" />
+                                    <defs>
+                                        <linearGradient id="footerGrad1" x1="2" y1="2" x2="30" y2="10" gradientUnits="userSpaceOnUse">
+                                            <stop stopColor="#4f46e5" />
+                                            <stop offset="1" stopColor="#ec4899" />
+                                        </linearGradient>
+                                        <linearGradient id="footerGrad2" x1="2" y1="10" x2="30" y2="22" gradientUnits="userSpaceOnUse">
+                                            <stop stopColor="#7c3aed" />
+                                            <stop offset="1" stopColor="#4f46e5" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <Typography className="footer-brand-text">Digital Dockers</Typography>
+                            </Box>
+                            <Typography className="footer-tagline">AI-Powered Productivity Suite</Typography>
+                        </Box>
+
+                        <Box className="footer-links">
+                            <Box className="footer-column">
+                                <Typography className="footer-heading">Product</Typography>
+                                <a href="#features">Features</a>
+                                <a href="#cta">Pricing</a>
+                            </Box>
+                            <Box className="footer-column">
+                                <Typography className="footer-heading">Company</Typography>
+                                <a href="#about">About</a>
+                                <a href="#contact">Contact</a>
+                            </Box>
+                            <Box className="footer-column">
+                                <Typography className="footer-heading">Legal</Typography>
+                                <a href="#privacy">Privacy</a>
+                                <a href="#terms">Terms</a>
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Box className="footer-bottom">
+                        <Typography>© {new Date().getFullYear()} Digital Dockers. All rights reserved.</Typography>
+                    </Box>
                 </Container>
             </Box>
         </Box>

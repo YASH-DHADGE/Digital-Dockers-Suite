@@ -24,13 +24,24 @@ const io = new Server(server, {
     cors: {
         origin: function (origin, callback) {
             // Allow localhost on any port during development
-            if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
+            // Allow production Netlify frontend
+            const allowedOrigins = [
+                /^http:\/\/localhost:\d+$/,
+                'https://digitaldockers.netlify.app'
+            ];
+
+            if (!origin) {
+                callback(null, true);
+            } else if (allowedOrigins.some(allowed =>
+                allowed instanceof RegExp ? allowed.test(origin) : allowed === origin
+            )) {
                 callback(null, true);
             } else {
                 callback(new Error('CORS not allowed'), false);
             }
         },
-        methods: ["GET", "POST"]
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
@@ -85,7 +96,22 @@ app.set('notificationHandler', notificationHandler);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'https://digitaldockers.netlify.app'
+        ];
+
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 app.use(helmet());

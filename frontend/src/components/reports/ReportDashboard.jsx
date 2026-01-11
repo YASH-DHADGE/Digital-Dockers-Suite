@@ -28,7 +28,7 @@ const ReportDashboard = () => {
     // Socket.io for real-time updates
     useEffect(() => {
         if (!socketRef.current) {
-            const socket = io('http://localhost:5000', {
+            const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
                 transports: ['websocket', 'polling'],
                 reconnection: true,
                 reconnectionDelay: 1000,

@@ -53,7 +53,7 @@ const EmailListWidget = () => {
                 <Typography variant="body2" color="text.secondary" align="center" paragraph>
                     Connect your Google account to manage your emails.
                 </Typography>
-                <Button variant="outlined" href="http://localhost:5000/api/auth/google">
+                <Button variant="outlined" href={`${import.meta.env.VITE_API_URL || ''}/api/auth/google`}>
                     Connect Gmail
                 </Button>
             </Card>

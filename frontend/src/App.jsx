@@ -17,6 +17,7 @@ import BacklogPage from './components/backlog/BacklogPage';
 import RoadmapPage from './components/dashboards/RoadmapPage';
 import MeetingsPage from './components/meetings/MeetingsPage';
 import EmailGeneratorPage from './pages/apps/EmailGeneratorPage';
+import PPTGeneratorPage from './pages/apps/PPTGeneratorPage';
 import DocumentManager from './components/documents/DocumentManager';
 import WellnessCheckin from './components/wellness/WellnessCheckin';
 import ReportDashboard from './components/reports/ReportDashboard';
@@ -79,6 +80,7 @@ function App() {
                   <Route path="roadmap" element={<RoadmapPage />} />
                   <Route path="meetings" element={<MeetingsPage />} />
                   <Route path="email-generator" element={<EmailGeneratorPage />} />
+                  <Route path="ppt-generator" element={<PPTGeneratorPage />} />
                   <Route path="documents" element={<DocumentManager />} />
                   <Route path="wellness" element={<WellnessCheckin />} />
                   <Route path="reports" element={<ReportDashboard />} />
