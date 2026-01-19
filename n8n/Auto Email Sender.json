@@ -1,0 +1,146 @@
+{
+  "name": "Auto Email Sender",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Write an email to {{ $json.body.to }} about {{ $json.body.subject }}.\n\nTone: {{ $json.body.tone }}\n\nDetails: {{ $json.body.prompt }}\n\nGenerate the complete email with body & dont include Subject."
+            },
+            {
+              "role": "system",
+              "content": "=You are an expert email writing assistant. Your role is to generate professional, well-structured emails based on the user's specifications.\n\nWhen generating emails, you must:\n- Match the requested tone precisely (formal, casual, friendly, professional, persuasive, apologetic, etc.)\n- Create appropriate subject lines if not provided\n- Structure the email with proper greeting, body, and closing\n- Ensure the content is clear, concise, and achieves the stated purpose\n- Use appropriate language and formatting for the context\n- Keep the email focused on the main message without unnecessary filler\n\nEmail Structure Guidelines:\n- Greeting: Use appropriate salutation based on formality level, but dont add the Reciepient name\n- Opening: Brief, relevant introduction or context\n- Body: Main message with clear paragraphs\n- Closing: Appropriate sign-off based on tone\n- Signature: Leave as Rohan Kapadi\n\nTone Guidelines:\n- Formal: Professional language, complete sentences, respectful distance\n- Casual: Conversational, friendly, relaxed language\n- Professional: Business-appropriate, clear, efficient\n- Friendly: Warm, personable, approachable\n- Persuasive: Compelling, benefit-focused, call-to-action oriented\n- Apologetic: Sincere, taking responsibility, solution-oriented\n- Urgent: Direct, time-sensitive, action-required language\n\nOutput only the complete email without any preamble, explanations, or meta-commentary. Do not include labels like \"Subject:\" or \"Body:\" - just provide the clean email text with the subject line on the first line.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7a08e14f-9a41-44af-85a6-174afcb9edd7",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Vl1ZO8aFxRuI63F1",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.to }}",
+        "subject": "={{ $('Webhook').item.json.body.subject }}",
+        "message": "={{ $('Format Email Text').item.json.html }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        0
+      ],
+      "id": "8caa4635-b3e0-4432-b144-69907a6ed6c9",
+      "name": "Send a message",
+      "webhookId": "00584ba3-99d9-4beb-97e8-550fd80c1e0e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gGnoOkiNbXPTcij7",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>My HTML document</title>\n</head>\n<body>\n  <div class=\"container\">\n    <p>\n      {{ $json.output[0].content[0].text.replace(/\\n/g, '<br>') }}\n    </p>\n  </div>\n</body>\n</html>\n\n<style>\n.container {\n  background-color: #ffffff;\n  text-align: center;\n  padding: 16px;\n  border-radius: 8px;\n}\n\nh1 {\n  color: #ff6d5a;\n  font-size: 24px;\n  font-weight: bold;\n  padding: 8px;\n}\n\nh2 {\n  color: #909399;\n  font-size: 18px;\n  font-weight: bold;\n  padding: 8px;\n}\n</style>\n\n<script>\nconsole.log(\"Hello World!\");\n</script>"
+      },
+      "id": "8231a0a7-ca5e-44dc-8005-f40e2351c10f",
+      "name": "Format Email Text",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auto-send-email",
+        "responseMode": "lastNode",
+        "responseData": "noData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3f5e75f9-1dce-4375-bf5d-568cecda694a",
+      "name": "Webhook",
+      "webhookId": "6a6da75f-ceec-40aa-8aa8-7ba44d83a7ab"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Format Email Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Email Text": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "2fd4715d-41b5-4e02-b4a6-b0845d436185",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d13472feb589274369fdb92d0735729a31106f19e1f05d7011af1fedc323ca28"
+  },
+  "id": "5OBW2GoqvFfM52sT",
+  "tags": []
+}

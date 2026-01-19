@@ -1,0 +1,612 @@
+{
+  "name": "Intelligent Legal Document Review and Compliance Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "legal-document-upload",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "e3bb6f99-6b93-47f0-9979-c8097b570f72",
+      "name": "Document Upload Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        144,
+        688
+      ],
+      "webhookId": "d0eafc52-b4b3-4cff-9bf2-973a7c92eedd",
+      "typeVersion": 2.1,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "complianceRules",
+              "type": "string",
+              "value": "<__PLACEHOLDER_VALUE__Compliance rules and regulations to check against__>"
+            },
+            {
+              "id": "id-2",
+              "name": "riskThreshold",
+              "type": "string",
+              "value": "medium"
+            },
+            {
+              "id": "id-3",
+              "name": "documentType",
+              "type": "string",
+              "value": "contract"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "765a9638-a1cd-4be2-b49f-667474fc3b5c",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        304,
+        400
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Upload",
+        "options": {}
+      },
+      "id": "63b4cb84-4f32-4fef-b580-1bbad6f07b91",
+      "name": "Extract Document Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "position": [
+        528,
+        400
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a legal document analysis expert specializing in contract review.\n\nYour task is to:\n1. Identify and extract all key clauses from the legal document\n2. Categorize each clause by type (e.g., termination, liability, payment, confidentiality, indemnification)\n3. Extract the exact text of each clause\n4. Identify the location (section/paragraph) of each clause\n5. Note any unusual or non-standard clauses\n\nReturn your analysis in the structured JSON format defined by the output parser."
+        }
+      },
+      "id": "a50acc52-7bc9-44a4-8665-dda4a449f169",
+      "name": "Clause Analysis Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        752,
+        400
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"clauses\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"type\": {\"type\": \"string\"},\n          \"text\": {\"type\": \"string\"},\n          \"location\": {\"type\": \"string\"},\n          \"isStandard\": {\"type\": \"boolean\"}\n        }\n      }\n    }\n  }\n}"
+      },
+      "id": "9b6b21f2-442e-49a7-b21b-3ce62293e4f8",
+      "name": "Clause Analysis Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        928,
+        640
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Clauses: {{ $json.output.clauses[2].text }}\n\nCompliance Rules: {{ $('Workflow Configuration').first().json.complianceRules }}\n\nRisk Threshold: {{ $('Workflow Configuration').first().json.riskThreshold }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a legal compliance expert specializing in contract risk assessment.\n\nYour task is to:\n1. Review each clause against the provided compliance rules and regulations\n2. Identify any clauses that violate or conflict with compliance requirements\n3. Assess the risk level of each problematic clause (low, medium, high, critical)\n4. Highlight specific compliance issues and their potential legal implications\n5. Flag any missing clauses that are required for compliance\n\nReturn your analysis in the structured JSON format defined by the output parser."
+        }
+      },
+      "id": "3529dbd3-d172-48b9-9d81-3010eedb00ef",
+      "name": "Compliance Check Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1104,
+        400
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Risky Areas: {{ JSON.stringify($json.riskyAreas) }}",
+        "options": {
+          "systemMessage": "You are a legal drafting expert specializing in contract language optimization.\n\nYour task is to:\n1. For each risky clause identified, provide alternative wording that addresses the compliance issue\n2. Ensure the alternative wording maintains the original intent while reducing legal risk\n3. Make the language clear, unambiguous, and legally sound\n4. Provide a brief explanation of why the alternative wording is better\n5. Suggest wording for any missing clauses that were flagged\n\nReturn your suggestions in the structured JSON format defined by the output parser."
+        }
+      },
+      "id": "63bb7c2b-7bda-4dd9-a0e5-f7bda3ec78cf",
+      "name": "Alternative Wording Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1456,
+        400
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"suggestions\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"originalClause\": {\"type\": \"string\"},\n          \"alternativeWording\": {\"type\": \"string\"},\n          \"explanation\": {\"type\": \"string\"},\n          \"riskReduction\": {\"type\": \"string\"}\n        }\n      }\n    },\n    \"missingClauseSuggestions\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"clauseType\": {\"type\": \"string\"},\n          \"suggestedWording\": {\"type\": \"string\"}\n        }\n      }\n    }\n  }\n}"
+      },
+      "id": "3ef8ef0f-2cc1-4ec1-86f6-2a902cbdb7c0",
+      "name": "Alternative Wording Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1600,
+        656
+      ],
+      "typeVersion": 1.3,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Complete Analysis Data:\n\nClauses: {{ JSON.stringify($('Clause Analysis Agent').first().json.clauses) }}\n\nRisky Areas: {{ JSON.stringify($('Compliance Check Agent').first().json.riskyAreas) }}\n\nMissing Clauses: {{ JSON.stringify($('Compliance Check Agent').first().json.missingClauses) }}\n\nSuggestions: {{ JSON.stringify($json.suggestions) }}\n\nMissing Clause Suggestions: {{ JSON.stringify($json.missingClauseSuggestions) }}",
+        "options": {
+          "systemMessage": "You are a legal document review specialist creating executive summaries.\n\nYour task is to:\n1. Create a comprehensive summary report of the legal document review\n2. Include an executive summary highlighting the most critical findings\n3. List all risky areas with their risk levels and compliance issues\n4. Provide all alternative wording suggestions in a clear, actionable format\n5. Include recommendations for next steps\n6. Format the report in professional HTML with proper sections and styling\n\nReturn ONLY the complete HTML report (including <html>, <head>, and <body> tags)."
+        }
+      },
+      "id": "defb18ea-361e-43fe-8553-147bd352610e",
+      "name": "Summary Report Generator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1808,
+        400
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "content": "## How It Works\nThis template automates legal document review by extracting text, analyzing clauses with OpenAI, checking compliance standards, and generating alternative wordings. Target audience: legal teams, contract managers, and compliance officers seeking efficient document processing. Problem solved: manual clause extraction and compliance review is time-consuming and error-prone. Workflow extracts document text, performs parallel AI-powered clause analysis and compliance verification via OpenAI, consolidates findings, generates alternative wordings for non-compliant clauses, creates summary reports, stores results in databases, and notifies stakeholders via email.",
+        "height": 192,
+        "width": 784
+      },
+      "id": "5af04556-1667-408a-b10a-bd782f74de25",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Customization\nModify OpenAI prompts for industry-specific clauses. Swap Google Sheets for your database. \n\n## Benefits\nReduces manual review time by 80%, ensures consistent clause standardization ",
+        "height": 176,
+        "width": 640,
+        "color": 5
+      },
+      "id": "5cc43b7e-ebd4-4c0b-9ac5-8a55229325e8",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1888,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Prerequisites\nOpenAI API key, Gmail account, Google Sheets access, document upload capability.\n\n## Use Cases\nLegal teams reviewing SaaS contracts, compliance departments auditing vendor agreements ",
+        "height": 208,
+        "width": 640,
+        "color": 4
+      },
+      "id": "311ad19f-970a-4bba-9700-7c82fc3e4d98",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1216,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Setup Steps\n1. Configure OpenAI API with clause analysis and compliance prompts. \n2. Connect Google Sheets for database staging. \n3. Set Gmail for notifications. \n4. Input document source (upload node). \n5. Test with sample contracts.",
+        "height": 208,
+        "width": 352,
+        "color": 3
+      },
+      "id": "89685040-243c-4610-9d28-35dd7572afeb",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        816,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Extract & Analyze\n**What:** Documents uploaded trigger text extraction and parallel clause analysis.\n**Why:** Automated extraction eliminates manual reading; parallel processing accelerates multi-clause evaluation.",
+        "height": 512,
+        "width": 1072,
+        "color": 7
+      },
+      "id": "66cb7eb3-15b7-450e-99a0-a5a7ed3071c9",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        288
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Compliance & Alternatives\n**What:** Compliance agent verifies standards; alternative agent rewrites problematic clauses.\n**Why:** Parallel checks ensure thoroughness  and provides immediate improvement suggestions.\n",
+        "height": 528,
+        "width": 672,
+        "color": 7
+      },
+      "id": "3bef21a5-108e-4df6-96e4-4dc6426f3091",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1088,
+        288
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Report & Archive\n**What:** Summary generator creates unified reports; results stored in database.\n**Why:** Centralized reporting simplifies compliance tracking and maintains audit trails.",
+        "height": 528,
+        "width": 1024,
+        "color": 7
+      },
+      "id": "8eaf75c6-1f9d-416e-821b-a8c8416e365c",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1792,
+        304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        608,
+        608
+      ],
+      "id": "5c7923a7-a79f-41af-bef5-b407d3918cf5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "esVQ36PULNQwzX33",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        672
+      ],
+      "id": "1f9c1c75-ab56-4952-922e-d1bc60db8660",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vetHje7gGL33OXQk",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        656
+      ],
+      "id": "485e6fb4-b2ce-45c2-917a-8c14f3d9434f",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "wtddLOE1PMN1Ykj8",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload",
+        "formDescription": "Upload legal doc",
+        "formFields": {
+          "values": [
+            {
+              "fieldName": "Upload",
+              "fieldLabel": "Upload",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.4,
+      "position": [
+        112,
+        400
+      ],
+      "id": "383a475a-2e53-4146-afda-8e7224b95479",
+      "name": "On form submission",
+      "webhookId": "6d17bd51-7c07-42fe-848b-86c7ba59273e"
+    },
+    {
+      "parameters": {
+        "sendTo": "15rohankapadi@gmail.com",
+        "subject": "={{ $('Extract Document Text').item.json.info.Title }}",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        400
+      ],
+      "id": "24f4b278-894c-44b4-ac2d-f01b54ab3247",
+      "name": "Send a message",
+      "webhookId": "0c4e6a1d-ffc1-4761-a87c-d9335b0d8ae2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gGnoOkiNbXPTcij7",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"riskyAreas\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"clauseType\": {\"type\": \"string\"},\n          \"clauseText\": {\"type\": \"string\"},\n          \"riskLevel\": {\"type\": \"string\"},\n          \"complianceIssue\": {\"type\": \"string\"},\n          \"legalImplication\": {\"type\": \"string\"}\n        }\n      }\n    },\n    \"missingClauses\": {\n      \"type\": \"array\",\n      \"items\": {\"type\": \"string\"}\n    }\n  }\n}"
+      },
+      "id": "e7be1ecf-ab02-4245-84ac-972957633d2c",
+      "name": "Compliance Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1280,
+        624
+      ],
+      "typeVersion": 1.3,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        672
+      ],
+      "id": "840f41b5-a1c1-40a9-8e79-7983d5d95faf",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vetHje7gGL33OXQk",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>My HTML document</title>\n</head>\n<body>\n  <div class=\"container\">\n    {{ $json.output.replace(/\\n/g,'<br>') }}\n  </div>\n</body>\n</html>\n\n<style>\n.container {\n  background-color: #ffffff;\n  text-align: center;\n  padding: 16px;\n  border-radius: 8px;\n}\n\nh1 {\n  color: #ff6d5a;\n  font-size: 24px;\n  font-weight: bold;\n  padding: 8px;\n}\n\nh2 {\n  color: #909399;\n  font-size: 18px;\n  font-weight: bold;\n  padding: 8px;\n}\n</style>\n\n<script>\nconsole.log(\"Hello World!\");\n</script>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        400
+      ],
+      "id": "57bb99e5-d2d4-401a-ace3-2dd76e554a8a",
+      "name": "HTML"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Clause Analysis Agent": {
+      "main": [
+        [
+          {
+            "node": "Compliance Check Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Document Text": {
+      "main": [
+        [
+          {
+            "node": "Clause Analysis Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compliance Check Agent": {
+      "main": [
+        [
+          {
+            "node": "Alternative Wording Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Extract Document Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Upload Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Summary Report Generator": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alternative Wording Agent": {
+      "main": [
+        [
+          {
+            "node": "Summary Report Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clause Analysis Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Clause Analysis Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alternative Wording Output Parser": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Clause Analysis Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Compliance Check Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Summary Report Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compliance Output Parser": {
+      "ai_outputParser": [
+        []
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Alternative Wording Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "7040e037-8a42-4c1a-8995-fa70b9d97b0c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d13472feb589274369fdb92d0735729a31106f19e1f05d7011af1fedc323ca28"
+  },
+  "id": "mwVwElZM6Jiv3msC",
+  "tags": []
+}
