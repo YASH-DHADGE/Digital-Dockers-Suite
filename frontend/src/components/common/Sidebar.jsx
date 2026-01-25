@@ -15,6 +15,7 @@ import {
     UsergroupAddOutlined,
     MailOutlined,
     FilePptOutlined,
+    SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -62,6 +63,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
                 { key: '/dashboard/backlog', icon: <InboxOutlined />, label: 'Backlog' },
                 { key: '/dashboard/roadmap', icon: <CalendarOutlined />, label: 'Roadmap' },
                 { key: '/dashboard/reports', icon: <BarChartOutlined />, label: 'Reports' },
+                { key: '/dashboard/tech-debt', icon: <SafetyCertificateOutlined />, label: 'Code Health' },
             ]
         },
         { type: 'divider' },

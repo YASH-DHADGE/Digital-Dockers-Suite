@@ -1,126 +1,133 @@
-const express = require('express');
-const dotenv = require('dotenv');
+const express = require("express");
+const dotenv = require("dotenv");
 
 // Load env vars - MUST BE FIRST
 dotenv.config();
 
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const path = require('path');
-const connectDB = require('./config/db');
-const passport = require('./config/passport');
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const path = require("path");
+const connectDB = require("./config/db");
+const passport = require("./config/passport");
 
 // Connect to database
 connectDB();
 
-const http = require('http');
-const { Server } = require('socket.io');
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-    cors: {
-        origin: function (origin, callback) {
-            // Allow localhost on any port during development
-            // Allow production Netlify frontend
-            const allowedOrigins = [
-                /^http:\/\/localhost:\d+$/,
-                'https://digitaldockers.netlify.app'
-            ];
+  cors: {
+    origin: function (origin, callback) {
+      // Allow localhost on any port during development
+      // Allow production Netlify frontend
+      const allowedOrigins = [
+        /^http:\/\/localhost:\d+$/,
+        "https://digitaldockers.netlify.app",
+      ];
 
-            if (!origin) {
-                callback(null, true);
-            } else if (allowedOrigins.some(allowed =>
-                allowed instanceof RegExp ? allowed.test(origin) : allowed === origin
-            )) {
-                callback(null, true);
-            } else {
-                callback(new Error('CORS not allowed'), false);
-            }
-        },
-        methods: ["GET", "POST"],
-        credentials: true
-    }
+      if (!origin) {
+        callback(null, true);
+      } else if (
+        allowedOrigins.some((allowed) =>
+          allowed instanceof RegExp ? allowed.test(origin) : allowed === origin,
+        )
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"), false);
+      }
+    },
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
-const Message = require('./models/Message');
-const WebSocketNotificationHandler = require('./websocket/notificationHandler');
+const Message = require("./models/Message");
+const WebSocketNotificationHandler = require("./websocket/notificationHandler");
 
 // Initialize Notification WebSocket Handler
 const notificationHandler = new WebSocketNotificationHandler(io);
 notificationHandler.initialize();
 
 // Socket.io Logic
-io.on('connection', (socket) => {
-    console.log(`User Connected: ${socket.id}`);
+io.on("connection", (socket) => {
+  console.log(`User Connected: ${socket.id}`);
 
-    socket.on('join_room', (data) => {
-        socket.join(data);
-        console.log(`User with ID: ${socket.id} joined room: ${data}`);
-    });
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User with ID: ${socket.id} joined room: ${data}`);
+  });
 
-    socket.on('send_message', async (data) => {
-        // data = { room, sender (user object), message, recipient }
-        // Broadcast to room
-        socket.to(data.room).emit('receive_message', data);
+  socket.on("send_message", async (data) => {
+    // data = { room, sender (user object), message, recipient }
+    // Broadcast to room
+    socket.to(data.room).emit("receive_message", data);
 
-        // Save to DB - only if sender has _id
-        if (data.sender && data.sender._id) {
-            try {
-                await Message.create({
-                    room: data.room,
-                    sender: data.sender._id,
-                    message: data.message,
-                    recipient: data.recipient || null
-                });
-            } catch (error) {
-                console.error('Error saving message:', error);
-            }
-        }
-    });
+    // Save to DB - only if sender has _id
+    if (data.sender && data.sender._id) {
+      try {
+        await Message.create({
+          room: data.room,
+          sender: data.sender._id,
+          message: data.message,
+          recipient: data.recipient || null,
+        });
+      } catch (error) {
+        console.error("Error saving message:", error);
+      }
+    }
+  });
 
-    socket.on('disconnect', () => {
-        console.log('User Disconnected', socket.id);
-    });
+  socket.on("disconnect", () => {
+    console.log("User Disconnected", socket.id);
+  });
 });
 
 // Make io and notification handler accessible in routes
-app.set('io', io);
-app.set('notificationHandler', notificationHandler);
+app.set("io", io);
+app.set("notificationHandler", notificationHandler);
 
 // ... Middlewares ...
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
+app.use(
+  cors({
     origin: function (origin, callback) {
-        const allowedOrigins = [
-            'http://localhost:5173',
-            'http://localhost:3000',
-            'https://digitaldockers.netlify.app'
-        ];
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://localhost:5175",
+        "http://localhost:3000",
+        "http://localhost:5001",
+        process.env.CLIENT_URL,
+        "https://digitaldockers.netlify.app",
+      ];
 
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
 
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
-    credentials: true
-}));
+    credentials: true,
+  }),
+);
 app.use(helmet());
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(passport.initialize());
 
 // Basic route
-app.get('/', (req, res) => {
-    res.send('API is running...');
+app.get("/", (req, res) => {
+  res.send("API is running...");
 });
 
 // Define Routes
@@ -155,20 +162,64 @@ app.use('/api/workload', require('./routes/workloadRoutes'));
 app.use('/api/reassignment', require('./routes/reassignmentRoutes'));
 app.use('/api/n8n', require('./routes/n8nRoutes'));
 app.use('/api/teams', require('./routes/teamRoutes'));
+app.use('/api/webhooks', require('./routes/webhookRoutes'));
+app.use('/api/tech-debt', require('./routes/techDebtRoutes'));
+app.use('/api/health', require('./routes/healthRoutes'));
+app.use('/api/integrations', require('./routes/githubIntegrationRoutes'));
+app.use('/api/analysis', require('./routes/analysisRoutes'));
 app.use('/api/ppt', require('./routes/pptRoutes'));
 
-const { errorHandler } = require('./middlewares/errorMiddleware');
+const { errorHandler } = require("./middlewares/errorMiddleware");
 app.use(errorHandler);
+
+// Initialize queue system
+const {
+  initializeQueueSystem,
+  closeAllQueues,
+} = require("./config/queue.config");
+initializeQueueSystem();
 
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-    console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 
+// Graceful shutdown
+const queues = []; // Track all queue instances if needed
+
+async function gracefulShutdown(signal) {
+  console.log(`\n${signal} received. Starting graceful shutdown...`);
+
+  try {
+    // Close HTTP server first
+    await new Promise((resolve) => {
+      server.close(resolve);
+    });
+    console.log("✅ HTTP server closed");
+
+    // Close all queues
+    await closeAllQueues(queues);
+
+    // Close database connection
+    await mongoose.connection.close();
+    console.log("✅ Database connection closed");
+
+    console.log("✅ Graceful shutdown complete");
+    process.exit(0);
+  } catch (error) {
+    console.error("❌ Error during shutdown:", error);
+    process.exit(1);
+  }
+}
+
+// Handle shutdown signals
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
-    console.log(`Error: ${err.message}`);
-    // Close server & exit process
-    server.close(() => process.exit(1));
+process.on("unhandledRejection", (err, promise) => {
+  console.log(`Error: ${err.message}`);
+  // Close server & exit process
+  gracefulShutdown("unhandledRejection");
 });
