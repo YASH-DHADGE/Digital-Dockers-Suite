@@ -31,6 +31,7 @@ import ProjectsListPage from './pages/ProjectsListPage';
 import Spaces from './components/spaces/Spaces';
 import CalendarWorkPlanner from './components/CalendarWorkPlanner';
 import TeamManagement from './components/admin/TeamManagement';
+import TechDebtPage from './pages/TechDebtPage';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -91,6 +92,7 @@ function App() {
                   <Route path="projects" element={<ProjectsListPage />} />
                   <Route path="spaces" element={<Spaces />} />
                   <Route path="work-planner" element={<CalendarWorkPlanner />} />
+                  <Route path="tech-debt" element={<TechDebtPage />} />
                   {/* TODO: Add SlideGeneratorPage and PresentationViewer when implemented */}
                   {/* <Route path="slide-generator" element={<SlideGeneratorPage />} /> */}
                   {/* <Route path="presentations/:id" element={<PresentationViewer />} /> */}
