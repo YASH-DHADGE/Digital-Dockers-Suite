@@ -42,7 +42,7 @@ const LoginPage = () => {
     return (
         <Grid container sx={{ minHeight: '100vh', overflow: 'hidden' }}>
             {/* Left Side - Form */}
-            <Grid item xs={12} md={5} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', p: 4, bgcolor: 'background.paper', zIndex: 2 }}>
+            <Grid size={{ xs: 12, md: 5 }} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', p: 4, bgcolor: 'background.paper', zIndex: 2 }}>
                 <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -152,7 +152,7 @@ const LoginPage = () => {
 
             {/* Right Side - Visual */}
             {!isMobile && (
-                <Grid item md={7} sx={{ position: 'relative', bgcolor: '#0f172a', overflow: 'hidden' }}>
+                <Grid size={{ md: 7 }} sx={{ position: 'relative', bgcolor: '#0f172a', overflow: 'hidden' }}>
                     <Box sx={{
                         position: 'absolute',
                         top: 0, left: 0, width: '100%', height: '100%',

@@ -17,25 +17,44 @@ const scan = async (files) => {
         numerical scores (1-5) for security, correctness, maintainability, performance, testing,
         and a list of specific findings.
         
-        Strict JSON format required matching:
+        IMPORTANT: Respond ONLY with valid JSON, no markdown or extra text.
+        
+        JSON format:
         {
-            "verdict": "GOOD" | "RISKY" | "BAD",
-            "categories": { "security": int, "correctness": int, ... },
-            "findings": [ { "file": string, "lineRange": [start, end], "message": string, "severity": int (1-5), "confidence": "high"|"medium"|"low" } ]
+            "verdict": "GOOD",
+            "categories": { "security": 5, "correctness": 5, "maintainability": 5, "performance": 5, "testing": 3 },
+            "findings": []
         }
+        
+        Use GOOD if code looks clean, RISKY if there are minor concerns, BAD if there are serious issues.
     `;
 
     try {
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig: { responseMimeType: "application/json" } });
+        // Use gemini-1.5-flash-latest model
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
-        const result = await model.generateContent([prompt, fileContext]);
+        const result = await model.generateContent(prompt + "\n\nCode to analyze:\n" + fileContext);
         const response = await result.response;
         const text = response.text();
-
-        return JSON.parse(text);
+        
+        // Try to extract JSON from response
+        let jsonText = text;
+        
+        // Remove markdown code blocks if present
+        const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) {
+            jsonText = jsonMatch[1];
+        }
+        
+        // Clean up the text
+        jsonText = jsonText.trim();
+        
+        const parsed = JSON.parse(jsonText);
+        console.log('[Gemini] AI Analysis complete:', parsed.verdict);
+        return parsed;
 
     } catch (error) {
-        console.error('LLM Scan Error (Gemini):', error);
+        console.error('LLM Scan Error (Gemini):', error.message);
         return {
             verdict: 'PENDING',
             categories: { security: 5, correctness: 5, maintainability: 5, performance: 5, testing: 5 },

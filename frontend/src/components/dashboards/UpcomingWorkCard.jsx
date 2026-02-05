@@ -42,10 +42,10 @@ const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
         >
             <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Text 
-                        style={{ 
-                            fontSize: '11px', 
-                            fontWeight: 600, 
+                    <Text
+                        style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
                             color: '#0052cc',
                             minWidth: '55px',
                             flexShrink: 0
@@ -53,8 +53,8 @@ const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
                     >
                         {task.key || 'TASK'}
                     </Text>
-                    <Text 
-                        ellipsis 
+                    <Text
+                        ellipsis
                         style={{ fontSize: '12px', color: '#262626', flex: 1 }}
                     >
                         {task.title}
@@ -98,8 +98,8 @@ const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
                             ))}
                         </div>
                     ) : (
-                        <div style={{ 
-                            textAlign: 'center', 
+                        <div style={{
+                            textAlign: 'center',
                             padding: '12px 0',
                             color: '#8c8c8c'
                         }}>
@@ -128,8 +128,8 @@ const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
                             ))}
                         </div>
                     ) : (
-                        <div style={{ 
-                            textAlign: 'center', 
+                        <div style={{
+                            textAlign: 'center',
                             padding: '12px 0',
                             color: '#8c8c8c'
                         }}>
@@ -159,10 +159,10 @@ const UpcomingWorkCard = ({ upcomingTasks, unscheduledTasks }) => {
                 borderRadius: 8,
                 border: '1px solid #f0f0f0'
             }}
-            bodyStyle={{ padding: '10px' }}
+            styles={{ body: { padding: '10px' } }}
         >
-            <Tabs 
-                items={tabItems} 
+            <Tabs
+                items={tabItems}
                 size="small"
                 tabBarStyle={{
                     marginBottom: '8px'

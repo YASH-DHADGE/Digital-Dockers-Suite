@@ -11,6 +11,32 @@ class GitHubService {
     }
 
     /**
+     * Get specific repository details
+     */
+    async getRepository(owner, repo) {
+        try {
+            const { data } = await this.octokit.repos.get({
+                owner,
+                repo
+            });
+
+            return {
+                id: data.id,
+                name: data.name,
+                fullName: data.full_name,
+                owner: data.owner.login,
+                url: data.html_url,
+                defaultBranch: data.default_branch,
+                language: data.language,
+                private: data.private
+            };
+        } catch (error) {
+            console.error('Error fetching repository details:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Get authenticated user's repositories
      */
     async getRepositories() {
@@ -198,6 +224,147 @@ class GitHubService {
                 }));
         } catch (error) {
             console.error('Error fetching repository tree:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Post commit status to GitHub (for Gatekeeper integration)
+     * This shows a check status on PRs and commits
+     */
+    async postCommitStatus(owner, repo, sha, status, description, targetUrl = null) {
+        try {
+            // Map our status to GitHub's expected values
+            const stateMap = {
+                'PASS': 'success',
+                'BLOCK': 'failure',
+                'WARN': 'pending',
+                'PENDING': 'pending',
+                'ERROR': 'error'
+            };
+
+            const { data } = await this.octokit.repos.createCommitStatus({
+                owner,
+                repo,
+                sha,
+                state: stateMap[status] || 'pending',
+                target_url: targetUrl,
+                description: description.substring(0, 140), // GitHub limit
+                context: 'Digital Dockers / Gatekeeper'
+            });
+
+            return {
+                id: data.id,
+                state: data.state,
+                context: data.context,
+                url: data.target_url
+            };
+        } catch (error) {
+            console.error('Error posting commit status:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Post a review comment on a PR
+     * Can be used to add inline comments or general review comments
+     */
+    async postReviewComment(owner, repo, prNumber, body, event = 'COMMENT') {
+        try {
+            // Create a review with comments
+            const { data } = await this.octokit.pulls.createReview({
+                owner,
+                repo,
+                pull_number: prNumber,
+                body,
+                event // 'APPROVE', 'REQUEST_CHANGES', or 'COMMENT'
+            });
+
+            return {
+                id: data.id,
+                state: data.state,
+                body: data.body,
+                url: data.html_url
+            };
+        } catch (error) {
+            console.error('Error posting review comment:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Post inline comments on specific lines in a PR
+     */
+    async postInlineComments(owner, repo, prNumber, comments) {
+        try {
+            // Each comment should have: path, line, body
+            const reviewComments = comments.map(c => ({
+                path: c.path,
+                line: c.line,
+                body: c.body
+            }));
+
+            const { data } = await this.octokit.pulls.createReview({
+                owner,
+                repo,
+                pull_number: prNumber,
+                event: 'COMMENT',
+                comments: reviewComments
+            });
+
+            return {
+                id: data.id,
+                commentsCount: comments.length
+            };
+        } catch (error) {
+            console.error('Error posting inline comments:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Post Gatekeeper analysis summary to PR
+     * Creates a comprehensive review with all findings
+     */
+    async postGatekeeperSummary(owner, repo, prNumber, analysisResults, status) {
+        try {
+            let summary = `## 🛡️ Gatekeeper Analysis\n\n`;
+            summary += `**Status:** ${status === 'PASS' ? '✅ PASS' : status === 'BLOCK' ? '❌ BLOCKED' : '⚠️ WARNING'}\n\n`;
+
+            // Lint results
+            if (analysisResults.lint) {
+                summary += `### Syntax Analysis\n`;
+                summary += `- Errors: ${analysisResults.lint.errors || 0}\n`;
+                summary += `- Warnings: ${analysisResults.lint.warnings || 0}\n\n`;
+            }
+
+            // Complexity results
+            if (analysisResults.complexity) {
+                summary += `### Complexity Analysis\n`;
+                summary += `- Health Score Delta: ${analysisResults.complexity.healthScoreDelta >= 0 ? '+' : ''}${analysisResults.complexity.healthScoreDelta || 0}\n`;
+                summary += `- Files Analyzed: ${analysisResults.complexity.fileChanges?.length || 0}\n\n`;
+            }
+
+            // AI findings
+            if (analysisResults.aiScan?.findings?.length > 0) {
+                summary += `### AI Findings\n`;
+                analysisResults.aiScan.findings.slice(0, 5).forEach((finding, i) => {
+                    summary += `${i + 1}. **${finding.message}**`;
+                    if (finding.suggestion) {
+                        summary += ` - 💡 ${finding.suggestion}`;
+                    }
+                    summary += `\n`;
+                });
+                summary += `\n`;
+            }
+
+            summary += `---\n*Powered by Digital Dockers Tech Debt Mode*`;
+
+            const event = status === 'PASS' ? 'APPROVE' : status === 'BLOCK' ? 'REQUEST_CHANGES' : 'COMMENT';
+
+            return await this.postReviewComment(owner, repo, prNumber, summary, event);
+        } catch (error) {
+            console.error('Error posting Gatekeeper summary:', error);
             throw error;
         }
     }

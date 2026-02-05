@@ -77,7 +77,7 @@ const TeamsPanel = ({ teams, selectedTeamId, onTeamSelect, loading }) => {
                                 boxShadow: isSelected ? '0 4px 12px rgba(0, 82, 204, 0.15)' : undefined,
                                 transition: 'all 0.2s ease'
                             }}
-                            bodyStyle={{ padding: 16 }}
+                            styles={{ body: { padding: 16 } }}
                         >
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                                 <Avatar

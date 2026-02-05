@@ -4,7 +4,9 @@
   "description": "Enterprise workplace automation platform with AI-powered code health monitoring",
   "main": "server.js",
   "scripts": {
+    "prestart": "node scripts/kill_port.js",
     "start": "node server.js",
+    "predev": "node scripts/kill_port.js",
     "dev": "nodemon server.js",
     "seed": "node scripts/seedTechDebt.js",
     "test": "echo \"Error: no test specified\" && exit 1"

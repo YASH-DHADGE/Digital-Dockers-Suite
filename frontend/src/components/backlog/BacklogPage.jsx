@@ -279,7 +279,7 @@ const BacklogPage = () => {
                                 </div>
                             }
                             style={{ height: '100%' }}
-                            bodyStyle={{ maxHeight: '600px', overflowY: 'auto' }}
+                            styles={{ body: { maxHeight: '600px', overflowY: 'auto' } }}
                         >
                             {!activeSprint ? (
                                 <Empty description="No active sprint selected" size="small" />

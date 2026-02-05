@@ -15,7 +15,8 @@ class MetricsCalculator {
                 {
                     $group: {
                         _id: null,
-                        avgRisk: { $avg: '$risk' },
+                        // Handle both nested risk.score and flat risk for backwards compatibility
+                        avgRisk: { $avg: { $ifNull: ['$risk.score', '$risk'] } },
                         totalFiles: { $sum: 1 }
                     }
                 }
@@ -95,13 +96,33 @@ class MetricsCalculator {
      */
     async identifyCriticalHotspots(repoId = null, threshold = 70) {
         try {
-            const query = repoId
-                ? { repoId, risk: { $gt: threshold } }
-                : { risk: { $gt: threshold } };
+            // Query files where risk.score > threshold (or flat risk for backwards compat)
+            const matchStage = repoId
+                ? { repoId }
+                : {};
 
-            const hotspots = await CodebaseFile.find(query)
-                .sort({ risk: -1 })
-                .limit(20);
+            const hotspots = await CodebaseFile.aggregate([
+                { $match: matchStage },
+                {
+                    $addFields: {
+                        normalizedRisk: { $ifNull: ['$risk.score', '$risk'] }
+                    }
+                },
+                { $match: { normalizedRisk: { $gt: threshold } } },
+                { $sort: { normalizedRisk: -1 } },
+                { $limit: 20 },
+                {
+                    $project: {
+                        path: 1,
+                        language: 1,
+                        risk: { $ifNull: ['$risk.score', '$risk'] },
+                        complexity: { $ifNull: ['$complexity.cyclomatic', '$complexity'] },
+                        churn: { $ifNull: ['$churn.churnRate', '$churn'] },
+                        category: { $ifNull: ['$risk.category', 'unknown'] },
+                        color: { $ifNull: ['$risk.color', '#666666'] }
+                    }
+                }
+            ]);
 
             const hotspotCount = hotspots.length;
 
@@ -186,7 +207,11 @@ class MetricsCalculator {
                 this.calculateRiskReduced(repoId)
             ]);
 
+            // Calculate health score as inverse of debt ratio (0-100)
+            const healthScore = Math.max(0, Math.min(100, 100 - debtRatio));
+
             return {
+                healthScore,
                 debtRatio,
                 blockRate,
                 hotspotCount: hotspots.count,
@@ -196,6 +221,7 @@ class MetricsCalculator {
         } catch (error) {
             console.error('Error getting all metrics:', error);
             return {
+                healthScore: 75,
                 debtRatio: 0,
                 blockRate: 0,
                 hotspotCount: 0,

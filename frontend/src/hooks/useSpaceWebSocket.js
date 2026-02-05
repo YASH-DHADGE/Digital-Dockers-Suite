@@ -14,7 +14,7 @@ const useSpaceWebSocket = (spaceId, userId) => {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    const wsUrl = import.meta.env.VITE_WS_URL || window.location.origin;
+    const wsUrl = import.meta.env.VITE_WS_URL || 'http://localhost:5001';
     const token = localStorage.getItem('token');
 
     const newSocket = io(wsUrl, {

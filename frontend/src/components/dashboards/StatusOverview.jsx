@@ -6,9 +6,9 @@ const { Text, Title } = Typography;
 const StatusOverview = ({ stats }) => {
     if (!stats) {
         return (
-            <Card 
-                title="📊 Status Overview" 
-                style={{ 
+            <Card
+                title="📊 Status Overview"
+                style={{
                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                     borderRadius: 8,
                     border: '1px solid #f0f0f0'
@@ -24,7 +24,7 @@ const StatusOverview = ({ stats }) => {
     const reviewCount = stats.statusBreakdown?.review || 0;
     const doneCount = stats.statusBreakdown?.done || 0;
     const totalCount = backlogCount + inProgressCount + reviewCount + doneCount;
-    
+
     // Fallback: if total is 0 but we have sprint data, calculate from sprint
     const displayDoneCount = totalCount === 0 && stats.issuesDone ? stats.issuesDone : doneCount;
     const displayTotalCount = totalCount === 0 && stats.issuesDone ? stats.issuesDone : totalCount;
@@ -32,52 +32,52 @@ const StatusOverview = ({ stats }) => {
 
     // Status breakdown with color coding
     const statusRows = [
-        { 
-            label: 'To Do', 
-            count: backlogCount, 
-            color: '#dfe1e6', 
+        {
+            label: 'To Do',
+            count: backlogCount,
+            color: '#dfe1e6',
             textColor: '#626f86',
             icon: '●'
         },
-        { 
-            label: 'In Progress', 
-            count: inProgressCount, 
-            color: '#0052cc', 
+        {
+            label: 'In Progress',
+            count: inProgressCount,
+            color: '#0052cc',
             textColor: '#0052cc',
             icon: '●'
         },
-        { 
-            label: 'In Review', 
-            count: reviewCount, 
-            color: '#ff5630', 
+        {
+            label: 'In Review',
+            count: reviewCount,
+            color: '#ff5630',
             textColor: '#ff5630',
             icon: '●'
         },
-        { 
-            label: 'Done', 
-            count: doneCount, 
-            color: '#00875a', 
+        {
+            label: 'Done',
+            count: doneCount,
+            color: '#00875a',
             textColor: '#00875a',
             icon: '●'
         }
     ];
 
     const metrics = [
-        { 
-            label: 'Total Issues', 
-            value: displayTotalCount, 
+        {
+            label: 'Total Issues',
+            value: displayTotalCount,
             icon: FileTextOutlined,
             color: '#0052cc'
         },
-        { 
-            label: 'Done', 
-            value: displayDoneCount, 
+        {
+            label: 'Done',
+            value: displayDoneCount,
             icon: CheckCircleOutlined,
             color: '#00875a'
         },
-        { 
-            label: 'In Progress', 
-            value: inProgressCount, 
+        {
+            label: 'In Progress',
+            value: inProgressCount,
             icon: ClockCircleOutlined,
             color: '#0052cc'
         }
@@ -91,7 +91,7 @@ const StatusOverview = ({ stats }) => {
     };
 
     return (
-        <Card 
+        <Card
             title={
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <FileTextOutlined style={{ fontSize: 13 }} />
@@ -100,15 +100,15 @@ const StatusOverview = ({ stats }) => {
                     </Text>
                 </div>
             }
-            style={{ 
+            style={{
                 boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
                 borderRadius: 8,
                 border: '1px solid #f0f0f0'
             }}
-            bodyStyle={{ padding: '10px' }}
+            styles={{ body: { padding: '10px' } }}
         >
             <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                
+
                 {/* SECTION 1: Sprint Completion */}
                 <div>
                     <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -121,7 +121,7 @@ const StatusOverview = ({ stats }) => {
                             {completionRate}%
                         </Text>
                     </div>
-                    <Progress 
+                    <Progress
                         percent={completionRate}
                         strokeColor={getProgressColor(completionRate)}
                         format={() => null}
@@ -150,7 +150,7 @@ const StatusOverview = ({ stats }) => {
                         {statusRows.map((status) => {
                             const percentage = totalCount > 0 ? Math.round((status.count / totalCount) * 100) : 0;
                             return (
-                                <Tooltip 
+                                <Tooltip
                                     key={status.label}
                                     title={`${status.count} issues • ${percentage}% of total`}
                                 >

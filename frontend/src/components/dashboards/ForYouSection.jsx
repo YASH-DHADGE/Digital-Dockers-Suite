@@ -36,11 +36,11 @@ const ForYouSection = ({ assignedIssues }) => {
             marginLeft: '-6px',
             marginRight: '-6px'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f6f8fa'}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f6f8fa'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
         >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                <Text 
+                <Text
                     style={{
                         margin: 0,
                         background: '#dbeafe',
@@ -89,7 +89,7 @@ const ForYouSection = ({ assignedIssues }) => {
                         borderRadius: 8,
                         border: '1px solid #f0f0f0'
                     }}
-                    bodyStyle={{ padding: '10px' }}
+                    styles={{ body: { padding: '10px' } }}
                 >
                     {assignedIssues && assignedIssues.length > 0 ? (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' }}>

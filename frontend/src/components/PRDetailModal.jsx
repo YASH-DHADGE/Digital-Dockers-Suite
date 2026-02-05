@@ -5,11 +5,18 @@ import {
   FaCode,
   FaExclamationTriangle,
   FaCheckCircle,
+  FaTimesCircle,
+  FaRobot,
+  FaGithub,
+  FaBrain,
+  FaLayerGroup,
+  FaCog,
+  FaClipboardCheck,
 } from "react-icons/fa";
 import { format } from "date-fns";
 
-const PRDetailModal = ({ pr, onClose }) => {
-  const [activeTab, setActiveTab] = useState("overview");
+const PRDetailModal = ({ pr, onClose, isDarkMode = false }) => {
+  const [activeTab, setActiveTab] = useState("layers");
 
   if (!pr) return null;
 
@@ -19,238 +26,391 @@ const PRDetailModal = ({ pr, onClose }) => {
     return "text-blue-600 bg-blue-100";
   };
 
+  const getLayerStatus = (layer) => {
+    if (!pr.analysisResults) return { status: "pending", icon: FaCog };
+
+    switch (layer) {
+      case "syntax":
+        const lintErrors = pr.analysisResults?.lint?.errors || 0;
+        return lintErrors === 0
+          ? { status: "pass", icon: FaCheckCircle, color: "text-green-500" }
+          : { status: "fail", icon: FaTimesCircle, color: "text-red-500" };
+      case "complexity":
+        const delta = pr.analysisResults?.complexity?.healthScoreDelta || 0;
+        return delta >= 0
+          ? { status: "pass", icon: FaCheckCircle, color: "text-green-500" }
+          : { status: "fail", icon: FaTimesCircle, color: "text-red-500" };
+      case "semantic":
+        const verdict = pr.analysisResults?.aiScan?.verdict;
+        if (verdict === "GOOD") return { status: "pass", icon: FaCheckCircle, color: "text-green-500" };
+        if (verdict === "BAD") return { status: "fail", icon: FaTimesCircle, color: "text-red-500" };
+        return { status: "warn", icon: FaExclamationTriangle, color: "text-yellow-500" };
+      default:
+        return { status: "pending", icon: FaCog, color: "text-gray-400" };
+    }
+  };
+
+  const analysisLayers = [
+    {
+      id: "syntax",
+      name: "Syntax Analysis",
+      icon: FaClipboardCheck,
+      description: "ESLint, Prettier, code style checks",
+      details: pr.analysisResults?.lint || {},
+    },
+    {
+      id: "complexity",
+      name: "Complexity Analysis",
+      icon: FaLayerGroup,
+      description: "Cyclomatic complexity, health score delta",
+      details: pr.analysisResults?.complexity || {},
+    },
+    {
+      id: "semantic",
+      name: "AI Semantic Analysis",
+      icon: FaBrain,
+      description: "GPT-4o code review, pattern detection",
+      details: pr.analysisResults?.aiScan || {},
+    },
+  ];
+
+  const tabs = [
+    { id: "layers", label: "Analysis Layers", icon: FaLayerGroup },
+    { id: "findings", label: "AI Findings", icon: FaRobot },
+    { id: "files", label: "Files", icon: FaCode },
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div
+        className={`relative rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden m-4 ${isDarkMode ? "bg-slate-800" : "bg-white"
+          }`}
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6">
           <div className="flex justify-between items-start">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <span className="text-2xl font-bold">#{pr.prNumber}</span>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                    pr.status === "PASS"
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ${pr.status === "PASS"
                       ? "bg-green-500"
                       : pr.status === "BLOCK"
                         ? "bg-red-500"
                         : "bg-yellow-500"
-                  }`}
+                    }`}
                 >
                   {pr.status}
                 </span>
+                {pr.status === "PASS" && (
+                  <FaCheckCircle className="text-green-300" size={20} />
+                )}
+                {pr.status === "BLOCK" && (
+                  <FaTimesCircle className="text-red-300" size={20} />
+                )}
               </div>
-              <h2 className="text-xl font-semibold mb-2">{pr.title}</h2>
-              <div className="flex items-center gap-4 text-sm opacity-90">
+              <h2 className="text-xl font-semibold mb-2 truncate">{pr.title}</h2>
+              <div className="flex items-center gap-4 text-sm opacity-90 flex-wrap">
                 <span>@{pr.author}</span>
                 <span>•</span>
-                <span>{pr.branch}</span>
+                <span>{pr.branch || pr.repoId}</span>
                 <span>•</span>
                 <span>
                   {pr.createdAt
-                    ? format(new Date(pr.createdAt), "MMM d, yyyy")
-                    : "Now"}
+                    ? format(new Date(pr.createdAt), "MMM d, yyyy HH:mm")
+                    : "Just now"}
                 </span>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition"
+              className="text-white hover:bg-white/20 rounded-full p-2 transition flex-shrink-0"
             >
               <FaTimes size={20} />
             </button>
           </div>
+
+          {/* Health Score Bar */}
+          <div className="mt-4 flex items-center gap-4">
+            <div className="flex-1 bg-white/20 rounded-full h-3 overflow-hidden">
+              <div
+                className={`h-full transition-all ${(pr.healthScore?.current || 0) > 70
+                    ? "bg-green-400"
+                    : (pr.healthScore?.current || 0) > 40
+                      ? "bg-yellow-400"
+                      : "bg-red-400"
+                  }`}
+                style={{ width: `${pr.healthScore?.current || 0}%` }}
+              />
+            </div>
+            <div className="text-right">
+              <span className="text-2xl font-bold">
+                {pr.healthScore?.current || 0}
+              </span>
+              <span className="text-sm opacity-75 ml-1">
+                ({pr.healthScore?.delta >= 0 ? "+" : ""}
+                {pr.healthScore?.delta || 0})
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200">
+        <div
+          className={`border-b ${isDarkMode ? "border-slate-700" : "border-gray-200"
+            }`}
+        >
           <div className="flex">
-            {["overview", "analysis", "files"].map((tab) => (
+            {tabs.map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 font-medium capitalize transition ${
-                  activeTab === tab
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-6 py-3 font-medium transition ${activeTab === tab.id
                     ? "border-b-2 border-indigo-600 text-indigo-600"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
+                    : isDarkMode
+                      ? "text-gray-400 hover:text-gray-200"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
               >
-                {tab}
+                <tab.icon size={14} />
+                {tab.label}
               </button>
             ))}
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-          {activeTab === "overview" && (
-            <div className="space-y-6">
-              {/* Health Score */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold mb-3">Health Score</h3>
-                <div className="flex items-center gap-4">
+        <div
+          className={`p-6 overflow-y-auto max-h-[calc(90vh-280px)] ${isDarkMode ? "text-gray-200" : "text-gray-800"
+            }`}
+        >
+          {/* Layers Tab - Layer by Layer Analysis */}
+          {activeTab === "layers" && (
+            <div className="space-y-4">
+              <p
+                className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                  } mb-4`}
+              >
+                The Gatekeeper runs a 3-layer analysis pipeline on every PR:
+              </p>
+
+              {analysisLayers.map((layer, idx) => {
+                const status = getLayerStatus(layer.id);
+                const StatusIcon = status.icon;
+
+                return (
                   <div
-                    className="text-4xl font-bold"
-                    style={{
-                      color:
-                        pr.healthScore?.current > 70
-                          ? "#10b981"
-                          : pr.healthScore?.current > 40
-                            ? "#f59e0b"
-                            : "#ef4444",
-                    }}
-                  >
-                    {pr.healthScore?.current || 0}
-                  </div>
-                  <div>
-                    <div
-                      className={`text-lg font-semibold ${
-                        pr.healthScore?.delta >= 0
-                          ? "text-green-600"
-                          : "text-red-600"
+                    key={layer.id}
+                    className={`border rounded-xl p-5 transition ${isDarkMode
+                        ? "bg-slate-700/50 border-slate-600"
+                        : "bg-gray-50 border-gray-200"
                       }`}
-                    >
-                      {pr.healthScore?.delta >= 0 ? "+" : ""}
-                      {pr.healthScore?.delta || 0}
-                    </div>
-                    <div className="text-sm text-gray-500">Delta</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-red-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-red-600">
-                    {pr.analysisResults?.lint?.errors || 0}
-                  </div>
-                  <div className="text-sm text-gray-600">Lint Errors</div>
-                </div>
-                <div className="bg-yellow-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-yellow-600">
-                    {pr.analysisResults?.lint?.warnings || 0}
-                  </div>
-                  <div className="text-sm text-gray-600">Warnings</div>
-                </div>
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {pr.filesChanged?.length || 0}
-                  </div>
-                  <div className="text-sm text-gray-600">Files Changed</div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3">
-                {pr.url && (
-                  <a
-                    href={pr.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
                   >
-                    <FaExternalLinkAlt />
-                    View in GitHub
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "analysis" && (
-            <div className="space-y-6">
-              {/* AI Findings */}
-              {pr.analysisResults?.aiScan?.findings?.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <FaExclamationTriangle className="text-yellow-600" />
-                    AI Findings
-                  </h3>
-                  <div className="space-y-3">
-                    {pr.analysisResults.aiScan.findings.map((finding, idx) => (
+                    <div className="flex items-start gap-4">
+                      {/* Layer Number */}
                       <div
-                        key={idx}
-                        className="border border-gray-200 rounded-lg p-4"
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold ${status.status === "pass"
+                            ? "bg-green-100 text-green-700"
+                            : status.status === "fail"
+                              ? "bg-red-100 text-red-700"
+                              : status.status === "warn"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-gray-200 text-gray-500"
+                          }`}
                       >
-                        <div className="flex items-start gap-3">
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-semibold ${getSeverityColor(finding.severity || 5)}`}
-                          >
-                            {finding.confidence || "medium"}
-                          </span>
-                          <div className="flex-1">
-                            <p className="font-medium mb-1">
-                              {finding.message}
-                            </p>
-                            {finding.suggestion && (
-                              <div className="mt-2 flex items-center justify-between bg-yellow-50 p-2 rounded border border-yellow-100">
-                                <p className="text-sm text-gray-700">
-                                  💡 {finding.suggestion}
-                                </p>
-                                <button
-                                  onClick={() =>
-                                    alert(
-                                      `Applying AI Fix via GitHub API...\n\nCommit: "Fix: ${finding.message}"`,
-                                    )
-                                  }
-                                  className="flex-shrink-0 ml-4 text-xs px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition font-medium shadow-sm"
-                                >
-                                  Apply Fix
-                                </button>
-                              </div>
-                            )}
-                            {finding.file && (
-                              <p className="text-xs text-gray-500 mt-2">
-                                <FaCode className="inline mr-1" />
-                                {finding.file}
-                              </p>
-                            )}
-                          </div>
-                        </div>
+                        {idx + 1}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
-              {/* Complexity Changes */}
-              {pr.analysisResults?.complexity?.fileChanges?.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-3">Complexity Changes</h3>
-                  <div className="space-y-2">
-                    {pr.analysisResults.complexity.fileChanges.map(
-                      (change, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                      {/* Layer Info */}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <layer.icon
+                            className={isDarkMode ? "text-indigo-400" : "text-indigo-600"}
+                          />
+                          <h3 className="font-semibold text-lg">{layer.name}</h3>
+                          <StatusIcon className={status.color} />
+                        </div>
+                        <p
+                          className={`text-sm mb-3 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
                         >
-                          <span className="text-sm font-mono">
-                            {change.file}
-                          </span>
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm text-gray-600">
-                              Complexity: {change.complexity}
+                          {layer.description}
+                        </p>
+
+                        {/* Layer-specific details */}
+                        {layer.id === "syntax" && (
+                          <div className="flex gap-4 text-sm">
+                            <span
+                              className={`px-3 py-1 rounded-full ${(layer.details.errors || 0) === 0
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                                }`}
+                            >
+                              {layer.details.errors || 0} errors
                             </span>
                             <span
-                              className={`text-sm font-semibold ${
-                                change.delta >= 0
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              }`}
+                              className={`px-3 py-1 rounded-full ${isDarkMode
+                                  ? "bg-slate-600 text-gray-300"
+                                  : "bg-gray-200 text-gray-700"
+                                }`}
                             >
-                              {change.delta >= 0 ? "+" : ""}
-                              {change.delta}
+                              {layer.details.warnings || 0} warnings
                             </span>
                           </div>
-                        </div>
-                      ),
-                    )}
+                        )}
+
+                        {layer.id === "complexity" && (
+                          <div className="flex gap-4 text-sm">
+                            <span
+                              className={`px-3 py-1 rounded-full ${(layer.details.healthScoreDelta || 0) >= 0
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                                }`}
+                            >
+                              Health Delta:{" "}
+                              {(layer.details.healthScoreDelta || 0) >= 0 ? "+" : ""}
+                              {layer.details.healthScoreDelta || 0}
+                            </span>
+                            <span
+                              className={`px-3 py-1 rounded-full ${isDarkMode
+                                  ? "bg-slate-600 text-gray-300"
+                                  : "bg-gray-200 text-gray-700"
+                                }`}
+                            >
+                              {layer.details.fileChanges?.length || 0} files analyzed
+                            </span>
+                          </div>
+                        )}
+
+                        {layer.id === "semantic" && (
+                          <div className="flex gap-4 text-sm">
+                            <span
+                              className={`px-3 py-1 rounded-full ${layer.details.verdict === "GOOD"
+                                  ? "bg-green-100 text-green-700"
+                                  : layer.details.verdict === "BAD"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-yellow-100 text-yellow-700"
+                                }`}
+                            >
+                              Verdict: {layer.details.verdict || "PENDING"}
+                            </span>
+                            <span
+                              className={`px-3 py-1 rounded-full ${isDarkMode
+                                  ? "bg-slate-600 text-gray-300"
+                                  : "bg-gray-200 text-gray-700"
+                                }`}
+                            >
+                              {layer.details.findings?.length || 0} findings
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
+                );
+              })}
+
+              {/* Final Verdict */}
+              <div
+                className={`mt-6 p-4 rounded-xl text-center ${pr.status === "PASS"
+                    ? "bg-green-100 border-2 border-green-300"
+                    : pr.status === "BLOCK"
+                      ? "bg-red-100 border-2 border-red-300"
+                      : "bg-yellow-100 border-2 border-yellow-300"
+                  }`}
+              >
+                <p className="font-semibold text-lg">
+                  {pr.status === "PASS"
+                    ? "✅ All checks passed - PR approved"
+                    : pr.status === "BLOCK"
+                      ? "❌ Blocked - Fix issues before merging"
+                      : "⚠️ Review required"}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Findings Tab */}
+          {activeTab === "findings" && (
+            <div className="space-y-4">
+              {pr.analysisResults?.aiScan?.findings?.length > 0 ? (
+                pr.analysisResults.aiScan.findings.map((finding, idx) => (
+                  <div
+                    key={idx}
+                    className={`border rounded-lg p-4 ${isDarkMode
+                        ? "bg-slate-700/50 border-slate-600"
+                        : "bg-white border-gray-200"
+                      }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-semibold ${getSeverityColor(
+                          finding.severity || 5
+                        )}`}
+                      >
+                        {finding.confidence || "medium"}
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-medium mb-1">{finding.message}</p>
+                        {finding.suggestion && (
+                          <div
+                            className={`mt-2 p-3 rounded-lg border ${isDarkMode
+                                ? "bg-yellow-900/30 border-yellow-700 text-yellow-200"
+                                : "bg-yellow-50 border-yellow-200 text-yellow-800"
+                              }`}
+                          >
+                            <div className="flex items-center justify-between gap-4">
+                              <p className="text-sm">💡 {finding.suggestion}</p>
+                              <button
+                                onClick={() =>
+                                  alert(
+                                    `Applying AI Fix via GitHub API...\n\nCommit: "Fix: ${finding.message}"`
+                                  )
+                                }
+                                className="flex-shrink-0 text-xs px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-medium"
+                              >
+                                Apply Fix
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {finding.file && (
+                          <p
+                            className={`text-xs mt-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                          >
+                            <FaCode className="inline mr-1" />
+                            {finding.file}
+                            {finding.line && `:${finding.line}`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <FaCheckCircle
+                    className={`mx-auto mb-3 ${isDarkMode ? "text-gray-600" : "text-gray-300"
+                      }`}
+                    size={48}
+                  />
+                  <p className={isDarkMode ? "text-gray-400" : "text-gray-500"}>
+                    No issues found by AI analysis
+                  </p>
                 </div>
               )}
             </div>
           )}
 
+          {/* Files Tab */}
           {activeTab === "files" && (
             <div>
               <h3 className="font-semibold mb-3">
@@ -260,14 +420,24 @@ const PRDetailModal = ({ pr, onClose }) => {
                 {pr.filesChanged?.map((file, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center gap-2 p-3 bg-gray-50 rounded hover:bg-gray-100 transition"
+                    className={`flex items-center gap-3 p-3 rounded-lg transition ${isDarkMode
+                        ? "bg-slate-700/50 hover:bg-slate-700"
+                        : "bg-gray-50 hover:bg-gray-100"
+                      }`}
                   >
-                    <FaCode className="text-gray-400" />
-                    <span className="font-mono text-sm">{file}</span>
+                    <FaCode
+                      className={isDarkMode ? "text-gray-500" : "text-gray-400"}
+                    />
+                    <span className="font-mono text-sm flex-1 truncate">
+                      {file}
+                    </span>
                   </div>
                 ))}
                 {(!pr.filesChanged || pr.filesChanged.length === 0) && (
-                  <p className="text-gray-500 text-center py-8">
+                  <p
+                    className={`text-center py-8 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                      }`}
+                  >
                     No files changed
                   </p>
                 )}
@@ -275,9 +445,41 @@ const PRDetailModal = ({ pr, onClose }) => {
             </div>
           )}
         </div>
+
+        {/* Footer */}
+        <div
+          className={`flex items-center justify-between px-6 py-4 border-t ${isDarkMode
+              ? "border-slate-700 bg-slate-800/50"
+              : "border-gray-200 bg-gray-50"
+            }`}
+        >
+          {pr.url ? (
+            <a
+              href={pr.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700"
+            >
+              <FaGithub /> View on GitHub
+              <FaExternalLinkAlt size={10} />
+            </a>
+          ) : (
+            <span />
+          )}
+          <button
+            onClick={onClose}
+            className={`px-4 py-2 rounded-lg text-sm font-medium ${isDarkMode
+                ? "bg-slate-700 text-gray-200 hover:bg-slate-600"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default PRDetailModal;
+

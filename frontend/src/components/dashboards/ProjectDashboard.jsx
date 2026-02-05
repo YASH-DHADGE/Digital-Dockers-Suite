@@ -307,7 +307,7 @@ const ProjectDashboard = () => {
                                     borderRadius: 8,
                                     border: '1px solid #f0f0f0'
                                 }}
-                                bodyStyle={{ padding: '16px 0' }}
+                                styles={{ body: { padding: '16px 0' } }}
                             >
                                 {stats?.workload?.length > 0 ? (
                                     <div>
@@ -448,7 +448,7 @@ const ProjectDashboard = () => {
                         Close
                     </button>
                 ]}
-                bodyStyle={{ padding: 0 }}
+                styles={{ body: { padding: 0 } }}
             >
                 <SmartReassignmentDashboard sprintId={stats?.activeSprint?._id} />
             </Modal>

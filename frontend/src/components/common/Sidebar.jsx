@@ -119,8 +119,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
                 onClose={() => setMobileOpen(false)}
                 open={mobileOpen}
                 width={280}
-                styles={{ body: { padding: 0 } }}
-                headerStyle={{ display: 'none' }} // Hide mock header in drawer
+                styles={{ body: { padding: 0 }, header: { display: 'none' } }}
             >
                 <div style={{ padding: '24px 24px 0', marginBottom: 24 }}>
                     <div style={{ fontSize: 18, fontWeight: 'bold', color: '#0052CC' }}>Digital Dockers</div>

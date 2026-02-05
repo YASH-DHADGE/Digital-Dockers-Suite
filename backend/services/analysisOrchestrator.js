@@ -5,6 +5,8 @@ const DependencyAnalysisService = require('./dependencyAnalysisService');
 const { analyzeCodeSemantic } = require('./openaiService');
 const PullRequest = require('../models/PullRequest');
 const CodebaseFile = require('../models/CodebaseFile');
+const fs = require('fs').promises;
+const path = require('path');
 
 class AnalysisOrchestrator {
     constructor(repoPath = null) {
@@ -258,11 +260,31 @@ class AnalysisOrchestrator {
 
             for (const file of files) {
                 if (this.shouldAnalyzeFile(file.path)) {
+                    let content = file.content;
+
+                    // NEW: Fetch content if missing (using GitHubService)
+                    if (!content) {
+                        try {
+                            // We need a GitHubService instance here. 
+                            // Ideally dependency injection, but for quick fix:
+                            const GitHubService = require('./githubService');
+                            const gh = new GitHubService();
+                            // Parse owner/repo from repoId
+                            const [owner, repo] = repoId.split('/');
+                            content = await gh.getFileContent(owner, repo, file.path);
+                        } catch (err) {
+                            console.error(`Failed to fetch content for ${file.path}`, err);
+                            continue;
+                        }
+                    }
+
+                    if (!content) continue;
+
                     // Syntax analysis
-                    const syntax = await this.syntaxService.analyzeFile(file.path, file.content);
+                    const syntax = await this.syntaxService.analyzeFile(file.path, content);
 
                     // Complexity analysis
-                    const complexity = this.complexityService.analyzeFile(file.path, file.content);
+                    const complexity = this.complexityService.analyzeFile(file.path, content);
 
                     // Churn analysis (if available)
                     const churnRate = this.churnService
@@ -270,7 +292,7 @@ class AnalysisOrchestrator {
                         : 0;
 
                     // Calculate risk
-                    const risk = complexity.complexity * churnRate;
+                    const risk = complexity.complexity * (churnRate || 1); // Default churn to 1 to avoid zero risk if unknown
 
                     // Save to database
                     await CodebaseFile.findOneAndUpdate(
@@ -330,12 +352,184 @@ class AnalysisOrchestrator {
             };
         }
     }
+    /**
+     * Analyze a locally cloned repository
+     */
+    async analyzeLocalRepository(repoId, localPath, io = null) {
+        return this.analyzeLocalRepositoryWithProgress(repoId, localPath, io, null);
+    }
+
+    /**
+     * Analyze a locally cloned repository with progress callback
+     */
+    async analyzeLocalRepositoryWithProgress(repoId, localPath, io = null, progressCallback = null) {
+        try {
+            console.log(`Starting local repository analysis for ${repoId} at ${localPath}...`);
+
+            const files = await this.walkDirectory(localPath);
+            const results = [];
+            let processed = 0;
+            const analyzableFiles = files.filter(f => this.shouldAnalyzeFile(f));
+            const totalFiles = analyzableFiles.length;
+
+            console.log(`Found ${totalFiles} analyzable files (of ${files.length} total).`);
+
+            for (const filePath of analyzableFiles) {
+                try {
+                    const content = await fs.readFile(filePath, 'utf-8');
+                    const relativePath = path.relative(localPath, filePath).replace(/\\/g, '/');
+
+                    // Syntax analysis
+                    const syntax = await this.syntaxService.analyzeFile(relativePath, content);
+
+                    // Complexity analysis
+                    const complexity = this.complexityService.analyzeFile(relativePath, content);
+
+                    // Churn analysis (git log based if churnService available)
+                    let churnRate = 0;
+                    if (this.churnService) {
+                        try {
+                            churnRate = await this.churnService.getFileChurnRate(relativePath);
+                        } catch (e) {
+                            // If churn fails, continue with 0
+                        }
+                    }
+
+                    // Calculate risk score (complexity * churn factor)
+                    const churnFactor = Math.max(1, Math.log10(churnRate + 1) + 1);
+                    const risk = Math.round(complexity.complexity * churnFactor);
+                    const riskCategory = risk > 70 ? 'critical' : risk > 40 ? 'warning' : 'healthy';
+                    const riskColor = risk > 70 ? '#FF4444' : risk > 40 ? '#FFAA00' : '#44FF44';
+
+                    // Save to database
+                    await CodebaseFile.findOneAndUpdate(
+                        { repoId, path: relativePath },
+                        {
+                            $set: {
+                                loc: complexity.loc,
+                                complexity: {
+                                    cyclomatic: complexity.complexity,
+                                    cognitive: complexity.cognitive || 0,
+                                    normalized: Math.min(100, complexity.complexity * 5),
+                                    healthScore: Math.max(0, 100 - (complexity.complexity * 5))
+                                },
+                                churn: {
+                                    totalCommits: churnRate,
+                                    recentCommits: churnRate,
+                                    churnRate: churnRate / 13, // Approximate weekly rate over ~90 days
+                                    lastModified: new Date()
+                                },
+                                risk: {
+                                    score: risk,
+                                    category: riskCategory,
+                                    color: riskColor,
+                                    confidence: churnRate > 0 ? 'high' : 'medium'
+                                },
+                                language: this.detectLanguage(relativePath),
+                                lastAnalyzed: new Date(),
+                                dependencies: complexity.dependencies || []
+                            }
+                        },
+                        { upsert: true, new: true }
+                    );
+
+                    results.push({
+                        path: relativePath,
+                        complexity: complexity.complexity,
+                        churnRate,
+                        risk
+                    });
+
+                    processed++;
+
+                    // Emit progress
+                    if (progressCallback) {
+                        await progressCallback(processed, totalFiles, relativePath);
+                    } else if (processed % 10 === 0 && io) {
+                        io.emit('scan:progress', {
+                            repoId,
+                            processed,
+                            total: totalFiles,
+                            percentage: Math.round((processed / totalFiles) * 100)
+                        });
+                    }
+
+                } catch (err) {
+                    console.error(`Error analyzing file ${filePath}:`, err.message);
+                }
+            }
+
+            console.log(`✅ Local analysis complete. Analyzed ${results.length} files.`);
+
+            return {
+                success: true,
+                filesAnalyzed: results.length,
+                results
+            };
+
+        } catch (error) {
+            console.error('Local repository analysis error:', error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Detect programming language from file extension
+     */
+    detectLanguage(filename) {
+        const ext = filename.substring(filename.lastIndexOf('.')).toLowerCase();
+        // Map to enum values from CodebaseFile schema
+        const langMap = {
+            '.js': 'javascript', '.jsx': 'jsx', '.ts': 'typescript', '.tsx': 'tsx',
+            '.py': 'python', '.java': 'java', '.kt': 'kotlin', '.go': 'go',
+            '.rb': 'ruby', '.php': 'php', '.cs': 'csharp', '.cpp': 'cpp', '.c': 'c',
+            '.swift': 'swift', '.rs': 'rust', '.html': 'html', '.css': 'css',
+            '.scss': 'scss', '.json': 'json', '.yaml': 'yaml', '.yml': 'yaml'
+        };
+        return langMap[ext] || 'other';
+    }
+
+    /**
+     * Recursively walk a directory
+     */
+    async walkDirectory(dir) {
+        // console.log(`Walking directory: ${dir}`);
+        let files = [];
+        try {
+            const items = await fs.readdir(dir);
+
+            for (const item of items) {
+                const fullPath = path.join(dir, item);
+                const stat = await fs.stat(fullPath);
+
+                if (stat.isDirectory()) {
+                    if (item !== '.git' && item !== 'node_modules' && item !== 'dist') {
+                        const subFiles = await this.walkDirectory(fullPath);
+                        files = files.concat(subFiles);
+                    }
+                } else {
+                    files.push(fullPath);
+                }
+            }
+        } catch (err) {
+            console.error(`Error walking ${dir}:`, err.message);
+        }
+        return files;
+    }
 
     /**
      * Check if file should be analyzed
      */
     shouldAnalyzeFile(filename) {
-        const analyzableExtensions = ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'];
+        const analyzableExtensions = [
+            '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', // JS/TS
+            '.py', '.java', '.rb', '.go', '.rs', '.php', // Backend
+            '.c', '.cpp', '.h', '.cs', '.swift', '.kt', // Systems/Mobile
+            '.html', '.css', '.scss', '.less', '.json', '.xml', '.yaml', '.yml' // Web/Config
+        ];
         const ext = filename.substring(filename.lastIndexOf('.'));
 
         // Exclude node_modules and other common directories

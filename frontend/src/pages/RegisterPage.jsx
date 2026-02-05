@@ -67,7 +67,7 @@ const RegisterPage = () => {
     return (
         <Grid container sx={{ minHeight: '100vh', overflow: 'hidden' }}>
             {/* Left Side - Form */}
-            <Grid item xs={12} md={5} sx={{
+            <Grid size={{ xs: 12, md: 5 }} sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -242,7 +242,7 @@ const RegisterPage = () => {
 
             {/* Right Side - Visual */}
             {!isMobile && (
-                <Grid item md={7} sx={{ position: 'relative', bgcolor: '#0f172a', overflow: 'hidden' }}>
+                <Grid size={{ md: 7 }} sx={{ position: 'relative', bgcolor: '#0f172a', overflow: 'hidden' }}>
                     <Box sx={{
                         position: 'absolute',
                         top: 0, left: 0, width: '100%', height: '100%',
