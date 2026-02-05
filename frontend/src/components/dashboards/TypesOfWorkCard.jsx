@@ -131,7 +131,7 @@ const TypesOfWorkCard = ({ projectId, onTypeClick }) => {
                 borderRadius: 8,
                 border: '1px solid #f0f0f0'
             }}
-            bodyStyle={{ padding: '16px 0' }}
+            styles={{ body: { padding: '16px 0' } }}
         >
             {hasData ? (
                 <Space direction="vertical" style={{ width: '100%' }} size={0}>

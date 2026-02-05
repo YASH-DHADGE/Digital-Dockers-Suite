@@ -1,25 +1,38 @@
 {
   "name": "digital-dockers-suite",
   "version": "1.0.0",
-  "description": "",
+  "description": "Enterprise workplace automation platform with AI-powered code health monitoring",
   "main": "server.js",
   "scripts": {
+    "prestart": "node scripts/kill_port.js",
     "start": "node server.js",
+    "predev": "node scripts/kill_port.js",
     "dev": "nodemon server.js",
+    "seed": "node scripts/seedTechDebt.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "workplace",
+    "automation",
+    "ai",
+    "tech-debt",
+    "code-health"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@babel/parser": "^7.28.6",
+    "@babel/traverse": "^7.28.6",
     "@google/generative-ai": "^0.24.1",
     "@langchain/openai": "^1.2.0",
+    "@octokit/rest": "^22.0.1",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
+    "eslint": "^9.39.2",
     "express": "^5.2.1",
     "express-async-handler": "^1.2.0",
     "express-validator": "^7.3.1",
@@ -36,7 +49,7 @@
     "nodemailer": "^7.0.11",
     "officeparser": "^5.2.2",
     "ollama": "^0.6.3",
-    "openai": "^6.15.0",
+    "openai": "^6.16.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-microsoft": "^2.1.0",
@@ -44,9 +57,17 @@
     "pptxgenjs": "^4.0.1",
     "puppeteer": "^24.36.0",
     "sharp": "^0.34.5",
-    "socket.io": "^4.8.1"
+    "simple-git": "^3.30.0",
+    "socket.io": "^4.8.1",
+    "typhonjs-escomplex": "^0.1.0"
+  },
+  "optionalDependencies": {
+    "bull": "^4.16.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

@@ -15,6 +15,7 @@ import {
     UsergroupAddOutlined,
     MailOutlined,
     FilePptOutlined,
+    SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -62,6 +63,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
                 { key: '/dashboard/backlog', icon: <InboxOutlined />, label: 'Backlog' },
                 { key: '/dashboard/roadmap', icon: <CalendarOutlined />, label: 'Roadmap' },
                 { key: '/dashboard/reports', icon: <BarChartOutlined />, label: 'Reports' },
+                { key: '/dashboard/tech-debt', icon: <SafetyCertificateOutlined />, label: 'Code Health' },
             ]
         },
         { type: 'divider' },
@@ -117,8 +119,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
                 onClose={() => setMobileOpen(false)}
                 open={mobileOpen}
                 width={280}
-                styles={{ body: { padding: 0 } }}
-                headerStyle={{ display: 'none' }} // Hide mock header in drawer
+                styles={{ body: { padding: 0 }, header: { display: 'none' } }}
             >
                 <div style={{ padding: '24px 24px 0', marginBottom: 24 }}>
                     <div style={{ fontSize: 18, fontWeight: 'bold', color: '#0052CC' }}>Digital Dockers</div>

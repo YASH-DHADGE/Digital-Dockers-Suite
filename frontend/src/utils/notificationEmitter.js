@@ -7,7 +7,7 @@ import axios from 'axios';
  */
 
 class NotificationEmitter {
-  constructor(baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000') {
+  constructor(baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001') {
     this.baseURL = baseURL;
     this.apiClient = axios.create({
       baseURL: `${baseURL}/api`
