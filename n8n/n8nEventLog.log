@@ -1,0 +1,2 @@
+{"__type":"$$EventMessageAudit","id":"b2fe8f98-c2fa-42ee-83e5-cdee7b6cb476","ts":"2026-02-19T01:34:44.071-05:00","eventName":"n8n.audit.user.login.success","message":"n8n.audit.user.login.success","payload":{"userId":"4d3fc1b6-ad2c-44ea-aea5-00ae4de9eade","_email":"yash.dhadge_comp23@pccoer.in","_firstName":"YASH","_lastName":"DHADGE","globalRole":"global:owner","authenticationMethod":"email"}}
+{"__type":"$$EventMessageConfirm","confirm":"b2fe8f98-c2fa-42ee-83e5-cdee7b6cb476","ts":"2026-02-19T01:34:44.072-05:00","source":{"id":"0","name":"eventBus"}}
