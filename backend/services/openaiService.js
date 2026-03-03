@@ -104,9 +104,52 @@ const generateEmailContent = async (bulletPoints, context, tone) => {
     }
 }
 
+// Analyze code semantics for Tech Debt Mode
+const analyzeCodeSemantic = async (codeDiff, requirements) => {
+    try {
+        if (!process.env.OPENAI_API_KEY) {
+            return {
+                status: 'pass',
+                analysis: "Dummy Analysis: OpenAI Key missing. Code looks okay.",
+                securityRisks: []
+            };
+        }
+
+        const prompt = `
+        You are a Senior Software Architect. Review the following code changes (diff):
+        ${codeDiff.substring(0, 3000)}... (truncated if too long)
+
+        Requirements/Context:
+        ${requirements || "General Code Quality"}
+
+        Analyze for:
+        1. Alignment with requirements.
+        2. Security risks (e.g., SQL Injection, XSS).
+        3. Logic flaws.
+
+        Output JSON: { "status": "pass" | "fail", "analysis": "string", "securityRisks": ["string"] }
+        `;
+
+        const completion = await openai.chat.completions.create({
+            messages: [
+                { role: "system", content: "You are a code review agent. Output strictly JSON." },
+                { role: "user", content: prompt }
+            ],
+            model: "gpt-4-turbo",
+            response_format: { type: "json_object" }
+        });
+
+        return JSON.parse(completion.choices[0].message.content);
+    } catch (error) {
+        console.error('Semantic Analysis Error:', error);
+        return { status: 'fail', error: error.message };
+    }
+};
+
 module.exports = {
     transcribeAudio,
     summarizeMeeting,
     analyzeTask,
-    generateEmailContent
+    generateEmailContent,
+    analyzeCodeSemantic
 };

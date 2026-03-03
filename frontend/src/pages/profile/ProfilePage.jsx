@@ -59,7 +59,7 @@ const ProfilePage = () => {
                         <Button
                             variant={user?.googleId ? "outlined" : "contained"}
                             color={user?.googleId ? "error" : "primary"}
-                            href="http://localhost:5000/api/auth/google" // Triggers backend OAuth route
+                            href={`${import.meta.env.VITE_API_URL || ''}/api/auth/google`}
                         >
                             {user?.googleId ? 'Disconnect' : 'Connect'}
                         </Button>

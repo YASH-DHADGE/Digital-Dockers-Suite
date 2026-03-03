@@ -17,6 +17,7 @@ import BacklogPage from './components/backlog/BacklogPage';
 import RoadmapPage from './components/dashboards/RoadmapPage';
 import MeetingsPage from './components/meetings/MeetingsPage';
 import EmailGeneratorPage from './pages/apps/EmailGeneratorPage';
+import PPTGeneratorPage from './pages/apps/PPTGeneratorPage';
 import DocumentManager from './components/documents/DocumentManager';
 import WellnessCheckin from './components/wellness/WellnessCheckin';
 import ReportDashboard from './components/reports/ReportDashboard';
@@ -30,8 +31,7 @@ import ProjectsListPage from './pages/ProjectsListPage';
 import Spaces from './components/spaces/Spaces';
 import CalendarWorkPlanner from './components/CalendarWorkPlanner';
 import TeamManagement from './components/admin/TeamManagement';
-import SlideGeneratorPage from './pages/apps/SlideGeneratorPage';
-import PresentationViewer from './pages/apps/PresentationViewer';
+import TechDebtPage from './pages/TechDebtPage';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, roles = [] }) => {
@@ -81,6 +81,7 @@ function App() {
                   <Route path="roadmap" element={<RoadmapPage />} />
                   <Route path="meetings" element={<MeetingsPage />} />
                   <Route path="email-generator" element={<EmailGeneratorPage />} />
+                  <Route path="ppt-generator" element={<PPTGeneratorPage />} />
                   <Route path="documents" element={<DocumentManager />} />
                   <Route path="wellness" element={<WellnessCheckin />} />
                   <Route path="reports" element={<ReportDashboard />} />
@@ -91,8 +92,10 @@ function App() {
                   <Route path="projects" element={<ProjectsListPage />} />
                   <Route path="spaces" element={<Spaces />} />
                   <Route path="work-planner" element={<CalendarWorkPlanner />} />
-                  <Route path="slide-generator" element={<SlideGeneratorPage />} />
-                  <Route path="presentations/:id" element={<PresentationViewer />} />
+                  <Route path="tech-debt" element={<TechDebtPage />} />
+                  {/* TODO: Add SlideGeneratorPage and PresentationViewer when implemented */}
+                  {/* <Route path="slide-generator" element={<SlideGeneratorPage />} /> */}
+                  {/* <Route path="presentations/:id" element={<PresentationViewer />} /> */}
                   <Route path="team-management" element={
                     <ProtectedRoute roles={['admin']}>
                       <TeamManagement />

@@ -14,7 +14,7 @@ import axios from 'axios';
 export const useRealtimeNotifications = (token) => {
   const socketRef = useRef(null);
   const reconnectTimeoutRef = useRef(null);
-  
+
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
@@ -30,7 +30,7 @@ export const useRealtimeNotifications = (token) => {
     }
 
     try {
-      const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5000', {
+      const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:5001', {
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
@@ -52,7 +52,7 @@ export const useRealtimeNotifications = (token) => {
           if (response.success) {
             console.log('[Notification] Authenticated successfully');
             setUnreadCount(response.unreadCount);
-            
+
             // Set initial notifications
             if (response.feed && response.feed.length > 0) {
               setNotifications(response.feed);
@@ -61,8 +61,8 @@ export const useRealtimeNotifications = (token) => {
 
             // Handle reconnect - fetch missed notifications
             if (lastNotificationId) {
-              socket.emit('notification:reconnect', 
-                { lastNotificationId }, 
+              socket.emit('notification:reconnect',
+                { lastNotificationId },
                 (reconnectResponse) => {
                   if (reconnectResponse.success && reconnectResponse.newNotifications?.length > 0) {
                     setNotifications(prev => [
@@ -142,7 +142,7 @@ export const useRealtimeNotifications = (token) => {
     } catch (err) {
       console.error('[Notification] Failed to connect:', err);
       setError(err.message);
-      
+
       // Retry connection after delay
       reconnectTimeoutRef.current = setTimeout(connect, 5000);
     }
@@ -158,7 +158,7 @@ export const useRealtimeNotifications = (token) => {
 
     // Also make API call for persistence
     axios.put(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/${notificationId}/read`,
+      `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/notifications/${notificationId}/read`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     ).catch(err => console.error('[Notification] Error marking as read:', err));
@@ -173,7 +173,7 @@ export const useRealtimeNotifications = (token) => {
     }
 
     axios.put(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/read/all`,
+      `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/notifications/read/all`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     ).catch(err => console.error('[Notification] Error marking all as read:', err));
@@ -188,7 +188,7 @@ export const useRealtimeNotifications = (token) => {
     }
 
     axios.put(
-      `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications/${notificationId}/archive`,
+      `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/notifications/${notificationId}/archive`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     ).catch(err => console.error('[Notification] Error archiving:', err));
@@ -200,7 +200,7 @@ export const useRealtimeNotifications = (token) => {
   const fetchNotifications = useCallback(async (page = 1, limit = 10) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/notifications`,
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/notifications`,
         {
           params: { page, limit },
           headers: { Authorization: `Bearer ${token}` }

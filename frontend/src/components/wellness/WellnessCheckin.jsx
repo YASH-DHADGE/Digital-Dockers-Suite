@@ -1,65 +1,106 @@
 import { useState } from 'react';
-import {
-    Box, Typography, Slider, RadioGroup, FormControlLabel,
-    Radio, Button, Paper, Alert
-} from '@mui/material';
-import api from '../../services/api';
+import { Box, Typography, Paper, Tabs, Tab, useTheme } from '@mui/material';
+import { Air, Psychology } from '@mui/icons-material';
+import BreathingExercise from './BreathingExercise';
+import WellnessCounselor from './WellnessCounselor';
 
 const WellnessCheckin = () => {
-    const [stress, setStress] = useState(5);
-    const [mood, setMood] = useState('neutral');
-    const [submitted, setSubmitted] = useState(false);
-
-    const handleSubmit = async () => {
-        try {
-            await api.post('/wellness/checkin', {
-                responses: {
-                    stressLevel: stress,
-                    mood: mood,
-                }
-            });
-            setSubmitted(true);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    if (submitted) {
-        return <Alert severity="success">Thanks for checking in! Take care of yourself.</Alert>;
-    }
+    const [activeTab, setActiveTab] = useState(0);
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
 
     return (
-        <Paper sx={{ p: 4, maxWidth: 600, mx: 'auto' }}>
-            <Typography variant="h5" gutterBottom>Daily Wellness Check-in</Typography>
+        <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
+            {/* Header */}
+            <Box sx={{ mb: 4, textAlign: 'center' }}>
+                <Typography
+                    variant="h4"
+                    fontWeight={700}
+                    sx={{
+                        background: isDark
+                            ? 'linear-gradient(135deg, #818cf8 0%, #22d3ee 100%)'
+                            : 'linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        mb: 1
+                    }}
+                >
+                    🧘 Wellness Center
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                    Take a moment to care for yourself
+                </Typography>
+            </Box>
 
-            <Typography gutterBottom sx={{ mt: 3 }}>Stress Level (1-10)</Typography>
-            <Slider
-                value={stress}
-                onChange={(_, val) => setStress(val)}
-                min={1}
-                max={10}
-                valueLabelDisplay="auto"
-                marks
-            />
-
-            <Typography gutterBottom sx={{ mt: 3 }}>Current Mood</Typography>
-            <RadioGroup row value={mood} onChange={(e) => setMood(e.target.value)}>
-                <FormControlLabel value="excellent" control={<Radio color="success" />} label="Excellent" />
-                <FormControlLabel value="good" control={<Radio color="primary" />} label="Good" />
-                <FormControlLabel value="neutral" control={<Radio color="default" />} label="Neutral" />
-                <FormControlLabel value="stressed" control={<Radio color="warning" />} label="Stressed" />
-                <FormControlLabel value="burnout" control={<Radio color="error" />} label="Burnout" />
-            </RadioGroup>
-
-            <Button
-                variant="contained"
-                fullWidth
-                sx={{ mt: 4 }}
-                onClick={handleSubmit}
+            {/* Tabs */}
+            <Paper
+                elevation={isDark ? 0 : 1}
+                sx={{
+                    mb: 4,
+                    borderRadius: 3,
+                    overflow: 'hidden',
+                    border: isDark ? '1px solid' : 'none',
+                    borderColor: 'divider'
+                }}
             >
-                Submit Check-in
-            </Button>
-        </Paper>
+                <Tabs
+                    value={activeTab}
+                    onChange={(_, v) => setActiveTab(v)}
+                    variant="fullWidth"
+                    sx={{
+                        bgcolor: 'background.paper',
+                        '& .MuiTab-root': {
+                            py: 2,
+                            fontSize: '1rem',
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            color: 'text.secondary',
+                            '&:hover': {
+                                bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'
+                            }
+                        },
+                        '& .Mui-selected': {
+                            color: 'primary.main'
+                        },
+                        '& .MuiTabs-indicator': {
+                            height: 3,
+                            bgcolor: 'primary.main'
+                        }
+                    }}
+                >
+                    <Tab icon={<Air />} label="Breathe" iconPosition="start" />
+                    <Tab icon={<Psychology />} label="Talk" iconPosition="start" />
+                </Tabs>
+            </Paper>
+
+            {/* Tab Content */}
+            <Box sx={{ mt: 3 }}>
+                {/* Breathing Tab */}
+                {activeTab === 0 && (
+                    <Paper
+                        elevation={isDark ? 0 : 1}
+                        sx={{
+                            p: 4,
+                            borderRadius: 3,
+                            border: isDark ? '1px solid' : 'none',
+                            borderColor: 'divider'
+                        }}
+                    >
+                        <Typography variant="h6" gutterBottom sx={{ mb: 3, textAlign: 'center' }}>
+                            🌬️ Breathing Exercises
+                        </Typography>
+                        <BreathingExercise />
+                    </Paper>
+                )}
+
+                {/* Talk Tab - Wellness Companion */}
+                {activeTab === 1 && (
+                    <Box>
+                        <WellnessCounselor />
+                    </Box>
+                )}
+            </Box>
+        </Box>
     );
 };
 

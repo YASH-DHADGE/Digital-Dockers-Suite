@@ -14,7 +14,9 @@ import {
     BarChartOutlined,
     UsergroupAddOutlined,
     MailOutlined,
-    SlidersOutlined,
+    FilePptOutlined,
+    SafetyCertificateOutlined,
+    AppstoreOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -37,7 +39,7 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
     } = theme.useToken();
 
     // Determine current sidebar state based on breakpoints
-    const isMobile = !screens.md; // < 768px
+    const isMobile = !screens.md; // Keep for some logic if needed, but styling is tailwind-driven
 
     // On tablet (md && !xl), default to collapsed (icon only)
     // On desktop (xl), default to full
@@ -62,18 +64,19 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
                 { key: '/dashboard/backlog', icon: <InboxOutlined />, label: 'Backlog' },
                 { key: '/dashboard/roadmap', icon: <CalendarOutlined />, label: 'Roadmap' },
                 { key: '/dashboard/reports', icon: <BarChartOutlined />, label: 'Reports' },
+                { key: '/dashboard/tech-debt', icon: <SafetyCertificateOutlined />, label: 'Code Health' },
             ]
         },
         { type: 'divider' },
         {
-            key: 'global-group',
-            label: 'APPS',
-            type: 'group',
+            key: 'apps-toolkit',
+            label: 'Apps & Toolkit',
+            icon: <AppstoreOutlined />,
             children: [
                 { key: '/dashboard/meetings', icon: <MessageOutlined />, label: 'Meetings', hidden: !hasAccess(['project_manager', 'technical_lead']) },
                 { key: '/dashboard/documents', icon: <FileTextOutlined />, label: 'Documents' },
                 { key: '/dashboard/email-generator', icon: <MailOutlined />, label: 'AI Email' },
-                { key: '/dashboard/slide-generator', icon: <SlidersOutlined />, label: 'AI Slides' },
+                { key: '/dashboard/ppt-generator', icon: <FilePptOutlined />, label: 'AI PPT Generator' },
                 { key: '/dashboard/chat', icon: <MessageOutlined />, label: 'Chat' },
                 { key: '/dashboard/organization', icon: <ApartmentOutlined />, label: 'Team' },
                 { key: '/dashboard/wellness', icon: <HeartOutlined />, label: 'Wellness' },
@@ -109,50 +112,50 @@ const Sidebar = ({ mobileOpen, setMobileOpen, collapsed }) => {
         />
     );
 
-    // Mobile Drawer
-    if (isMobile) {
-        return (
-            <Drawer
-                placement="left"
-                onClose={() => setMobileOpen(false)}
-                open={mobileOpen}
-                width={280}
-                styles={{ body: { padding: 0 } }}
-                headerStyle={{ display: 'none' }} // Hide mock header in drawer
-            >
-                <div style={{ padding: '24px 24px 0', marginBottom: 24 }}>
-                    <div style={{ fontSize: 18, fontWeight: 'bold', color: '#0052CC' }}>Digital Dockers</div>
-                </div>
-                {MenuContent}
-            </Drawer>
-        );
-    }
-
-    // Desktop/Tablet Sider
     return (
-        <Sider
-            trigger={null}
-            collapsible
-            collapsed={effectiveCollapsed && !hoverExpanded}
-            width={240}
-            collapsedWidth={80}
-            onMouseEnter={() => !screens.xl && setHoverExpanded(true)}
-            onMouseLeave={() => setHoverExpanded(false)}
-            style={{
-                background: colorBgContainer,
-                borderRight: `1px solid ${colorBorderSecondary}`,
-                overflowX: 'hidden',
-                overflowY: 'auto',
-                height: 'calc(100vh - 60px)',
-                position: 'fixed',
-                left: 0,
-                top: 60,
-                zIndex: 900,
-                transition: 'all 0.2s'
-            }}
-        >
-            {MenuContent}
-        </Sider>
+        <>
+            {/* Mobile Drawer */}
+            <div className="md:hidden">
+                <Drawer
+                    placement="left"
+                    onClose={() => setMobileOpen(false)}
+                    open={mobileOpen}
+                    width={280}
+                    styles={{ body: { padding: 0 }, header: { display: 'none' } }}
+                >
+                    <div style={{ padding: '24px 24px 0', marginBottom: 24 }}>
+                        <div style={{ fontSize: 18, fontWeight: 'bold', color: '#0052CC' }}>Digital Dockers</div>
+                    </div>
+                    {MenuContent}
+                </Drawer>
+            </div>
+
+            {/* Desktop/Tablet Sider */}
+            <Sider
+                trigger={null}
+                collapsible
+                collapsed={effectiveCollapsed && !hoverExpanded}
+                width={240}
+                collapsedWidth={80}
+                onMouseEnter={() => !screens.xl && setHoverExpanded(true)}
+                onMouseLeave={() => setHoverExpanded(false)}
+                className="hidden md:block"
+                style={{
+                    background: colorBgContainer,
+                    borderRight: `1px solid ${colorBorderSecondary}`,
+                    overflowX: 'hidden',
+                    overflowY: 'auto',
+                    height: 'calc(100vh - 60px)',
+                    position: 'fixed',
+                    left: 0,
+                    top: 60,
+                    zIndex: 900,
+                    transition: 'all 0.2s'
+                }}
+            >
+                {MenuContent}
+            </Sider>
+        </>
     );
 };
 

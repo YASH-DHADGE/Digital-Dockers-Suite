@@ -46,8 +46,18 @@ const DashboardLayout = () => {
                 algorithm,
                 token: {
                     colorPrimary: '#0052CC',
-                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                     borderRadius: 8,
+                    colorBgLayout: mode === 'dark' ? '#0d1117' : '#f4f5f7',
+                    colorBgContainer: mode === 'dark' ? '#161b22' : '#ffffff',
+                },
+                components: {
+                    Card: {
+                        borderRadiusLG: 12,
+                    },
+                    Button: {
+                        borderRadius: 8,
+                    },
                 },
             }}
         >
@@ -63,13 +73,18 @@ const DashboardLayout = () => {
                     <Content
                         style={{
                             marginLeft: getContentMargin(),
-                            padding: isMobile ? 16 : 24,
+                            padding: isMobile ? 12 : isTablet ? 16 : 24,
                             minHeight: 'calc(100vh - 60px)',
-                            transition: 'margin-left 0.2s ease, padding 0.2s ease',
+                            transition: 'margin-left 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease',
                             overflow: 'auto',
+                            background: mode === 'dark'
+                                ? 'linear-gradient(135deg, #0d1117 0%, #161b22 100%)'
+                                : 'linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%)',
                         }}
                     >
-                        <Outlet />
+                        <div className="scale-in">
+                            <Outlet />
+                        </div>
                     </Content>
                 </Layout>
             </Layout>

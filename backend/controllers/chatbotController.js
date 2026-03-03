@@ -89,12 +89,14 @@ const getWelcome = asyncHandler(async (req, res) => {
 
     res.json({
         success: true,
-        message: `Hi ${userName}! 👋 I'm DockerBot, your AI assistant. I can help you navigate the platform, find your tasks, check meetings, and more. What would you like to know?`,
+        message: `Hi ${userName}! 👋 I'm DockerBot, your AI assistant. I can help you with tasks, meetings, navigation, and more. What would you like to know?`,
         suggestions: [
-            "What are my tasks?",
+            "What are my pending tasks?",
+            "When is my next meeting?",
             "How do I create a sprint?",
-            "Show me the dashboard features",
-            "When is my next meeting?"
+            "What should I work on today?",
+            "How does the AI Email work?",
+            "Show me the dashboard features"
         ]
     });
 });

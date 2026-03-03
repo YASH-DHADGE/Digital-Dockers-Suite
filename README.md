@@ -1,422 +1,382 @@
-# Digital Dockers Suite - AI-Powered Workplace Platform
+<p align="center">
+  <img src="https://img.shields.io/badge/Digital_Dockers-Suite-6C63FF?style=for-the-badge&labelColor=0D1117&logo=docker&logoColor=6C63FF" alt="Digital Dockers Suite" />
+</p>
 
-> **Your Complete Digital Workspace** - A comprehensive AI-powered productivity platform combining document management, team communication, task tracking, and intelligent insights.
+<h1 align="center">🚀 Digital Dockers Suite</h1>
+
+<p align="center">
+  <strong>An AI-Powered Enterprise Workplace Automation Platform</strong>
+</p>
+
+<p align="center">
+  <em>All-in-one project management, team collaboration, and code health monitoring — supercharged with AI.</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-7-646CFF?style=flat-square&logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Express-5-000000?style=flat-square&logo=express&logoColor=white" />
+  <img src="https://img.shields.io/badge/MongoDB-Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white" />
+  <img src="https://img.shields.io/badge/Socket.IO-4-010101?style=flat-square&logo=socket.io&logoColor=white" />
+  <img src="https://img.shields.io/badge/Gemini-AI-8E75B2?style=flat-square&logo=googlegemini&logoColor=white" />
+  <img src="https://img.shields.io/badge/n8n-Workflows-EA4B71?style=flat-square&logo=n8n&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-ISC-blue?style=flat-square" />
+</p>
+
+<br />
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Architecture](#-architecture)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Project Structure](#-project-structure)
+- [API Reference](#-api-reference)
+- [n8n Workflows](#-n8n-workflows)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
 
 ## 🌟 Overview
 
-Digital Dockers Suite is a modern MERN-stack application designed to streamline workplace productivity. The platform integrates multiple productivity tools into one cohesive workspace:
+**Digital Dockers Suite** is a full-stack, AI-powered enterprise workspace designed for modern engineering teams. It combines **project management**, **real-time collaboration**, **AI-driven code health analysis**, and **workplace automation** into a single, unified platform.
 
-- **Document Management** - Upload, analyze, and extract insights from documents
-- **AI Chat Assistant** - OpenAI and Ollama-powered conversational AI
-- **Task Management** - Organize and track tasks with deadlines
-- **Team Communication** - Real-time messaging and group chats
-- **Calendar Integration** - Google Calendar sync for meetings
-- **Email Management** - Integrated email workflows
-- **Meeting Scheduler** - Plan and organize meetings
-- **AI Insights** - Data-driven analytics and recommendations
-- **Reports Generation** - Automated reporting tools
+Built with a MERN-like stack (MongoDB, Express, React, Node.js) and enhanced with **Google Gemini AI**, **Socket.IO** for real-time features, and **n8n** workflow automations, the platform empowers teams to plan sprints, monitor technical debt, review pull requests, generate reports, and much more — all from one dashboard.
+
+---
+
+## ✨ Key Features
+
+### 📊 Project Management
+| Feature | Description |
+|---|---|
+| **Kanban Task Board** | Drag-and-drop task management with priorities, labels, and assignments |
+| **Sprint Planning** | Create and manage sprints with burndown charts and velocity tracking |
+| **Backlog Grooming** | Organize and prioritize your product backlog |
+| **Epic & Roadmap Timelines** | Visualize project milestones on interactive roadmap views |
+| **Subtask Hierarchies** | Break tasks into granular work items with dependency tracking |
+| **Work Logs & Time Tracking** | Built-in timer and manual logging for work effort tracking |
+
+### 🤖 AI-Powered Intelligence
+| Feature | Description |
+|---|---|
+| **Codebase MRI** | Deep-scan any GitHub repo for tech debt — complexity hotspots, churn analysis, dependency risks, and code smells visualized via heatmaps and scatter plots |
+| **Gatekeeper Stream** | AI-powered pull request review feed with automated code quality analysis |
+| **AI Chatbot** | Context-aware assistant powered by Gemini AI for project queries |
+| **Smart Reassignment** | AI-driven workload balancing and task reassignment recommendations |
+| **AI Insight Banners** | Personalized "For You" suggestions based on project activity |
+| **RAG Document Search** | Retrieval-Augmented Generation for intelligent document querying |
+
+### 💬 Real-Time Collaboration
+| Feature | Description |
+|---|---|
+| **Live Chat** | Real-time messaging with room-based conversations via Socket.IO |
+| **Spaces** | Collaborative workspaces with content, comments, and activity feeds |
+| **Notifications** | Real-time push notifications with read/unread, categories, and batching |
+| **Activity Stream** | Live feed of all project events and team actions |
+
+### 🏢 Workplace Tools
+| Feature | Description |
+|---|---|
+| **Meeting Scheduler** | Create, manage, and track meetings with agenda support |
+| **Email Generator** | AI-powered professional email drafting |
+| **PPT Generator** | Automated presentation creation powered by n8n + PptxGenJS |
+| **Document Manager** | Upload, analyze, and organize documents (PDF, DOCX parsing) |
+| **Calendar Work Planner** | Visual calendar for planning and scheduling work items |
+| **Wellness Check-ins** | AI-powered wellness companion for team mental health tracking |
+
+### 🛡️ Administration & Reporting
+| Feature | Description |
+|---|---|
+| **Role-Based Dashboards** | Custom views for Admins, Project Managers, Team Leads, and Developers |
+| **Team Management** | Organizational graph, team CRUD, and member role management |
+| **Reports & Analytics** | Generate project status reports with integrated charts |
+| **Workload Dashboard** | Monitor team capacity and identify overloaded members |
+| **GitHub Webhooks** | Ingest GitHub events for automated PR tracking and issue syncing |
+
+---
+
+## 🏗️ Architecture
+
+![WhatsApp Image 2026-02-25 at 1 17 02 AM](https://github.com/user-attachments/assets/6e10bbb5-da19-4b66-b23a-720f3309e52b)
+
+
+## 🛠️ Tech Stack
+
+### Frontend
+| Technology | Purpose |
+|---|---|
+| **React 19** | UI framework |
+| **Vite 7** | Build tool & dev server |
+| **MUI (Material UI) 7** | Primary component library |
+| **Ant Design 6** | Supplementary UI components |
+| **Framer Motion** | Animations & transitions |
+| **D3.js** | Advanced data visualizations (Codebase MRI heatmaps) |
+| **Recharts + Chart.js** | Dashboard charts & burndown graphs |
+| **ReactFlow + Dagre** | Organizational graph layout |
+| **Socket.IO Client** | Real-time WebSocket communication |
+| **React Hook Form + Yup** | Form handling & validation |
+| **React Router v7** | Client-side routing |
+
+### Backend
+| Technology | Purpose |
+|---|---|
+| **Node.js** | Runtime environment |
+| **Express 5** | Web framework |
+| **MongoDB + Mongoose 9** | Database & ODM |
+| **Socket.IO 4** | Real-time bidirectional communication |
+| **Passport.js** | Authentication (JWT + Google OAuth 2.0) |
+| **Google Gemini AI** | AI-powered analysis, chatbot, and insights |
+| **Mistral AI** | Wellness companion AI |
+| **OpenAI** | Code review analysis |
+| **Octokit** | GitHub API integration |
+| **Bull** | Job queue management (Redis-backed) |
+| **Sharp** | Image processing |
+| **Puppeteer** | Web scraping & PDF generation |
+| **PptxGenJS** | PowerPoint presentation generation |
+| **Nodemailer** | Email delivery |
+
+### DevOps & Tooling
+| Technology | Purpose |
+|---|---|
+| **n8n** | Workflow automation (Email, PPT, Document analysis) |
+| **Concurrently** | Parallel process runner for monorepo dev |
+| **Nodemon** | Backend hot-reload |
+| **ESLint** | Code linting |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- **Node.js** ≥ 20.0.0
+- **npm** ≥ 9.x
+- **MongoDB Atlas** account (or local MongoDB instance)
+- **Git**
+
+### Installation
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/SiddharajShirke/Digital-Dockers-Suite.git
+cd Digital-Dockers-Suite
+```
+
+**2. Install all dependencies**
+
+```bash
+# Install root, backend, and frontend dependencies
+npm run install:all
+```
+
+> **💡 Tip:** If you encounter peer dependency conflicts, use:
+> ```bash
+> cd backend && npm install --legacy-peer-deps
+> cd ../frontend && npm install --legacy-peer-deps
+> ```
+
+**3. Set up environment variables**
+
+```bash
+# Copy the example env file
+cp backend/.env.example backend/.env
+```
+
+Edit `backend/.env` with your actual credentials (see [Environment Variables](#-environment-variables)).
+
+**4. Start the application**
+
+```bash
+# Start both frontend and backend concurrently
+npm run dev
+```
+
+Or start them separately:
+
+```bash
+# Terminal 1 — Backend (port 5001)
+npm run server
+
+# Terminal 2 — Frontend (port 5173)
+npm run client
+```
+
+**5. Open in browser**
+
+Navigate to: [http://localhost:5173](http://localhost:5173)
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file in the `backend/` directory. See [`backend/.env.example`](backend/.env.example) for a complete template.
+
+| Variable | Required | Description |
+|---|---|---|
+| `MONGO_URI` | ✅ | MongoDB connection string |
+| `JWT_SECRET` | ✅ | Secret key for JWT token signing |
+| `JWT_EXPIRE` | ✅ | Token expiry duration (e.g., `30d`) |
+| `PORT` | ❌ | Server port (default: `5000`) |
+| `NODE_ENV` | ❌ | Environment mode (`development` / `production`) |
+| `GOOGLE_CLIENT_ID` | ❌ | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | ❌ | Google OAuth client secret |
+| `GOOGLE_CALLBACK_URL` | ❌ | Google OAuth callback URL |
+| `GEMINI_API_KEY` | ❌ | Google Gemini API key (for AI features) |
+| `MISTRAL_API_KEY` | ❌ | Mistral AI key (for Wellness Companion) |
+| `OPENAI_API_KEY` | ❌ | OpenAI key (for code review) |
+| `GITHUB_TOKEN` | ❌ | GitHub PAT (increases API rate limit) |
+| `REDIS_URL` | ❌ | Redis URL (for Bull queues; mock used in dev) |
+| `CLIENT_URL` | ❌ | Frontend URL for CORS |
+| `N8N_PPT_WEBHOOK_URL` | ❌ | n8n webhook for PPT generation |
+
+---
 
 ## 📁 Project Structure
 
 ```
 Digital-Dockers-Suite/
-├── backend/                   # Node.js/Express backend
-│   ├── config/                # Configuration files
-│   ├── controllers/           # Request handlers
-│   ├── middlewares/           # Express middlewares
-│   ├── models/                # Mongoose schemas
-│   │   ├── Calendar.js        # Calendar events model
-│   │   ├── Chat.js            # Chat messages model
-│   │   ├── Communication.js   # Communication logs
-│   │   ├── Document.js        # Document metadata
-│   │   ├── DocumentAnalysis.js # AI analysis results
-│   │   ├── Email.js           # Email management
-│   │   ├── Insight.js         # Analytics insights
-│   │   ├── Meeting.js         # Meeting schedules
-│   │   ├── Message.js         # Messages model
-│   │   ├── Report.js          # Generated reports
-│   │   ├── Task.js            # Task management
-│   │   └── User.js            # User authentication
-│   ├── routes/                # API routes
-│   ├── scripts/               # Utility scripts
-│   ├── services/              # Business logic layer
-│   ├── uploads/               # File upload storage
-│   ├── .env                   # Environment variables
-│   ├── package.json           # Dependencies
-│   └── server.js              # Express server entry
-├── frontend/                  # React frontend
-│   ├── src/                   # Source files
-│   ├── public/                # Static assets
-│   └── package.json           # Frontend dependencies
-├── node_modules/              # Dependencies
-└── README.md                  # This file
+├── backend/                     # Express.js API Server
+│   ├── config/                  # DB connection, Passport, Queue config
+│   ├── controllers/             # Route handlers (32 controllers)
+│   ├── middlewares/              # Auth, role, upload, error middleware
+│   ├── models/                  # Mongoose schemas (32 models)
+│   ├── routes/                  # API route definitions (33 routes)
+│   ├── services/                # Business logic & AI integrations
+│   │   ├── analysis/            # CodebaseMRI analysis engine
+│   │   ├── geminiService.js     # Google Gemini AI integration
+│   │   ├── githubService.js     # GitHub API operations
+│   │   ├── prAnalysisService.js # Pull request code review AI
+│   │   └── ...                  # 27+ service modules
+│   ├── websocket/               # Socket.IO notification handler
+│   ├── scripts/                 # Utility & seed scripts
+│   ├── server.js                # Application entry point
+│   └── .env.example             # Environment variable template
+│
+├── frontend/                    # React + Vite Client App
+│   └── src/
+│       ├── components/          # UI Components (106+)
+│       │   ├── dashboards/      # Role-based dashboard views
+│       │   ├── tasks/           # Kanban board & task management
+│       │   ├── backlog/         # Backlog management
+│       │   ├── spaces/          # Collaborative workspaces
+│       │   ├── wellness/        # Wellness check-in UI
+│       │   ├── meetings/        # Meeting scheduler
+│       │   ├── chat/            # Real-time chat interface
+│       │   ├── CodebaseMRI.jsx  # Tech debt heatmap visualization
+│       │   └── ...
+│       ├── context/             # React Context (Auth, Chat, Theme, Timer, Project)
+│       ├── hooks/               # Custom hooks (WebSocket, Teams, Timer, etc.)
+│       ├── pages/               # Page-level components (14 pages)
+│       ├── services/            # API service layer (Axios clients)
+│       └── styles/              # Global styles & theme
+│
+├── n8n/                         # n8n Workflow Automations
+│   ├── Auto Email Sender.json
+│   ├── PPT Generator.json
+│   ├── Generate Structured Summary & Q&A from Documents.json
+│   └── Intelligent Legal Document Review.json
+│
+├── package.json                 # Root monorepo configuration
+└── README.md
 ```
-
-## 🚀 Features
-
-### 1. Document Management
-- Upload documents (PDF, DOCX, TXT)
-- AI-powered document analysis
-- Extract text and insights using Mammoth and pdf-parse
-- Categorize and organize documents
-- GridFS storage for large files
-
-### 2. AI Chat Assistant
-- **OpenAI Integration** - GPT-powered responses
-- **Ollama Support** - Local AI model deployment
-- **LangChain** - Advanced AI workflows
-- Context-aware conversations
-- Multi-user chat rooms
-- Direct messaging
-
-### 3. Task Management
-- Create and assign tasks
-- Set deadlines and priorities
-- Track progress and completion
-- Task categorization
-- Team collaboration
-
-### 4. Team Communication
-- Real-time messaging with Socket.IO
-- Group chats and channels
-- Direct messaging
-- Message history
-- File sharing
-
-### 5. Calendar Integration
-- Google Calendar API sync
-- Create and manage events
-- Meeting scheduling
-- Reminders and notifications
-- Calendar sharing
-
-### 6. Email Management
-- Nodemailer integration
-- Send and receive emails
-- Email templates
-- Automated notifications
-
-### 7. Meeting Scheduler
-- Schedule meetings
-- Participant management
-- Calendar integration
-- Meeting notes
-- Recurring meetings
-
-### 8. AI Insights & Analytics
-- Data-driven insights
-- Performance metrics
-- Trend analysis
-- Automated recommendations
-
-### 9. Reports Generation
-- Automated report creation
-- Custom report templates
-- Export capabilities
-- Scheduled reports
-
-### 10. Sub-Task Management ⭐ NEW
-- **Hierarchical Tasks** - Parent-child task relationships
-- **Auto Status Propagation** - Parent status updates automatically
-- **Story Points Aggregation** - Subtask points roll up to parent
-- **Burndown Analytics** - Real-time sprint progress tracking
-- **Smart Validation** - Prevent invalid nesting and circular references
-- **Audit Logging** - Track all subtask operations
-- **Drag-and-Drop** - Reorganize subtasks visually
-- **Team Collaboration** - Assign and track subtask progress
-
-## 🛠️ Technology Stack
-
-### Backend
-- **Runtime**: Node.js (v18+)
-- **Framework**: Express.js 5.x
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT + Passport.js (Google/Microsoft OAuth)
-- **Real-time**: Socket.IO
-- **File Storage**: GridFS, Multer
-- **AI/ML**: 
-  - OpenAI API
-  - Ollama (local models)
-  - LangChain
-- **Security**: Helmet, bcryptjs, express-validator
-
-### Frontend  
-- **Framework**: React.js
-- **State Management**: Context API / Redux
-- **Styling**: CSS/SCSS
-- **HTTP Client**: Axios
-
-### Key Dependencies
-- `googleapis` - Google Calendar/Drive integration
-- `nodemailer` - Email functionality
-- `mammoth` - DOCX parsing
-- `pdf-parse` - PDF text extraction
-- `dayjs` - Date/time manipulation
-- `morgan` - HTTP logging
-- `cors` - Cross-origin resource sharing
-
-## 📦 Installation
-
-### Prerequisites
-- Node.js (v18 or higher)
-- MongoDB (running locally or URI)
-- OpenAI API Key (for AI features)
-- Google/Microsoft Client IDs (for OAuth)
-
-### Setup Steps
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/YASH-DHADGE/Digital-Dockers-Suite.git
-cd Digital-Dockers-Suite
-```
-
-2. **Backend Setup**
-```bash
-cd backend
-npm install
-```
-
-3. **Configure environment variables**
-
-Create `.env` file in the `backend` directory:
-```env
-# Server Configuration
-PORT=5000
-NODE_ENV=development
-
-# Database
-MONGO_URI=mongodb://localhost:27017/digital-dockers
-
-# Authentication
-JWT_SECRET=your_jwt_secret_key_here
-JWT_EXPIRE=7d
-
-# OAuth
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_secret
-MICROSOFT_CLIENT_ID=your_microsoft_client_id
-MICROSOFT_CLIENT_SECRET=your_microsoft_secret
-
-# AI Services
-OPENAI_API_KEY=your_openai_api_key
-OLLAMA_BASE_URL=http://localhost:11434
-
-# Email
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASSWORD=your_email_password
-
-# Google Calendar API
-GOOGLE_API_KEY=your_google_api_key
-```
-
-4. **Frontend Setup**
-```bash
-cd ../frontend
-npm install
-```
-
-5. **Run development servers**
-
-**Backend:**
-```bash
-cd backend
-npm run dev    # Runs with nodemon
-# OR
-npm start      # Production mode
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm start
-```
-
-6. **Access the application**
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-
-## 📚 Database Models
-
-### User
-- Authentication credentials
-- Profile information
-- OAuth tokens
-- Roles and permissions
-
-### Document
-- File metadata (name, type, size)
-- Upload date and user
-- GridFS file reference
-- Tags and categories
-
-### DocumentAnalysis
-- Extracted text content
-- AI-generated insights
-- Document summary
-- Key entities and topics
-
-### Chat
-- Sender and recipient
-- Message content
-- Room/channel
-- Timestamp
-- Message type (direct/group)
-
-### Task
-- Title and description
-- Assigned user
-- Due date and priority
-- Status (pending/in-progress/completed)
-- Tags and categories
-
-### Meeting
-- Title and description
-- Participants
-- Date and time
-- Location (physical/virtual)
-- Calendar sync status
-
-### Calendar
-- Event details
-- Google Calendar ID
-- Attendees
-- Reminders
-
-### Email
-- Sender and recipients
-- Subject and body
-- Attachments
-- Send status
-
-### Insight
-- Analytics data
-- Generated insights
-- Recommendations
-- Date range
-
-### Report
-- Report type
-- Generated data
-- Creation date
-- Export format
-
-### Message
-- Communication logs
-- Message threading
-- Read status
-
-## 🔗 API Endpoints (Examples)
-
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `GET /api/auth/logout` - Logout
-- `GET /api/auth/google` - Google OAuth
-- `GET /api/auth/microsoft` - Microsoft OAuth
-
-### Documents
-- `POST /api/documents/upload` - Upload document
-- `GET /api/documents` - List all documents
-- `GET /api/documents/:id` - Get document
-- `DELETE /api/documents/:id` - Delete document
-- `POST /api/documents/:id/analyze` - AI analysis
-
-### Tasks
-- `POST /api/tasks` - Create task
-- `GET /api/tasks` - List tasks
-- `PUT /api/tasks/:id` - Update task
-- `DELETE /api/tasks/:id` - Delete task
-
-### Sub-Tasks ⭐ NEW
-- `POST /api/work-items/:parentId/subtasks` - Create sub-task
-- `GET /api/work-items/:parentId/subtasks` - List sub-tasks
-- `PATCH /api/work-items/:taskId/status` - Update sub-task status (auto-updates parent)
-- `PATCH /api/work-items/:taskId` - Update sub-task details
-- `DELETE /api/work-items/:taskId` - Delete sub-task
-- `PATCH /api/work-items/:taskId/parent` - Move sub-task to different parent
-
-### Sprint Burndown Analytics ⭐ NEW
-- `GET /api/sprints/:sprintId/burndown` - Get burndown chart data (ideal vs actual)
-- `GET /api/burndown/project/:projectId/history` - Get historical burndown data
-- `GET /api/burndown/project/:projectId/velocity` - Get team velocity metrics
-
-### Chat
-- `GET /api/chat/rooms` - List chat rooms
-- `POST /api/chat/message` - Send message
-- `GET /api/chat/messages/:roomId` - Get room messages
-
-### Calendar
-- `POST /api/calendar/events` - Create event
-- `GET /api/calendar/events` - List events
-- `PUT /api/calendar/events/:id` - Update event
-- `DELETE /api/calendar/events/:id` - Delete event
-
-### AI
-- `POST /api/ai/chat` - AI chat completion
-- `POST /api/ai/analyze` - Analyze document
-- `POST /api/ai/insights` - Generate insights
-
-## 🔐 Security Features
-
-- **JWT Authentication** - Secure token-based auth
-- **OAuth 2.0** - Google/Microsoft login
-- **Password Hashing** - bcryptjs encryption
-- **Input Validation** - express-validator
-- **Helmet.js** - HTTP security headers
-- **CORS** - Configured cross-origin requests
-- **Rate Limiting** - API rate limits
-- **File Upload Validation** - File type and size checks
-
-## 🧪 Testing
-
-```bash
-cd backend
-npm test
-```
-
-## 📱 Real-time Features
-
-**Socket.IO Events:**
-- `message:send` - Send chat message
-- `message:receive` - Receive message
-- `user:online` - User online status
-- `typing` - Typing indicator
-- `notification` - System notifications
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the ISC License.
-
-## 👥 Authors
-
-- **YASH-DHADGE** - *Project Lead* - [GitHub](https://github.com/YASH-DHADGE)
-
-## 🙏 Acknowledgments
-
-- OpenAI for AI capabilities
-- Google APIs for calendar integration
-- MongoDB for database
-- Socket.IO for real-time features
-- Express.js community
-- React.js community
-
-## 📧 Support
-
-For issues, questions, or suggestions:
-- Open an issue on [GitHub](https://github.com/YASH-DHADGE/Digital-Dockers-Suite/issues)
-- Check existing documentation
 
 ---
 
-**Made with ❤️ for modern digital workspaces**
+## 📡 API Reference
+
+The backend exposes **33 REST API route groups** under `/api/`:
+
+| Endpoint | Description |
+|---|---|
+| `/api/auth` | Authentication (register, login, Google OAuth) |
+| `/api/users` | User profiles & management |
+| `/api/projects` | Project CRUD |
+| `/api/tasks` | Task management (Kanban board) |
+| `/api/sprints` | Sprint planning & management |
+| `/api/burndown` | Burndown chart data |
+| `/api/work-items` | Subtasks & work item breakdowns |
+| `/api/work-logs` | Time tracking & work logs |
+| `/api/epics` | Epic management |
+| `/api/backlog` | Backlog items |
+| `/api/roadmap` | Roadmap data |
+| `/api/meetings` | Meeting scheduler CRUD |
+| `/api/chat` | Chat room messages |
+| `/api/chatbot` | AI Chatbot queries |
+| `/api/emails` | Email generation |
+| `/api/ppt` | PPT generation via n8n |
+| `/api/documents` | Document upload & management |
+| `/api/rag` | RAG-powered document Q&A |
+| `/api/wellness` | Wellness check-in data |
+| `/api/calendar` | Calendar events |
+| `/api/reports` | Report generation |
+| `/api/insights` | AI-generated insights |
+| `/api/notifications` | Push notification management |
+| `/api/spaces` | Collaborative spaces |
+| `/api/teams` | Team CRUD & members |
+| `/api/workload` | Workload analytics |
+| `/api/reassignment` | Smart task reassignment |
+| `/api/activity` | Activity feed |
+| `/api/tech-debt` | Code health & tech debt analysis |
+| `/api/health` | System health checks |
+| `/api/integrations` | GitHub integration endpoints |
+| `/api/analysis` | Codebase analysis orchestration |
+| `/api/n8n` | n8n workflow triggers |
+| `/api/webhooks` | GitHub webhook receivers |
+
+---
+
+## ⚙️ n8n Workflows
+
+The platform integrates with **n8n** for workflow automations:
+
+| Workflow | Description |
+|---|---|
+| **Auto Email Sender** | Automated email drafting and delivery |
+| **PPT Generator** | AI-powered presentation creation from project data |
+| **Document Summary & Q&A** | Structured summary generation from uploaded documents |
+| **Legal Document Review** | Intelligent compliance analysis for legal documents |
+
+> To use n8n workflows, install [n8n](https://n8n.io/) and import the JSON files from the `n8n/` directory.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Development Guidelines
+
+- Follow existing code style and project structure
+- Write meaningful commit messages
+- Update documentation for new features
+- Test your changes before submitting a PR
+
+---
+
+## 📄 License
+
+This project is licensed under the **ISC License**. See the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  <strong>Built with ❤️ by the Digital Dockers Team</strong>
+</p>
+
+<p align="center">
+  <a href="#-digital-dockers-suite">⬆ Back to Top</a>
+</p>

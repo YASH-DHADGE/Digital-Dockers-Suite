@@ -119,6 +119,11 @@ const ProjectDashboard = () => {
         }]
     } : null;
 
+    // Derived synchronized metrics
+    const displayTotalCount = stats ? ((stats.statusBreakdown?.todo || 0) + (stats.statusBreakdown?.in_progress || 0) + (stats.statusBreakdown?.review || 0) + (stats.statusBreakdown?.done || 0)) || stats.totalTasks || 0 : 0;
+    const displayDoneCount = stats ? (stats.statusBreakdown?.done || stats.issuesDone || 0) : 0;
+    const syncedProgress = displayTotalCount > 0 ? Math.round((displayDoneCount / displayTotalCount) * 100) : (stats?.sprintProgress || 0);
+
     if (loading) {
         return (
             <div className="dashboard-loading">
@@ -133,7 +138,9 @@ const ProjectDashboard = () => {
             <div className="dashboard-header">
                 <Title level={2}>Project Overview: {currentProject?.name || 'No Project Selected'}</Title>
                 <Typography.Text type="secondary">
-                    <span>Lead: {currentProject?.lead?.fullName || 'N/A'}</span>
+                    <span>Lead: {currentProject?.lead?.fullName ? currentProject.lead.fullName : (
+                        <>Unassigned <a href="#" onClick={(e) => e.preventDefault()} style={{ fontSize: '13px', marginLeft: 4, textDecoration: 'underline' }}>Assign</a></>
+                    )}</span>
                     <span>•</span>
                     <span>Key: {currentProject?.key}</span>
                     <span>•</span>
@@ -158,10 +165,10 @@ const ProjectDashboard = () => {
                         </div>
                         <div className="kpi-content">
                             <div className="kpi-label">Sprint Progress</div>
-                            <div className="kpi-value">{stats?.sprintProgress || 0}%</div>
+                            <div className="kpi-value">{syncedProgress}%</div>
                             <div className="kpi-progress">
                                 <Progress
-                                    percent={stats?.sprintProgress || 0}
+                                    percent={syncedProgress}
                                     showInfo={false}
                                     strokeColor="#ff5630"
                                     size="small"
@@ -176,10 +183,10 @@ const ProjectDashboard = () => {
                             <CheckCircleOutlined />
                         </div>
                         <div className="kpi-content">
-                            <div className="kpi-label">Issues Done</div>
-                            <div className="kpi-value">{stats?.issuesDone || 0}</div>
+                            <div className="kpi-label">Completed</div>
+                            <div className="kpi-value">{displayDoneCount}</div>
                             <div style={{ fontSize: 12, color: '#626f86', marginTop: 8 }}>
-                                of {stats?.totalTasks || 0} total
+                                of {displayTotalCount} total
                             </div>
                         </div>
                     </div>
@@ -307,7 +314,7 @@ const ProjectDashboard = () => {
                                     borderRadius: 8,
                                     border: '1px solid #f0f0f0'
                                 }}
-                                bodyStyle={{ padding: '16px 0' }}
+                                styles={{ body: { padding: '16px 0' } }}
                             >
                                 {stats?.workload?.length > 0 ? (
                                     <div>
@@ -379,9 +386,9 @@ const ProjectDashboard = () => {
                                                         </div>
                                                         <Text
                                                             strong
-                                                            style={{ fontSize: '12px', color: '#262626', minWidth: 35, textAlign: 'right', flexShrink: 0 }}
+                                                            style={{ fontSize: '12px', color: '#262626', minWidth: 60, textAlign: 'right', flexShrink: 0 }}
                                                         >
-                                                            {Math.round(percentage)}%
+                                                            {item.points || 0} of {maxPoints || 0} pts ({Math.round(percentage)}%)
                                                         </Text>
                                                     </div>
                                                 </div>
@@ -432,8 +439,8 @@ const ProjectDashboard = () => {
                 onCancel={() => setShowReassignmentModal(false)}
                 width={1200}
                 footer={[
-                    <button 
-                        key="close" 
+                    <button
+                        key="close"
                         onClick={() => setShowReassignmentModal(false)}
                         style={{
                             padding: '8px 16px',
@@ -448,15 +455,11 @@ const ProjectDashboard = () => {
                         Close
                     </button>
                 ]}
-                bodyStyle={{ padding: 0 }}
+                styles={{ body: { padding: 0 } }}
             >
                 <SmartReassignmentDashboard sprintId={stats?.activeSprint?._id} />
             </Modal>
         </div>
-
-                </Col >
-            </Row >
-        </div >
     );
 };
 
