@@ -1,3 +1,9 @@
+// Fix: Override DNS to use Google's public DNS (8.8.8.8) for SRV lookups.
+// Node.js uses a different DNS resolver than Windows, and the local network's
+// DNS server blocks SRV record queries, causing MongoDB Atlas connections to fail.
+const dns = require("dns");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
 const express = require("express");
 const dotenv = require("dotenv");
 
