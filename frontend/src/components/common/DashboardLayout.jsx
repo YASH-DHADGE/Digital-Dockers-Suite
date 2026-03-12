@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Layout, ConfigProvider, theme, Grid } from 'antd';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import ChatbotWidget from '../chatbot/ChatbotWidget';
@@ -11,6 +11,7 @@ const { useBreakpoint } = Grid;
 
 const DashboardLayout = () => {
     const { mode } = useThemeMode();
+    const location = useLocation();
     const screens = useBreakpoint();
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [desktopCollapsed, setDesktopCollapsed] = useState(false);
@@ -40,6 +41,7 @@ const DashboardLayout = () => {
     };
 
     const algorithm = mode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm;
+    const showChatbot = !location.pathname.startsWith('/dashboard/wellness');
 
     return (
         <ConfigProvider
@@ -89,7 +91,7 @@ const DashboardLayout = () => {
                     </Content>
                 </Layout>
             </Layout>
-            <ChatbotWidget />
+            {showChatbot && <ChatbotWidget />}
         </ConfigProvider>
     );
 };

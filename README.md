@@ -89,7 +89,7 @@ Built with a MERN-like stack (MongoDB, Express, React, Node.js) and enhanced wit
 | **PPT Generator** | Automated presentation creation powered by n8n + PptxGenJS |
 | **Document Manager** | Upload, analyze, and organize documents (PDF, DOCX parsing) |
 | **Calendar Work Planner** | Visual calendar for planning and scheduling work items |
-| **Wellness Check-ins** | AI-powered wellness companion for team mental health tracking |
+| **Wellness Check-ins** | Guided breathing and check-in tools for team mental health support |
 
 ### 🛡️ Administration & Reporting
 | Feature | Description |
@@ -132,8 +132,8 @@ Built with a MERN-like stack (MongoDB, Express, React, Node.js) and enhanced wit
 | **MongoDB + Mongoose 9** | Database & ODM |
 | **Socket.IO 4** | Real-time bidirectional communication |
 | **Passport.js** | Authentication (JWT + Google OAuth 2.0) |
-| **Google Gemini AI** | AI-powered analysis, chatbot, and insights |
-| **Mistral AI** | Wellness companion AI |
+| **Google Gemini AI** | AI-powered analysis and insights |
+| **Mistral AI** | Main chatbot responses |
 | **OpenAI** | Code review analysis |
 | **Octokit** | GitHub API integration |
 | **Bull** | Job queue management (Redis-backed) |
@@ -230,7 +230,7 @@ Create a `.env` file in the `backend/` directory. See [`backend/.env.example`](b
 | `GOOGLE_CLIENT_SECRET` | ❌ | Google OAuth client secret |
 | `GOOGLE_CALLBACK_URL` | ❌ | Google OAuth callback URL |
 | `GEMINI_API_KEY` | ❌ | Google Gemini API key (for AI features) |
-| `MISTRAL_API_KEY` | ❌ | Mistral AI key (for Wellness Companion) |
+| `MISTRAL_API_KEY` | ❌ | Mistral AI key (for main chatbot) |
 | `OPENAI_API_KEY` | ❌ | OpenAI key (for code review) |
 | `GITHUB_TOKEN` | ❌ | GitHub PAT (increases API rate limit) |
 | `REDIS_URL` | ❌ | Redis URL (for Bull queues; mock used in dev) |

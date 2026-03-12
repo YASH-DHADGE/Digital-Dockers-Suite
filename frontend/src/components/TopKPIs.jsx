@@ -112,51 +112,54 @@ const TopKPIs = ({ metrics, loading, isDarkMode }) => {
     return history;
   };
 
-  const kpis = useMemo(() => [
-    {
-      label: "Health Score",
-      value: metrics.healthScore || 75,
-      isGauge: true,
-      trend: metrics.healthScoreDelta || 0,
-      trendLabel: "vs last sprint",
-    },
-    {
-      label: "Avg Debt Ratio",
-      value: metrics.debtRatio || 35,
-      suffix: "/100",
-      trend: metrics.debtRatioDelta || -3,
-      color: metrics.debtRatio > 50 ? "red" : "green",
-      icon: <FaChartLine />,
-      history: generateHistory(metrics.debtRatio || 35, 8),
-    },
-    {
-      label: "PR Block Rate",
-      value: metrics.blockRate || 12,
-      suffix: "%",
-      trend: metrics.blockRateDelta || -5,
-      color: metrics.blockRate > 20 ? "red" : "green",
-      icon: <FaShieldAlt />,
-      trendLabel: "7 day",
-      history: generateHistory(metrics.blockRate || 12, 5),
-    },
-    {
-      label: "Critical Hotspots",
-      value: metrics.hotspotCount || 4,
-      trend: metrics.hotspotDelta || -2,
-      color: metrics.hotspotCount > 5 ? "red" : metrics.hotspotCount > 0 ? "yellow" : "green",
-      icon: <FaFire />,
-      history: generateHistory(metrics.hotspotCount || 4, 2),
-    },
-    {
-      label: "Risk Reduced",
-      value: metrics.riskReduced || 15,
-      suffix: " pts",
-      trend: null,
-      color: "green",
-      icon: <FaBroom />,
-      trendLabel: "this sprint",
-    },
-  ], [metrics]);
+  const kpis = useMemo(() => {
+    const safeMetrics = metrics || {};
+    return [
+      {
+        label: "Health Score",
+        value: safeMetrics.healthScore || 75,
+        isGauge: true,
+        trend: safeMetrics.healthScoreDelta || 0,
+        trendLabel: "vs last sprint",
+      },
+      {
+        label: "Avg Debt Ratio",
+        value: safeMetrics.debtRatio || 35,
+        suffix: "/100",
+        trend: safeMetrics.debtRatioDelta || -3,
+        color: safeMetrics.debtRatio > 50 ? "red" : "green",
+        icon: <FaChartLine />,
+        history: generateHistory(safeMetrics.debtRatio || 35, 8),
+      },
+      {
+        label: "PR Block Rate",
+        value: safeMetrics.blockRate || 12,
+        suffix: "%",
+        trend: safeMetrics.blockRateDelta || -5,
+        color: safeMetrics.blockRate > 20 ? "red" : "green",
+        icon: <FaShieldAlt />,
+        trendLabel: "7 day",
+        history: generateHistory(safeMetrics.blockRate || 12, 5),
+      },
+      {
+        label: "Critical Hotspots",
+        value: safeMetrics.hotspotCount || 4,
+        trend: safeMetrics.hotspotDelta || -2,
+        color: safeMetrics.hotspotCount > 5 ? "red" : safeMetrics.hotspotCount > 0 ? "yellow" : "green",
+        icon: <FaFire />,
+        history: generateHistory(safeMetrics.hotspotCount || 4, 2),
+      },
+      {
+        label: "Risk Reduced",
+        value: safeMetrics.riskReduced || 15,
+        suffix: " pts",
+        trend: null,
+        color: "green",
+        icon: <FaBroom />,
+        trendLabel: "this sprint",
+      },
+    ];
+  }, [metrics]);
 
   const getTrendIcon = (trend, color) => {
     if (trend === null || trend === undefined) return null;

@@ -35,7 +35,6 @@ import { Bar, Pie } from "react-chartjs-2";
 import { useState, useEffect, useRef } from "react";
 import { useTeams, useTeamMetrics } from "../../hooks/useTeams";
 import TeamsPanel from "./TeamsPanel";
-import EmailGeneratorForm from "../common/EmailGeneratorForm";
 import io from "socket.io-client";
 
 ChartJS.register(
@@ -467,12 +466,6 @@ const ReportDashboard = () => {
         </Col>
       </Row>
 
-      {/* Email Generator */}
-      <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
-        <Col xs={24} lg={12}>
-          <EmailGeneratorForm />
-        </Col>
-      </Row>
     </div>
   );
 };
