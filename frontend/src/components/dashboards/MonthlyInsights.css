@@ -218,3 +218,36 @@
         font-size: 12px;
     }
 }
+
+.dark .insights-card,
+.dark .capacity-item,
+.dark .tip {
+    background: var(--color-bg-card);
+    border-color: var(--color-border);
+}
+
+.dark .chart-card,
+.dark .capacity-card,
+.dark .tips-card {
+    background: var(--surface-secondary);
+}
+
+.dark .insights-card h2,
+.dark .insights-card h3,
+.dark .month-name,
+.dark .section-title {
+    color: var(--color-text-primary);
+}
+
+.dark .metrics-card .ant-statistic-title,
+.dark .capacity-details small,
+.dark .tip,
+.dark .progress-label,
+.dark .completion-metric {
+    color: var(--color-text-secondary);
+}
+
+.dark .capacity-bar,
+.dark .story-points {
+    background: #1f2937;
+}

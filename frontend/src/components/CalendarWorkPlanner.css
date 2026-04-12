@@ -398,3 +398,56 @@
         padding: 0 4px;
     }
 }
+
+.dark .calendar-work-planner {
+    background: var(--color-bg-light);
+}
+
+.dark .planner-header h1,
+.dark .summary-value,
+.dark .day-number,
+.dark .work-item-title {
+    color: var(--color-text-primary);
+}
+
+.dark .planner-header p,
+.dark .summary-label,
+.dark .weekday,
+.dark .calendar-legend,
+.dark .work-item.completed .work-item-title {
+    color: var(--color-text-secondary);
+}
+
+.dark .summary-card,
+.dark .calendar-card,
+.dark .work-items-card,
+.dark .calendar-day,
+.dark .work-item {
+    background: var(--color-bg-card);
+    border-color: var(--color-border);
+}
+
+.dark .calendar-weekdays,
+.dark .calendar-day.other-month,
+.dark .calendar-day.other-month:hover,
+.dark .calendar-card :global(.ant-card-head),
+.dark .work-items-card :global(.ant-card-head) {
+    background: var(--surface-secondary);
+    border-color: var(--color-border);
+}
+
+.dark .calendar-day:hover {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #60a5fa;
+}
+
+.dark .calendar-day.selected {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.dark .calendar-legend,
+.dark .work-item-meta,
+.dark :global(.ant-modal-header) {
+    border-color: var(--color-border);
+}

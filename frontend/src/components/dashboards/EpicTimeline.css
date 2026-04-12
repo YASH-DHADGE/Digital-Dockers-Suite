@@ -110,3 +110,30 @@
         border: 1px solid #333;
     }
 }
+
+.dark .epic-timeline-container {
+    background: var(--color-bg-card);
+    box-shadow: var(--shadow-dark-sm);
+}
+
+.dark .epic-timeline-container::-webkit-scrollbar-track {
+    background: #1f2937;
+}
+
+.dark .epic-timeline-container::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+.dark .epic-timeline-container::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+.dark .timeline-track::before {
+    background-image: repeating-linear-gradient(
+        to right,
+        transparent 0,
+        transparent 99px,
+        #30363d 99px,
+        #30363d 100px
+    );
+}

@@ -16,6 +16,7 @@ import {
     ReferenceLine,
     Brush,
 } from "recharts";
+import { useThemeMode } from "../context/ThemeContext";
 
 const PR_STATUS_COLORS = {
     PASS: "#22c55e",
@@ -33,7 +34,9 @@ const isPullRequestClosed = (status) => {
     return normalized === "PASS" || normalized === "CLOSED" || normalized === "MERGED";
 };
 
-const CodebaseConditionCharts = ({ files = [], pullRequests = [], issues = [], isDarkMode = false }) => {
+const CodebaseConditionCharts = ({ files = [], pullRequests = [], issues = [] }) => {
+    const { mode } = useThemeMode();
+    const isDarkMode = mode === "dark";
     const snapshot = useMemo(() => {
         const prCounts = { open: 0, closed: 0 };
         const issueCounts = { open: 0, closed: 0 };

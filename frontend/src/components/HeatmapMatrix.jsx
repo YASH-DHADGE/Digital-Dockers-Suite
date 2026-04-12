@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 import { FaFolder, FaCalendarAlt } from "react-icons/fa";
+import { useThemeMode } from "../context/ThemeContext";
 
 /**
  * HeatmapMatrix - Folder × Time heatmap visualization
  * Shows how different folders' risk scores change over sprints
  */
-const HeatmapMatrix = ({ data = [], isDarkMode, onCellClick }) => {
+const HeatmapMatrix = ({ data = [], onCellClick }) => {
+    const { mode } = useThemeMode();
+    const isDarkMode = mode === 'dark';
     const svgRef = useRef();
     const containerRef = useRef();
     const [hoveredCell, setHoveredCell] = useState(null);

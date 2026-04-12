@@ -621,3 +621,45 @@
     border-color: #0066cc;
   }
 }
+
+.dark .subtask-panel {
+  background: var(--surface-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .parent-title,
+.dark .child-title,
+.dark .keyboard-hints summary,
+.dark .story-points-badge {
+  color: var(--color-text-primary);
+}
+
+.dark .issue-key,
+.dark .child-key,
+.dark .stat-value,
+.dark .assignee-badge,
+.dark .keyboard-hints kbd {
+  background: #1f2937;
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .story-points-badge,
+.dark .children-stats,
+.dark .empty-state,
+.dark .child-item,
+.dark .status-dropdown,
+.dark .delete-btn,
+.dark .keyboard-hints {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.dark .child-description,
+.dark .subtask-content,
+.dark .completion-bar,
+.dark .keyboard-hints li {
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}

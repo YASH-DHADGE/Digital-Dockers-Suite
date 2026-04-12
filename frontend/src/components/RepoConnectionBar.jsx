@@ -10,13 +10,15 @@ import {
     FaSpinner
 } from 'react-icons/fa';
 import api from '../services/api';
+import { useThemeMode } from '../context/ThemeContext';
 
 const RepoConnectionBar = ({
     onConnect,
-    isDarkMode,
     connectedRepo = null,
     onRefresh
 }) => {
+    const { mode } = useThemeMode();
+    const isDarkMode = mode === 'dark';
     const [repoUrl, setRepoUrl] = useState('');
     const [selectedBranch, setSelectedBranch] = useState('main');
     const [branches] = useState(['main', 'master', 'develop']);
@@ -248,7 +250,7 @@ const RepoConnectionBar = ({
 
             {/* Connected Repo Display */}
             {connectedRepo && !showChangeRepo ? (
-                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-slate-700' : 'bg-gray-50'
+                <div className={`flex items-center justify-between p-3 rounded-lg ${isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
                     }`}>
                     <div className="flex items-center gap-3">
                         <FaCheckCircle className="text-green-500" />
@@ -296,7 +298,7 @@ const RepoConnectionBar = ({
                 </div>
             ) : connectedRepo && showChangeRepo ? (
                 /* Change Repo Form */
-                <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-slate-700' : 'bg-gray-50'}`}>
+                <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-gray-50 border-gray-200'}`}>
                     <div className="flex items-center justify-between mb-3">
                         <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Currently: <strong>{connectedRepo.fullName}</strong>
@@ -348,7 +350,7 @@ const RepoConnectionBar = ({
                 </div>
             ) : analysisProgress && analysisProgress.status === 'running' ? (
                 /* Analysis in Progress (Connecting) */
-                <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-slate-700' : 'bg-indigo-50'}`}>
+                <div className={`p-3 rounded-lg border ${isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-indigo-50 border-indigo-100'}`}>
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <FaSpinner className="animate-spin text-indigo-500" />

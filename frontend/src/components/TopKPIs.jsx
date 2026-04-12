@@ -9,6 +9,7 @@ import {
   FaBroom,
   FaHeartbeat,
 } from "react-icons/fa";
+import { useThemeMode } from "../context/ThemeContext";
 
 /**
  * Mini Sparkline component - renders a simple line chart
@@ -96,7 +97,9 @@ const HealthGauge = ({ value = 0, size = 80, isDarkMode }) => {
   );
 };
 
-const TopKPIs = ({ metrics, loading, isDarkMode }) => {
+const TopKPIs = ({ metrics, loading }) => {
+  const { mode } = useThemeMode();
+  const isDarkMode = mode === "dark";
 
 
   // Generate mock history for sparklines (in production, this would come from the API)

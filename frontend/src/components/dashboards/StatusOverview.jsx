@@ -1,17 +1,22 @@
 import { Card, Row, Col, Typography, Empty, Progress, Skeleton, Space, Tooltip } from 'antd';
 import { CheckCircleOutlined, ClockCircleOutlined, BgColorsOutlined, FileTextOutlined } from '@ant-design/icons';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const { Text, Title } = Typography;
 
 const StatusOverview = ({ stats }) => {
+    const { mode } = useThemeMode();
+    const isDark = mode === 'dark';
+
     if (!stats) {
         return (
             <Card
                 title="📊 Status Overview"
                 style={{
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                     borderRadius: 8,
-                    border: '1px solid #f0f0f0'
+                    border: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`,
+                    background: isDark ? '#161b22' : '#fff',
                 }}
             >
                 <Skeleton active paragraph={{ rows: 6 }} />
@@ -101,9 +106,10 @@ const StatusOverview = ({ stats }) => {
                 </div>
             }
             style={{
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                 borderRadius: 8,
-                border: '1px solid #f0f0f0'
+                border: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`,
+                background: isDark ? '#161b22' : '#fff',
             }}
             styles={{ body: { padding: '10px' } }}
         >
@@ -134,11 +140,11 @@ const StatusOverview = ({ stats }) => {
                 </div>
 
                 {/* Divider */}
-                <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
+                <div style={{ height: '1px', backgroundColor: isDark ? '#30363d' : '#f0f0f0' }}></div>
 
                 {/* SECTION 2: Status Breakdown */}
                 <div>
-                    <Text strong style={{ fontSize: 11, color: '#262626', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 12 }}>
+                    <Text strong style={{ fontSize: 11, color: isDark ? '#e6edf3' : '#262626', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 12 }}>
                         Status Distribution
                     </Text>
                     <Space orientation="vertical" style={{ width: '100%' }} size="small">
@@ -174,7 +180,7 @@ const StatusOverview = ({ stats }) => {
                                             <span style={{ color: status.color, fontSize: 12, fontWeight: 600 }}>
                                                 {status.icon}
                                             </span>
-                                            <Text style={{ fontSize: 12, fontWeight: 500, color: '#262626', minWidth: 80 }}>
+                                            <Text style={{ fontSize: 12, fontWeight: 500, color: isDark ? '#e6edf3' : '#262626', minWidth: 80 }}>
                                                 {status.label}
                                             </Text>
                                             <Text strong style={{ fontSize: 12, color: status.textColor, minWidth: 30 }}>
@@ -207,11 +213,11 @@ const StatusOverview = ({ stats }) => {
                 </div>
 
                 {/* Divider */}
-                <div style={{ height: '1px', backgroundColor: '#f0f0f0' }}></div>
+                <div style={{ height: '1px', backgroundColor: isDark ? '#30363d' : '#f0f0f0' }}></div>
 
                 {/* SECTION 3: Key Metrics */}
                 <div>
-                    <Text strong style={{ fontSize: 12, color: '#262626', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 10 }}>
+                    <Text strong style={{ fontSize: 12, color: isDark ? '#e6edf3' : '#262626', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: 10 }}>
                         Key Metrics
                     </Text>
                     <Row gutter={[10, 10]}>
@@ -222,18 +228,18 @@ const StatusOverview = ({ stats }) => {
                                     <div
                                         style={{
                                             padding: '10px 12px',
-                                            backgroundColor: '#fafafa',
+                                            backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#fafafa',
                                             borderRadius: 8,
-                                            border: '1px solid #f0f0f0',
+                                            border: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`,
                                             transition: 'all 0.2s ease'
                                         }}
                                         onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                            e.currentTarget.style.borderColor = '#d9d9d9';
+                                            e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.08)' : '#f5f5f5';
+                                            e.currentTarget.style.borderColor = isDark ? '#484f58' : '#d9d9d9';
                                         }}
                                         onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = '#fafafa';
-                                            e.currentTarget.style.borderColor = '#f0f0f0';
+                                            e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.04)' : '#fafafa';
+                                            e.currentTarget.style.borderColor = isDark ? '#30363d' : '#f0f0f0';
                                         }}
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>

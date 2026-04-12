@@ -12,10 +12,13 @@ import {
     Cell,
     Legend,
 } from "recharts";
+import { useThemeMode } from "../context/ThemeContext";
 
 const PIE_COLORS = ["#22c55e", "#16a34a", "#84cc16", "#f59e0b", "#f97316", "#ef4444", "#94a3b8"];
 
-const HotspotInsightCharts = ({ files = [], isDarkMode = false, onFileSelect }) => {
+const HotspotInsightCharts = ({ files = [], onFileSelect }) => {
+    const { mode } = useThemeMode();
+    const isDarkMode = mode === 'dark';
     const hotspotData = useMemo(() => {
         const normalized = files.map((file) => ({
             ...file,

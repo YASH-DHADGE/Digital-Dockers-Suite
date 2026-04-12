@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Select, Space, Popconfirm, Spin, message, Avatar, Tag } from 'antd';
 import { UserAddOutlined, DeleteOutlined, LockOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import { useThemeMode } from '../../context/ThemeContext';
 
 /**
  * SpaceMembers Component
@@ -14,6 +15,8 @@ const SpaceMembers = ({ space, visible, onClose }) => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedRole, setSelectedRole] = useState('EDITOR');
   const [users, setUsers] = useState([]);
+  const { mode } = useThemeMode();
+  const isDark = mode === 'dark';
 
   const loadMembers = React.useCallback(async () => {
     setLoading(true);
@@ -115,7 +118,15 @@ const SpaceMembers = ({ space, visible, onClose }) => {
     >
       <Spin spinning={loading}>
         {/* Add member */}
-        <div style={{ marginBottom: 24, padding: '16px', backgroundColor: '#fafafa', borderRadius: '4px' }}>
+        <div
+          style={{
+            marginBottom: 24,
+            padding: '16px',
+            backgroundColor: isDark ? '#1f2937' : '#fafafa',
+            borderRadius: '4px',
+            border: `1px solid ${isDark ? '#334155' : 'transparent'}`
+          }}
+        >
           <h4>Add Member</h4>
           <Space style={{ width: '100%' }}>
             <Select
@@ -156,13 +167,13 @@ const SpaceMembers = ({ space, visible, onClose }) => {
           {members.map((member) => (
             <div
               key={member.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px 0',
-                borderBottom: '1px solid #f0f0f0'
-              }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 0',
+              borderBottom: `1px solid ${isDark ? '#334155' : '#f0f0f0'}`
+            }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <Avatar src={member.user.avatar} icon="👤" />

@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import * as d3 from "d3";
 import { FaCubes, FaHistory, FaExclamationTriangle } from "react-icons/fa";
+import { useThemeMode } from "../context/ThemeContext";
 
 /**
  * ScatterPlot - Complexity × Churn visualization
  * Files in upper-right quadrant are high-risk hotspots
  */
-const ScatterPlot = ({ data = [], isDarkMode, onPointClick }) => {
+const ScatterPlot = ({ data = [], onPointClick }) => {
+    const { mode } = useThemeMode();
+    const isDarkMode = mode === 'dark';
     const svgRef = useRef();
     const containerRef = useRef();
     const [hoveredPoint, setHoveredPoint] = useState(null);

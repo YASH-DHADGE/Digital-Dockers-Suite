@@ -471,3 +471,49 @@
     color: #ccc;
   }
 }
+
+.dark .modal-dialog {
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+}
+
+.dark .modal-header,
+.dark .modal-footer,
+.dark .modal-info {
+  border-color: var(--color-border);
+}
+
+.dark .modal-title,
+.dark .form-label,
+.dark .btn-secondary {
+  color: var(--color-text-primary);
+}
+
+.dark .modal-close-btn,
+.dark .form-hint,
+.dark .modal-info p,
+.dark .info-hint {
+  color: var(--color-text-secondary);
+}
+
+.dark .modal-close-btn:hover,
+.dark .btn-secondary:hover:not(:disabled) {
+  background: #374151;
+}
+
+.dark .form-input,
+.dark .form-textarea,
+.dark .form-select,
+.dark .btn-secondary,
+.dark .modal-info {
+  background: #111827;
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.dark .form-input:disabled,
+.dark .form-textarea:disabled,
+.dark .form-select:disabled {
+  background: #1f2937;
+  color: var(--color-text-secondary);
+}

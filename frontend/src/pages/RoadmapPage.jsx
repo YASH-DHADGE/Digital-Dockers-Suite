@@ -11,6 +11,7 @@ import {
     Tooltip, Legend, ResponsiveContainer, Area
 } from 'recharts';
 import { fetchRoadmapData, fetchInsights } from '../services/roadmapService';
+import { useThemeMode } from '../context/ThemeContext';
 import '../styles/RoadmapPage.css';
 
 /**
@@ -24,12 +25,21 @@ import '../styles/RoadmapPage.css';
  */
 
 /* ---------- KPI CARD ---------- */
-const KpiCard = ({ icon, title, value, suffix, color }) => (
-    <div className="roadmap-kpi-card" style={{ borderTop: `3px solid ${color}` }}>
+const KpiCard = ({ icon, title, value, suffix, color, isDark }) => (
+    <div 
+        className="roadmap-kpi-card" 
+        style={{ 
+            borderTop: `3px solid ${color}`,
+            backgroundColor: isDark ? '#1e293b' : '#fff',
+            borderColor: isDark ? '#334155' : '#e2e8f0'
+        }}
+    >
         <div className="kpi-icon" style={{ color }}>{icon}</div>
         <div className="kpi-body">
-            <div className="kpi-value">{value}<span className="kpi-suffix">{suffix}</span></div>
-            <div className="kpi-title">{title}</div>
+            <div className="kpi-value" style={{ color: isDark ? '#f1f5f9' : '#1e293b' }}>
+                {value}<span className="kpi-suffix">{suffix}</span>
+            </div>
+            <div className="kpi-title" style={{ color: isDark ? '#94a3b8' : '#64748b' }}>{title}</div>
         </div>
     </div>
 );
@@ -63,6 +73,8 @@ import MonthColumn from '../components/roadmap/MonthColumn';
 
 /* ---------- MAIN PAGE ---------- */
 const RoadmapPage = () => {
+    const { mode } = useThemeMode();
+    const isDark = mode === 'dark';
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -317,6 +329,7 @@ const RoadmapPage = () => {
                     value={displayMetrics.avgVelocity}
                     suffix=" pts/sprint"
                     color="#722ed1"
+                    isDark={isDark}
                 />
                 <KpiCard
                     icon={<ThunderboltOutlined />}
@@ -324,6 +337,7 @@ const RoadmapPage = () => {
                     value={displayMetrics.monthlyVelocity}
                     suffix=" pts"
                     color="#1890ff"
+                    isDark={isDark}
                 />
                 <KpiCard
                     icon={<ClockCircleOutlined />}
@@ -331,6 +345,7 @@ const RoadmapPage = () => {
                     value={displayMetrics.burndown}
                     suffix=" months"
                     color="#fa8c16"
+                    isDark={isDark}
                 />
                 <KpiCard
                     icon={<CheckCircleOutlined />}
@@ -338,6 +353,7 @@ const RoadmapPage = () => {
                     value={displayMetrics.onTime}
                     suffix="%"
                     color="#52c41a"
+                    isDark={isDark}
                 />
             </div>
 
@@ -404,11 +420,11 @@ const RoadmapPage = () => {
                             }}
                             style={{ cursor: isPersonMode ? 'default' : 'pointer' }}
                         >
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                            <YAxis tick={{ fontSize: 12 }} />
-                            <Tooltip />
-                            <Legend />
+                            <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#f0f0f0'} />
+                            <XAxis dataKey="month" tick={{ fontSize: 12, fill: isDark ? '#94a3b8' : '#666' }} />
+                            <YAxis tick={{ fontSize: 12, fill: isDark ? '#94a3b8' : '#666' }} />
+                            <Tooltip contentStyle={{ backgroundColor: isDark ? '#1e293b' : '#fff', borderColor: isDark ? '#334155' : '#e2e8f0', color: isDark ? '#f1f5f9' : '#000' }} />
+                            <Legend wrapperStyle={{ color: isDark ? '#f1f5f9' : '#000' }} />
                             <Bar
                                 dataKey="completedPoints"
                                 stackId="a"

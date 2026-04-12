@@ -179,6 +179,44 @@
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02), 0 0 0 4px rgba(88, 101, 242, 0.1);
 }
 
+/* Dark Mode Overrides */
+.dark .notes-editor-container {
+  background: var(--color-bg-card);
+}
+
+.dark .notes-header,
+.dark .notes-toolbar,
+.dark .notes-editor,
+.dark .notes-footer,
+.dark .typing-indicator {
+  background: var(--surface-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .notes-title,
+.dark .stat-value,
+.dark .save-btn {
+  color: var(--color-text-primary);
+}
+
+.dark .toolbar-btn,
+.dark .notes-footer,
+.dark .typing-indicator,
+.dark .stat-label,
+.dark .notes-editor::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.dark .toolbar-btn:hover {
+  background: #374151;
+  color: #f3f4f6;
+}
+
+.dark .toolbar-divider,
+.dark .stat-divider {
+  background: var(--color-border);
+  color: var(--color-border);
+}
 /* Footer Styles */
 .notes-footer {
   display: flex;

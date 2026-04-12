@@ -15,8 +15,11 @@ import {
   FaSync,
   FaGithub,
 } from "react-icons/fa";
+import { useThemeMode } from "../context/ThemeContext";
 
-const CodebaseMRI = ({ isDarkMode, repoId }) => {
+const CodebaseMRI = ({ repoId }) => {
+  const { mode } = useThemeMode();
+  const isDarkMode = mode === "dark";
   const containerRef = useRef();
   const [data, setData] = useState([]);
   const [pullRequests, setPullRequests] = useState([]);
@@ -171,7 +174,7 @@ const CodebaseMRI = ({ isDarkMode, repoId }) => {
     <>
       <div
         ref={containerRef}
-        className={`shadow rounded-lg p-6 h-full flex flex-col transition-colors ${isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white"
+        className={`shadow rounded-lg p-6 h-full flex flex-col transition-colors ${isDarkMode ? "bg-slate-800 border border-slate-700" : "bg-white border border-slate-200"
           }`}
       >
         {/* Header */}

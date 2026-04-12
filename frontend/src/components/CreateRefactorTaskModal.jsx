@@ -46,7 +46,7 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-md w-full">
+      <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-lg shadow-2xl max-w-md w-full border border-transparent dark:border-slate-700">
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-lg">
           <div className="flex justify-between items-center">
@@ -64,22 +64,22 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* File Info */}
           {file && (
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 border border-transparent dark:border-slate-700">
               <h3 className="font-semibold mb-2">File Details</h3>
-              <p className="text-sm font-mono text-gray-700 mb-2">
+              <p className="text-sm font-mono text-gray-700 dark:text-slate-300 mb-2">
                 {file.path}
               </p>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div>
-                  <span className="text-gray-600">Risk:</span>
+                  <span className="text-gray-600 dark:text-slate-400">Risk:</span>
                   <span className="font-bold ml-1">{file.risk}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Complexity:</span>
+                  <span className="text-gray-600 dark:text-slate-400">Complexity:</span>
                   <span className="font-bold ml-1">{file.complexity}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">Churn:</span>
+                  <span className="text-gray-600 dark:text-slate-400">Churn:</span>
                   <span className="font-bold ml-1">{file.churnRate}</span>
                 </div>
               </div>
@@ -88,7 +88,7 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
 
           {/* Task ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Task ID
             </label>
             <input
@@ -100,14 +100,14 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
                   digitalDockersTaskId: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100"
               required
             />
           </div>
 
           {/* Priority */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Priority
             </label>
             <select
@@ -115,7 +115,7 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
               onChange={(e) =>
                 setFormData({ ...formData, priority: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100"
             >
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
@@ -125,7 +125,7 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
 
           {/* SLA Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               SLA Date
             </label>
             <input
@@ -134,13 +134,13 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
               onChange={(e) =>
                 setFormData({ ...formData, sla: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100"
             />
           </div>
 
           {/* Assignee */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
               Assignee
             </label>
             <input
@@ -150,13 +150,13 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
                 setFormData({ ...formData, assignee: e.target.value })
               }
               placeholder="Enter username"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-slate-100"
             />
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded">
               {error}
             </div>
           )}
@@ -166,7 +166,7 @@ const CreateRefactorTaskModal = ({ file, onClose, onTaskCreated }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+              className="flex-1 px-4 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition"
             >
               Cancel
             </button>

@@ -11,8 +11,11 @@ import {
   FaTasks,
   FaFileCode,
 } from "react-icons/fa";
+import { useThemeMode } from "../context/ThemeContext";
 
-const ActionsBacklog = ({ isDarkMode, repoId }) => {
+const ActionsBacklog = ({ repoId }) => {
+  const { mode } = useThemeMode();
+  const isDarkMode = mode === "dark";
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -307,10 +310,10 @@ const ActionsBacklog = ({ isDarkMode, repoId }) => {
                       {resolveTypeLabel(card)}
                     </span>
                     <span className={`text-xs px-2 py-1 rounded-full font-bold ${String(card.status || "").toUpperCase() === "BLOCK" || String(card.status || "").toUpperCase() === "HIGH_RISK"
-                      ? "bg-red-100 text-red-700"
+                      ? isDarkMode ? "bg-red-900/40 text-red-300 border border-red-800/50" : "bg-red-100 text-red-700"
                       : String(card.status || "").toUpperCase() === "WARN" || String(card.status || "").toUpperCase() === "WATCH"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-emerald-100 text-emerald-700"
+                        ? isDarkMode ? "bg-amber-900/40 text-amber-300 border border-amber-800/50" : "bg-amber-100 text-amber-700"
+                        : isDarkMode ? "bg-emerald-900/40 text-emerald-300 border border-emerald-800/50" : "bg-emerald-100 text-emerald-700"
                       }`}>
                       {String(card.status || "PENDING").toUpperCase()}
                     </span>
@@ -399,10 +402,10 @@ const ActionsBacklog = ({ isDarkMode, repoId }) => {
               {uiState && uiState.type !== "loading" && (
                 <div
                   className={`mt-3 rounded-lg border p-2.5 text-xs ${uiState.type === "success"
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    ? isDarkMode ? "border-emerald-800/50 bg-emerald-900/30 text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-800"
                     : uiState.type === "warning"
-                      ? "border-amber-200 bg-amber-50 text-amber-800"
-                      : "border-red-200 bg-red-50 text-red-800"
+                      ? isDarkMode ? "border-amber-800/50 bg-amber-900/30 text-amber-300" : "border-amber-200 bg-amber-50 text-amber-800"
+                      : isDarkMode ? "border-red-800/50 bg-red-900/30 text-red-300" : "border-red-200 bg-red-50 text-red-800"
                     }`}
                 >
                   <div className="flex items-start gap-2">

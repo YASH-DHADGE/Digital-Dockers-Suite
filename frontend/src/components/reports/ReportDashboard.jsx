@@ -378,7 +378,7 @@ export default function ReportDashboard() {
                 {tMetrics.assigneeWorkload.map(user => (
                   <Card key={user.name} size="small" className="reports-team-member-card" style={{ width: 220, borderColor: isDark ? '#30363d' : '#f0f0f0', background: isDark ? '#161b22' : '#fafafa' }}>
                     <Statistic title={<Text strong>{user.name}</Text>} value={user.tasksAssigned} suffix="tasks" styles={{ content: { fontSize: 18, color: '#1890ff' } }} />
-                    <div style={{ marginTop: 8, fontSize: 12, color: 'gray' }}>
+                    <div style={{ marginTop: 8, fontSize: 12, color: isDark ? '#9ca3af' : '#6b7280' }}>
                       Pushed: {user.storyPoints} pts<br/>
                       Completed: {user.tasksCompleted} / {user.tasksAssigned}
                     </div>
@@ -405,7 +405,7 @@ export default function ReportDashboard() {
       {aiReport && !generatingAI && (
         <div className="reports-ai-report" style={{ animation: 'fadeIn 0.5s', borderTop: '2px dashed #d9d9d9', paddingTop: 40, marginTop: 24 }}>
           <div style={{ marginBottom: 24 }}>
-            <Title level={3} style={{ margin: 0, color: '#1890ff' }}>Intelligence Report</Title>
+            <Title level={3} style={{ margin: 0, color: isDark ? '#60a5fa' : '#1890ff' }}>Intelligence Report</Title>
             <Text type="secondary">Generated securely on {new Date().toLocaleString()}</Text>
           </div>
 

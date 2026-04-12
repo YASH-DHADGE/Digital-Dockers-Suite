@@ -51,6 +51,7 @@ const getLayoutedElements = (nodes, edges, direction = 'TB') => {
 
 // Company/Workspace node
 const CompanyNode = ({ data }) => {
+    const theme = useTheme();
     return (
         <GlassCard
             sx={{
@@ -75,7 +76,7 @@ const CompanyNode = ({ data }) => {
                     {data.subtitle}
                 </Typography>
             </Box>
-            <Handle type="source" position={Position.Bottom} style={{ background: '#4f46e5', border: '2px solid white' }} />
+            <Handle type="source" position={Position.Bottom} style={{ background: '#4f46e5', border: `2px solid ${theme.palette.mode === 'dark' ? '#334155' : 'white'}` }} />
         </GlassCard>
     );
 };
@@ -116,8 +117,8 @@ const TeamNode = ({ data }) => {
                         {data.memberCount} members
                     </Typography>
                 </Box>
-                <Handle type="target" position={Position.Top} style={{ background: data.color || '#6554C0', border: '1px solid white' }} />
-                <Handle type="source" position={Position.Bottom} style={{ background: data.color || '#6554C0', border: '1px solid white' }} />
+                <Handle type="target" position={Position.Top} style={{ background: data.color || '#6554C0', border: `1px solid ${theme.palette.mode === 'dark' ? '#334155' : 'white'}` }} />
+                <Handle type="source" position={Position.Bottom} style={{ background: data.color || '#6554C0', border: `1px solid ${theme.palette.mode === 'dark' ? '#334155' : 'white'}` }} />
             </GlassCard>
         </Tooltip>
     );
@@ -199,8 +200,8 @@ const PersonNode = ({ data }) => {
                         }}
                     />
                 </Box>
-                <Handle type="target" position={Position.Top} style={{ background: data.isLead ? '#4f46e5' : '#94a3b8', border: '1px solid white' }} />
-                <Handle type="source" position={Position.Bottom} style={{ background: data.isLead ? '#4f46e5' : '#94a3b8', border: '1px solid white' }} />
+                <Handle type="target" position={Position.Top} style={{ background: data.isLead ? '#4f46e5' : '#94a3b8', border: `1px solid ${theme.palette.mode === 'dark' ? '#334155' : 'white'}` }} />
+                <Handle type="source" position={Position.Bottom} style={{ background: data.isLead ? '#4f46e5' : '#94a3b8', border: `1px solid ${theme.palette.mode === 'dark' ? '#334155' : 'white'}` }} />
             </GlassCard>
         </Tooltip>
     );

@@ -6,6 +6,7 @@ import { Bar, Line, Pie } from 'react-chartjs-2';
 import { reportService } from '../../services/reportService';
 import projectService from '../../services/projectService';
 import sprintService from '../../services/sprintService';
+import { useThemeMode } from '../../context/ThemeContext';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend, ArcElement);
 
@@ -13,6 +14,8 @@ const { Title: AntTitle, Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
 export default function AIReportGenerator() {
+    const { mode } = useThemeMode();
+    const isDark = mode === 'dark';
     const [projects, setProjects] = useState([]);
     const [sprints, setSprints] = useState([]);
     const [selectedProject, setSelectedProject] = useState(null);
@@ -184,7 +187,7 @@ export default function AIReportGenerator() {
     };
 
     return (
-        <div style={{ marginTop: 40, borderTop: '1px solid #f0f0f0', paddingTop: 40 }}>
+        <div style={{ marginTop: 40, borderTop: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`, paddingTop: 40 }}>
             <div style={{ display: 'flex', alignItems: 'center', marginBottom: 24 }}>
                 <RobotOutlined style={{ fontSize: 28, color: '#722ed1', marginRight: 16 }} />
                 <div>
@@ -193,7 +196,7 @@ export default function AIReportGenerator() {
                 </div>
             </div>
 
-            <Card style={{ marginBottom: 24, background: '#fafafa' }}>
+            <Card style={{ marginBottom: 24, background: isDark ? '#161b22' : '#fafafa', borderColor: isDark ? '#30363d' : '#f0f0f0' }}>
                 <Space size="large" align="end" wrap>
                     <div>
                         <Text strong style={{ display: 'block', marginBottom: 8 }}>Select Project</Text>
@@ -270,14 +273,14 @@ export default function AIReportGenerator() {
                     {/* AI Executive Summary & Confidence */}
                     <Row gutter={24} style={{ marginBottom: 24 }}>
                         <Col span={16}>
-                            <Card title="AI Executive Summary" bordered={false} style={{ height: '100%', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                            <Card title="AI Executive Summary" bordered={false} style={{ height: '100%', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', background: isDark ? '#161b22' : '#fff' }}>
                                 <Paragraph style={{ fontSize: 16, lineHeight: 1.8 }}>
                                     {reportData.aiInsights?.executiveSummary}
                                 </Paragraph>
                             </Card>
                         </Col>
                         <Col span={8}>
-                            <Card title="AI Confidence Score" bordered={false} style={{ height: '100%', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', textAlign: 'center' }}>
+                            <Card title="AI Confidence Score" bordered={false} style={{ height: '100%', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', textAlign: 'center', background: isDark ? '#161b22' : '#fff' }}>
                                 <Progress 
                                     type="dashboard" 
                                     percent={reportData.aiInsights?.confidenceScoring?.score || 0} 
@@ -291,7 +294,7 @@ export default function AIReportGenerator() {
                     </Row>
 
                     {/* AI Breakdowns */}
-                    <Card title="NVIDIA AI Insights" style={{ marginBottom: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                    <Card title="NVIDIA AI Insights" style={{ marginBottom: 24, boxShadow: '0 4px 12px rgba(0,0,0,0.05)', background: isDark ? '#161b22' : '#fff' }}>
                         <Collapse ghost defaultActiveKey={['1', '2']}>
                             <Panel header={<Text strong>Task Flow & Pipeline Analysis</Text>} key="1">
                                 <Paragraph>{reportData.aiInsights?.taskBreakdowns}</Paragraph>
@@ -320,7 +323,7 @@ export default function AIReportGenerator() {
                     {renderCharts()}
 
                     {/* Risk Matrix Table */}
-                    <Card title="AI Risk Matrix & Mitigations" style={{ marginTop: 24, marginBottom: 24, borderColor: '#ffccc7' }} headStyle={{ background: '#fff1f0' }}>
+                    <Card title="AI Risk Matrix & Mitigations" style={{ marginTop: 24, marginBottom: 24, borderColor: isDark ? '#7f1d1d' : '#ffccc7', background: isDark ? '#161b22' : '#fff' }} headStyle={{ background: isDark ? '#431418' : '#fff1f0' }}>
                         <Table 
                             dataSource={reportData.aiInsights?.riskMatrix || []} 
                             pagination={false}

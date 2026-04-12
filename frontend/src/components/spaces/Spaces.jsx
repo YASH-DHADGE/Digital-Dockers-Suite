@@ -4,6 +4,7 @@ import { PlusOutlined, DeleteOutlined, EditOutlined, TeamOutlined, HistoryOutlin
 import axios from 'axios';
 import { useProject } from '../../context/ProjectContext';
 import { useAuth } from '../../context/AuthContext';
+import { useThemeMode } from '../../context/ThemeContext';
 import './Spaces.css';
 import SpaceEditor from './SpaceEditor';
 import SpaceMembers from './SpaceMembers';
@@ -13,6 +14,8 @@ import SpaceMembers from './SpaceMembers';
  * Main hub for collaborative note-taking, drawing, and mind mapping
  */
 const Spaces = () => {
+  const { mode } = useThemeMode();
+  const isDark = mode === 'dark';
   const { currentProject } = useProject();
   const { user } = useAuth();
   const projectId = currentProject?._id;
@@ -132,14 +135,19 @@ const Spaces = () => {
     if (spaces.length === 0 && !searchQuery) {
       return (
         <Empty
-          image={<FolderOpenOutlined style={{ fontSize: 64, color: '#e2e8f0' }} />}
+          image={<FolderOpenOutlined style={{ fontSize: 64, color: isDark ? '#475569' : '#e2e8f0' }} />}
           description={
-             <div style={{ color: '#64748b', marginTop: 16 }}>
-                 <h3 style={{ color: '#334155', marginBottom: 4 }}>No spaces yet</h3>
+             <div style={{ color: isDark ? '#94a3b8' : '#64748b', marginTop: 16 }}>
+                 <h3 style={{ color: isDark ? '#e2e8f0' : '#334155', marginBottom: 4 }}>No spaces yet</h3>
                  <p>Create a space to start organizing notes and documents together.</p>
              </div>
           }
-          style={{ padding: '64px 0', background: '#fff', borderRadius: 8, border: '1px dashed #e2e8f0' }}
+          style={{
+            padding: '64px 0',
+            background: isDark ? '#161b22' : '#fff',
+            borderRadius: 8,
+            border: `1px dashed ${isDark ? '#334155' : '#e2e8f0'}`
+          }}
           extra={
             <Button type="primary" icon={<PlusOutlined />} onClick={() => setCreateModalVisible(true)}>
               Create First Space

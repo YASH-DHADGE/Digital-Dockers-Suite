@@ -540,10 +540,17 @@ h4 {
   animation: scaleIn var(--transition-fast);
 }
 
-/* Focus Visible for Accessibility */
-:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+/* Completely remove default browser and Tailwind form plugin focus rings */
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
+.MuiOutlinedInput-root.Mui-focused {
+  outline: none !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
 }
 
 /* Reduced Motion */

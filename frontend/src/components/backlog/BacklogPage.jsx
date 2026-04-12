@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Card, Button, Select, Table, Tag, Avatar, Space, Empty, message, Typography, Row, Col, Divider, Input, Checkbox } from 'antd';
 import { PlusOutlined, BugOutlined, CheckCircleOutlined, FileTextOutlined, HolderOutlined, SearchOutlined, CalendarOutlined } from '@ant-design/icons';
 import { useProject } from '../../context/ProjectContext';
+import { useThemeMode } from '../../context/ThemeContext';
 import taskService from '../../services/taskService';
 import CreateIssueModal from '../tasks/CreateIssueModal';
 import './BacklogPage.css';
@@ -52,6 +53,8 @@ const STATUS_LABEL = {
 
 
 const BacklogPage = () => {
+    const { mode } = useThemeMode();
+    const isDark = mode === 'dark';
     const { currentProject, sprints, activeSprint, syncTrigger } = useProject();
     const [backlogIssues, setBacklogIssues] = useState([]);
     const [sprintIssues, setSprintIssues] = useState([]);
@@ -409,7 +412,7 @@ const BacklogPage = () => {
                                         ref={provided.innerRef}
                                         {...provided.droppableProps}
                                         style={{
-                                            backgroundColor: snapshot.isDraggingOver ? '#fafafa' : 'transparent',
+                                            backgroundColor: snapshot.isDraggingOver ? (isDark ? '#1f2937' : '#fafafa') : 'transparent',
                                             padding: '8px',
                                             borderRadius: '4px',
                                             transition: 'background-color 0.2s'

@@ -316,3 +316,41 @@
     color: #e6e6e6;
   }
 }
+
+.dark .task-card {
+  background-color: rgba(59, 130, 246, 0.18);
+}
+
+.dark .task-card.completed {
+  background-color: rgba(16, 185, 129, 0.18);
+}
+
+.dark .task-card.carried-over {
+  background-color: rgba(245, 158, 11, 0.2);
+}
+
+.dark .task-title,
+.dark .tooltip-value {
+  color: var(--color-text-primary);
+}
+
+.dark .task-key,
+.dark .task-meta,
+.dark .tooltip-label,
+.dark .task-meta :global(.ant-avatar),
+.dark .tooltip-value :global(.ant-avatar) {
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+.dark .tooltip-row {
+  border-color: var(--color-border);
+}
+
+.dark :global(.task-tooltip-overlay .ant-tooltip-inner) {
+  background: #111827;
+}
+
+.dark :global(.task-tooltip-overlay .ant-tooltip-arrow-content) {
+  border-top-color: #111827 !important;
+}

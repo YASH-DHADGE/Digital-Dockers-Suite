@@ -14,8 +14,11 @@ import {
   FaClipboardCheck,
 } from "react-icons/fa";
 import { format } from "date-fns";
+import { useThemeMode } from "../context/ThemeContext";
 
 const PRDetailModal = ({ pr, onClose }) => {
+  const { mode } = useThemeMode();
+  const isDarkMode = mode === "dark";
   const [activeTab, setActiveTab] = useState("layers");
 
   if (!pr) return null;
@@ -26,9 +29,9 @@ const PRDetailModal = ({ pr, onClose }) => {
     : [];
 
   const getSeverityColor = (severity) => {
-    if (severity >= 8) return "text-red-700 bg-red-100 border border-red-200";
-    if (severity >= 5) return "text-amber-700 bg-amber-100 border border-amber-200";
-    return "text-blue-700 bg-blue-100 border border-blue-200";
+    if (severity >= 8) return isDarkMode ? "text-red-300 bg-red-900/40 border border-red-800/50" : "text-red-700 bg-red-100 border border-red-200";
+    if (severity >= 5) return isDarkMode ? "text-amber-300 bg-amber-900/40 border border-amber-800/50" : "text-amber-700 bg-amber-100 border border-amber-200";
+    return isDarkMode ? "text-blue-300 bg-blue-900/40 border border-blue-800/50" : "text-blue-700 bg-blue-100 border border-blue-200";
   };
 
   const getGatekeeperScore = () => {
@@ -198,14 +201,14 @@ const PRDetailModal = ({ pr, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden m-4 bg-white border border-blue-100">
-        <div className="p-4 border-b border-blue-100 bg-blue-50">
+      <div className={`relative rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden m-4 border border-blue-100 transition-colors ${isDarkMode ? "bg-slate-900 border-slate-700 shadow-slate-950/50" : "bg-white border-blue-100 shadow-xl"}`}>
+        <div className={`p-4 border-b transition-colors ${isDarkMode ? "border-slate-700 bg-slate-800/50" : "border-blue-100 bg-blue-50"}`}>
           <div className="flex justify-between items-start gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="text-base font-bold text-blue-800">PR #{pr.prNumber ?? "N/A"}</span>
+                <span className={`text-base font-bold ${isDarkMode ? "text-cyan-400" : "text-blue-800"}`}>PR #{pr.prNumber ?? "N/A"}</span>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-semibold ${pr.status === "PASS"
                     ? "bg-green-500 text-white"
@@ -220,8 +223,8 @@ const PRDetailModal = ({ pr, onClose }) => {
                 {pr.status === "BLOCK" && <FaTimesCircle className="text-red-600" size={16} />}
               </div>
 
-              <h2 className="text-lg font-semibold text-slate-900 truncate">{pr.title || "Pull Request Overview"}</h2>
-              <div className="flex items-center gap-3 text-xs text-slate-600 mt-1 flex-wrap">
+              <h2 className={`text-lg font-semibold truncate ${isDarkMode ? "text-white" : "text-slate-900"}`}>{pr.title || "Pull Request Overview"}</h2>
+              <div className={`flex items-center gap-3 text-xs mt-1 flex-wrap ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>
                 <span>@{pr.author || "unknown"}</span>
                 <span>•</span>
                 <span>{pr.branch || pr.repoId || "repository"}</span>
@@ -231,17 +234,17 @@ const PRDetailModal = ({ pr, onClose }) => {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="text-right px-3 py-1.5 rounded-lg border border-blue-200 bg-white">
-                <div className="text-lg font-bold text-blue-700 leading-none">{overallScore}</div>
-                <div className="text-[11px] text-slate-500">Δ {overallDelta >= 0 ? "+" : ""}{overallDelta}</div>
+              <div className={`text-right px-3 py-1.5 rounded-lg border transition-colors ${isDarkMode ? "border-slate-600 bg-slate-800" : "border-blue-200 bg-white"}`}>
+                <div className={`text-lg font-bold leading-none ${isDarkMode ? "text-cyan-400" : "text-blue-700"}`}>{overallScore}</div>
+                <div className={`text-[11px] ${isDarkMode ? "text-slate-400" : "text-slate-500"}`}>Δ {overallDelta >= 0 ? "+" : ""}{overallDelta}</div>
               </div>
-              <button onClick={onClose} className="text-blue-700 hover:bg-blue-100 rounded-full p-2 transition flex-shrink-0">
+              <button onClick={onClose} className={`rounded-full p-2 transition flex-shrink-0 ${isDarkMode ? "text-slate-300 hover:bg-slate-700" : "text-blue-700 hover:bg-blue-100"}`}>
                 <FaTimes size={18} />
               </button>
             </div>
           </div>
 
-          <div className="mt-3 h-2 rounded-full bg-blue-100 overflow-hidden">
+          <div className={`mt-3 h-2 rounded-full overflow-hidden ${isDarkMode ? "bg-slate-700" : "bg-blue-100"}`}>
             <div
               className={`h-full transition-all ${overallScore > 80 ? "bg-green-500" : overallScore > 60 ? "bg-amber-500" : "bg-red-500"}`}
               style={{ width: `${overallScore}%` }}
@@ -249,15 +252,15 @@ const PRDetailModal = ({ pr, onClose }) => {
           </div>
         </div>
 
-        <div className="border-b border-blue-100 bg-blue-50/40">
+        <div className={`border-b transition-colors ${isDarkMode ? "border-slate-700 bg-slate-800/30" : "border-blue-100 bg-blue-50/40"}`}>
           <div className="flex">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-3 font-semibold text-sm transition ${activeTab === tab.id
-                  ? "border-b-2 border-blue-600 text-blue-700 bg-white"
-                  : "text-slate-600 hover:text-blue-700"
+                  ? isDarkMode ? "border-b-2 border-cyan-500 text-cyan-400 bg-slate-800/50" : "border-b-2 border-blue-600 text-blue-700 bg-white"
+                  : isDarkMode ? "text-slate-400 hover:text-slate-200" : "text-slate-600 hover:text-blue-700"
                   }`}
               >
                 <tab.icon size={14} />
@@ -267,7 +270,7 @@ const PRDetailModal = ({ pr, onClose }) => {
           </div>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-280px)] text-slate-800 bg-white">
+        <div className={`p-6 overflow-y-auto max-h-[calc(90vh-280px)] transition-colors ${isDarkMode ? "bg-slate-900 text-slate-200" : "bg-white text-slate-800"}`}>
           {activeTab === "layers" && (
             <div className="space-y-4">
               {analysisLayers.map((layer, idx) => {
@@ -275,18 +278,18 @@ const PRDetailModal = ({ pr, onClose }) => {
                 const StatusIcon = status.icon;
 
                 return (
-                  <div key={layer.id} className="border border-blue-100 rounded-xl p-5 bg-white shadow-sm">
+                  <div key={layer.id} className={`border rounded-xl p-5 shadow-sm transition-colors ${isDarkMode ? "border-slate-800 bg-slate-800/40" : "border-blue-100 bg-white"}`}>
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center text-base font-bold bg-blue-100 text-blue-700 border border-blue-200">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold border transition-colors ${isDarkMode ? "bg-slate-700 text-cyan-300 border-slate-600" : "bg-blue-100 text-blue-700 border-blue-200"}`}>
                         {idx + 1}
                       </div>
 
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-3 flex-wrap">
-                          <layer.icon className="text-blue-600" />
-                          <h3 className="font-semibold text-lg text-slate-900">{layer.name}</h3>
+                          <layer.icon className={isDarkMode ? "text-cyan-400" : "text-blue-600"} />
+                          <h3 className={`font-semibold text-lg ${isDarkMode ? "text-white" : "text-slate-900"}`}>{layer.name}</h3>
                           <StatusIcon className={status.color} />
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
+                          <span className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${isDarkMode ? "bg-slate-800 text-cyan-300 border-slate-700" : "bg-blue-100 text-blue-700 border-blue-200"}`}>
                             Score: {getLayerScore(layer.id)}
                           </span>
                         </div>
@@ -324,13 +327,13 @@ const PRDetailModal = ({ pr, onClose }) => {
 
                               return (
                                 <>
-                            <span className={`px-3 py-1 rounded-full border ${delta >= 0
-                              ? "bg-green-100 text-green-700 border-green-200"
-                              : "bg-red-100 text-red-700 border-red-200"
+                            <span className={`px-3 py-1 rounded-full border transition-colors ${delta >= 0
+                              ? isDarkMode ? "bg-green-900/30 text-green-300 border-green-800/50" : "bg-green-100 text-green-700 border-green-200"
+                              : isDarkMode ? "bg-red-900/30 text-red-300 border-red-800/50" : "bg-red-100 text-red-700 border-red-200"
                               }`}>
                               Delta: {delta >= 0 ? "+" : ""}{delta}
                             </span>
-                            <span className="px-3 py-1 rounded-full border bg-blue-100 text-blue-700 border-blue-200">
+                            <span className={`px-3 py-1 rounded-full border transition-colors ${isDarkMode ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-blue-100 text-blue-700 border-blue-200"}`}>
                               Files: {files}
                             </span>
                                 </>
@@ -350,18 +353,18 @@ const PRDetailModal = ({ pr, onClose }) => {
 
                               return (
                                 <>
-                            <span className={`px-3 py-1 rounded-full border ${String(verdict || "").toUpperCase() === "GOOD"
-                              ? "bg-green-100 text-green-700 border-green-200"
+                            <span className={`px-3 py-1 rounded-full border transition-colors ${String(verdict || "").toUpperCase() === "GOOD"
+                              ? isDarkMode ? "bg-green-900/30 text-green-300 border-green-800/50" : "bg-green-100 text-green-700 border-green-200"
                               : String(verdict || "").toUpperCase() === "BAD"
-                                ? "bg-red-100 text-red-700 border-red-200"
-                                : "bg-amber-100 text-amber-700 border-amber-200"
+                                ? isDarkMode ? "bg-red-900/30 text-red-300 border-red-800/50" : "bg-red-100 text-red-700 border-red-200"
+                                : isDarkMode ? "bg-amber-900/30 text-amber-300 border-amber-800/50" : "bg-amber-100 text-amber-700 border-amber-200"
                               }`}>
                               Verdict: {semanticVerdictLabel(verdict)}
                             </span>
-                            <span className="px-3 py-1 rounded-full border bg-blue-100 text-blue-700 border-blue-200">
+                            <span className={`px-3 py-1 rounded-full border transition-colors ${isDarkMode ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-blue-100 text-blue-700 border-blue-200"}`}>
                               Findings: {findings}
                             </span>
-                            <span className="px-3 py-1 rounded-full border bg-blue-100 text-blue-700 border-blue-200">
+                            <span className={`px-3 py-1 rounded-full border transition-colors ${isDarkMode ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-blue-100 text-blue-700 border-blue-200"}`}>
                               Engine: {engine}{model ? ` / ${model}` : ""}
                             </span>
                                 </>
@@ -393,12 +396,12 @@ const PRDetailModal = ({ pr, onClose }) => {
                         : `${semanticVerdictLabel(metrics.verdict ?? layer.details?.verdict)} • Findings ${Number(metrics.findings ?? layer.details?.findings?.length ?? 0)}`;
 
                   return (
-                    <div key={`finding-summary-${layer.id}`} className="rounded-xl border border-blue-100 bg-blue-50/60 p-3">
+                    <div key={`finding-summary-${layer.id}`} className={`rounded-xl border p-3 transition-colors ${isDarkMode ? "border-slate-700 bg-slate-800/50" : "border-blue-100 bg-blue-50/60"}`}>
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="text-sm font-semibold text-blue-800">{layer.name}</span>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-white border border-blue-200 text-blue-700">{score}</span>
+                        <span className={`text-sm font-semibold ${isDarkMode ? "text-cyan-300" : "text-blue-800"}`}>{layer.name}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${isDarkMode ? "bg-slate-700 border-slate-600 text-cyan-200" : "bg-white border-blue-200 text-blue-700"}`}>{score}</span>
                       </div>
-                      <div className="text-xs text-slate-600 mb-1">{meta}</div>
+                      <div className={`text-xs mb-1 ${isDarkMode ? "text-slate-400" : "text-slate-600"}`}>{meta}</div>
                       <div className={`text-xs font-semibold ${status.color}`}>{String(status.status || "pending").toUpperCase()}</div>
                     </div>
                   );
@@ -407,21 +410,21 @@ const PRDetailModal = ({ pr, onClose }) => {
 
               {unifiedFindings.length > 0 ? (
                 unifiedFindings.map((finding, idx) => (
-                  <div key={`unified-finding-${idx}`} className="border border-blue-100 rounded-lg p-4 bg-white shadow-sm">
+                  <div key={`unified-finding-${idx}`} className={`border rounded-lg p-4 shadow-sm transition-colors ${isDarkMode ? "border-slate-800 bg-slate-800/30" : "border-blue-100 bg-white"}`}>
                     <div className="flex items-start gap-3">
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${getSeverityColor(finding.severity || 5)}`}>
                         {finding.confidence || "medium"}
                       </span>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <span className="px-2 py-0.5 rounded-full text-[11px] border border-blue-200 bg-blue-100 text-blue-700 uppercase">
+                          <span className={`px-2 py-0.5 rounded-full text-[11px] border transition-colors ${isDarkMode ? "border-slate-700 bg-slate-800 text-cyan-300" : "border-blue-200 bg-blue-100 text-blue-700"} uppercase`}>
                             {finding.layer || "semantic"}
                           </span>
-                          <p className="font-medium text-slate-900">{finding.message}</p>
+                          <p className={`font-medium ${isDarkMode ? "text-white" : "text-slate-900"}`}>{finding.message}</p>
                         </div>
 
                         {finding.suggestion && (
-                          <div className="mt-2 p-3 rounded-lg border bg-blue-50 border-blue-200 text-blue-900">
+                          <div className={`mt-2 p-3 rounded-lg border transition-colors ${isDarkMode ? "bg-slate-900 border-slate-700 text-slate-300" : "bg-blue-50 border-blue-200 text-blue-900"}`}>
                             <div className="flex items-center justify-between gap-4">
                               <p className="text-sm">{finding.suggestion}</p>
                               <button
@@ -430,7 +433,7 @@ const PRDetailModal = ({ pr, onClose }) => {
                                     `Applying AI Fix via GitHub API...\n\nCommit: "Fix: ${finding.message}"`
                                   )
                                 }
-                                className="flex-shrink-0 text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                                className={`flex-shrink-0 text-xs px-3 py-1.5 rounded-lg transition font-medium ${isDarkMode ? "bg-cyan-600 hover:bg-cyan-500 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
                               >
                                 Apply Fix
                               </button>
@@ -462,57 +465,63 @@ const PRDetailModal = ({ pr, onClose }) => {
 
           {activeTab === "files" && (
             <div>
-              <h3 className="font-semibold mb-3 text-slate-900">
+              <h3 className={`font-semibold mb-3 ${isDarkMode ? "text-white" : "text-slate-900"}`}>
                 Changed Files ({fileChangeMetrics.length || pr.filesChanged?.length || 0})
               </h3>
               <div className="space-y-2">
                 {fileChangeMetrics.length > 0
                   ? fileChangeMetrics.map((file, idx) => (
-                    <div key={`${file.file || "file"}-${idx}`} className="p-3 rounded-lg border border-blue-100 bg-white shadow-sm">
+                    <div key={`${file.file || "file"}-${idx}`} className={`p-3 rounded-lg border transition-colors ${isDarkMode ? "border-slate-800 bg-slate-800/40" : "border-blue-100 bg-white shadow-sm"}`}>
                       <div className="flex items-center gap-3">
-                        <FaCode className="text-blue-400" />
-                        <span className="font-mono text-sm flex-1 truncate text-slate-800">{file.file}</span>
+                        <FaCode className={isDarkMode ? "text-cyan-400" : "text-blue-400"} />
+                        <span className={`font-mono text-sm flex-1 truncate ${isDarkMode ? "text-slate-200" : "text-slate-800"}`}>{file.file}</span>
                       </div>
                       <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                        <span className="px-2 py-1 rounded border bg-blue-100 text-blue-800 border-blue-200">
+                        <span className={`px-2 py-1 rounded border transition-colors ${isDarkMode ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-blue-100 text-blue-800 border-blue-200"}`}>
                           Complexity: {file.complexity || 0}
                         </span>
-                        <span className={`px-2 py-1 rounded border ${(file.riskScore || 0) > 70 ? "bg-red-100 text-red-700 border-red-200" : (file.riskScore || 0) > 40 ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-green-100 text-green-700 border-green-200"}`}>
+                        <span className={`px-2 py-1 rounded border transition-colors ${(file.riskScore || 0) > 70 
+                          ? isDarkMode ? "bg-red-900/30 text-red-300 border-red-800/50" : "bg-red-100 text-red-700 border-red-200" 
+                          : (file.riskScore || 0) > 40 
+                            ? isDarkMode ? "bg-amber-900/30 text-amber-300 border-amber-800/50" : "bg-amber-100 text-amber-700 border-amber-200" 
+                            : isDarkMode ? "bg-green-900/30 text-green-300 border-green-800/50" : "bg-green-100 text-green-700 border-green-200"}`}>
                           Risk: {file.riskScore || 0}
                         </span>
-                        <span className="px-2 py-1 rounded border bg-blue-100 text-blue-800 border-blue-200">
+                        <span className={`px-2 py-1 rounded border transition-colors ${isDarkMode ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-blue-100 text-blue-800 border-blue-200"}`}>
                           LOC: {file.loc || 0}
                         </span>
-                        <span className="px-2 py-1 rounded border bg-blue-100 text-blue-800 border-blue-200">
+                        <span className={`px-2 py-1 rounded border transition-colors ${isDarkMode ? "bg-slate-800 text-slate-300 border-slate-700" : "bg-blue-100 text-blue-800 border-blue-200"}`}>
                           Diff: +{file.additions || 0} / -{file.deletions || 0}
                         </span>
-                        <span className={`px-2 py-1 rounded border ${(file.lintErrors || 0) > 0 ? "bg-red-100 text-red-700 border-red-200" : "bg-green-100 text-green-700 border-green-200"}`}>
+                        <span className={`px-2 py-1 rounded border transition-colors ${(file.lintErrors || 0) > 0 
+                          ? isDarkMode ? "bg-red-900/30 text-red-300 border-red-800/50" : "bg-red-100 text-red-700 border-red-200" 
+                          : isDarkMode ? "bg-green-900/30 text-green-300 border-green-800/50" : "bg-green-100 text-green-700 border-green-200"}`}>
                           Lint: {file.lintErrors || 0} errors, {file.lintWarnings || 0} warnings
                         </span>
                       </div>
                     </div>
                   ))
                   : pr.filesChanged?.map((file, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-3 rounded-lg border border-blue-100 bg-white shadow-sm">
-                      <FaCode className="text-blue-400" />
-                      <span className="font-mono text-sm flex-1 truncate text-slate-800">{file}</span>
+                    <div key={idx} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${isDarkMode ? "border-slate-800 bg-slate-800/40" : "border-blue-100 bg-white shadow-sm"}`}>
+                      <FaCode className={isDarkMode ? "text-cyan-400" : "text-blue-400"} />
+                      <span className={`font-mono text-sm flex-1 truncate ${isDarkMode ? "text-slate-200" : "text-slate-800"}`}>{file}</span>
                     </div>
                   ))}
                 {fileChangeMetrics.length === 0 && (!pr.filesChanged || pr.filesChanged.length === 0) && (
-                  <p className="text-center py-8 text-slate-400">No file metrics available.</p>
+                  <p className={`text-center py-8 ${isDarkMode ? "text-slate-500" : "text-slate-400"}`}>No file metrics available.</p>
                 )}
               </div>
             </div>
           )}
         </div>
 
-        <div className="flex items-center justify-between px-6 py-4 border-t border-blue-100 bg-blue-50/40">
+        <div className={`flex items-center justify-between px-6 py-4 border-t transition-colors ${isDarkMode ? "border-slate-700 bg-slate-800/50" : "border-blue-100 bg-blue-50/40"}`}>
           {pr.url ? (
             <a
               href={pr.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-blue-700 hover:text-blue-800"
+              className={`flex items-center gap-2 text-sm transition-colors ${isDarkMode ? "text-cyan-400 hover:text-cyan-300" : "text-blue-700 hover:text-blue-800"}`}
             >
               <FaGithub /> View on GitHub
               <FaExternalLinkAlt size={10} />
@@ -522,7 +531,7 @@ const PRDetailModal = ({ pr, onClose }) => {
           )}
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${isDarkMode ? "bg-slate-700 text-white hover:bg-slate-600" : "bg-blue-600 text-white hover:bg-blue-700"}`}
           >
             Close
           </button>

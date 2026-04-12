@@ -71,32 +71,32 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
             />
 
             {/* Modal */}
-            <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden m-4">
+            <div className="relative bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-xl shadow-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden m-4 border border-transparent dark:border-slate-700">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700 bg-gradient-to-r from-indigo-50 to-white dark:from-slate-800 dark:to-slate-900">
                     <div className="flex-1 min-w-0">
-                        <h2 className="text-lg font-bold text-gray-900 truncate">
+                        <h2 className="text-lg font-bold text-gray-900 dark:text-slate-100 truncate">
                             {displayFile.path?.split("/").pop() || "File Details"}
                         </h2>
-                        <p className="text-sm text-gray-500 truncate">{displayFile.path}</p>
+                        <p className="text-sm text-gray-500 dark:text-slate-400 truncate">{displayFile.path}</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="ml-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                        className="ml-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
                     >
                         <FaTimes size={18} />
                     </button>
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex border-b border-gray-200 px-6">
+                <div className="flex border-b border-gray-200 dark:border-slate-700 px-6">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
-                                ? "border-indigo-600 text-indigo-600"
-                                : "border-transparent text-gray-500 hover:text-gray-700"
+                                ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
+                                : "border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
                                 }`}
                         >
                             <tab.icon size={14} />
@@ -117,8 +117,8 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                             {activeTab === "overview" && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Risk Gauge */}
-                                    <div className="bg-gray-50 rounded-xl p-6">
-                                        <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                                    <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-6 border border-transparent dark:border-slate-700">
+                                        <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-4">
                                             Risk Score
                                         </h3>
                                         <div className="flex items-center gap-6">
@@ -126,7 +126,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                                 className="relative w-24 h-24 rounded-full flex items-center justify-center"
                                                 style={{ background: getRiskGradient(riskScore) }}
                                             >
-                                                <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+                                                <div className="absolute inset-2 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center">
                                                     <span className="text-2xl font-bold" style={{ color: riskColor }}>
                                                         {riskScore.toFixed(0)}
                                                     </span>
@@ -143,7 +143,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                                 >
                                                     {riskCategory}
                                                 </span>
-                                                <p className="mt-2 text-sm text-gray-500">
+                                                <p className="mt-2 text-sm text-gray-500 dark:text-slate-400">
                                                     Confidence: {displayFile.risk?.confidence || "low"}
                                                 </p>
                                             </div>
@@ -151,29 +151,29 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                     </div>
 
                                     {/* Metrics */}
-                                    <div className="bg-gray-50 rounded-xl p-6">
-                                        <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                                    <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-6 border border-transparent dark:border-slate-700">
+                                        <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-4">
                                             Metrics
                                         </h3>
                                         <div className="space-y-3">
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Lines of Code</span>
+                                                <span className="text-gray-600 dark:text-slate-400">Lines of Code</span>
                                                 <span className="font-semibold">{displayFile.loc || 0}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Cyclomatic Complexity</span>
+                                                <span className="text-gray-600 dark:text-slate-400">Cyclomatic Complexity</span>
                                                 <span className="font-semibold">
                                                     {displayFile.complexity?.cyclomatic || displayFile.complexity || 0}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Churn Rate (90d)</span>
+                                                <span className="text-gray-600 dark:text-slate-400">Churn Rate (90d)</span>
                                                 <span className="font-semibold">
                                                     {displayFile.churn?.recentCommits || displayFile.churnRate || 0} commits
                                                 </span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-600">Language</span>
+                                                <span className="text-gray-600 dark:text-slate-400">Language</span>
                                                 <span className="font-semibold capitalize">
                                                     {displayFile.language || "unknown"}
                                                 </span>
@@ -183,14 +183,14 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
 
                                     {/* Top Contributors */}
                                     {displayFile.churn?.topContributors?.length > 0 && (
-                                        <div className="bg-gray-50 rounded-xl p-6">
-                                            <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                                        <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-6 border border-transparent dark:border-slate-700">
+                                            <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-4">
                                                 Top Contributors
                                             </h3>
                                             <div className="space-y-2">
                                                 {displayFile.churn.topContributors.slice(0, 5).map((contributor, idx) => (
                                                     <div key={idx} className="flex justify-between items-center">
-                                                        <span className="text-gray-600 truncate">
+                                                        <span className="text-gray-600 dark:text-slate-400 truncate">
                                                             {contributor.name || contributor.email}
                                                         </span>
                                                         <span className="text-sm bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded">
@@ -204,8 +204,8 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
 
                                     {/* Recommendations */}
                                     {displayFile.recommendations?.length > 0 && (
-                                        <div className="bg-gray-50 rounded-xl p-6">
-                                            <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                                        <div className="bg-gray-50 dark:bg-slate-800 rounded-xl p-6 border border-transparent dark:border-slate-700">
+                                            <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-4">
                                                 AI Recommendations
                                             </h3>
                                             <div className="space-y-2">
@@ -232,7 +232,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                             {/* Functions Tab */}
                             {activeTab === "functions" && (
                                 <div>
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-4">
                                         Function Complexity ({displayFile.functions?.length || 0} functions)
                                     </h3>
                                     {displayFile.functions?.length > 0 ? (
@@ -242,7 +242,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                                 .map((fn, idx) => (
                                                     <div
                                                         key={idx}
-                                                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-transparent dark:border-slate-700"
                                                     >
                                                         <div className="flex items-center gap-3">
                                                             <span
@@ -257,7 +257,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                                             </span>
                                                             <div>
                                                                 <span className="font-mono text-sm">{fn.name}</span>
-                                                                <span className="text-xs text-gray-400 ml-2">
+                                                                <span className="text-xs text-gray-400 dark:text-slate-500 ml-2">
                                                                     Lines {fn.startLine}-{fn.endLine}
                                                                 </span>
                                                             </div>
@@ -272,7 +272,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                                 ))}
                                         </div>
                                     ) : (
-                                        <p className="text-gray-500 text-center py-8">
+                                        <p className="text-gray-500 dark:text-slate-400 text-center py-8">
                                             No function-level analysis available
                                         </p>
                                     )}
@@ -282,7 +282,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                             {/* History Tab */}
                             {activeTab === "history" && (
                                 <div>
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                                    <h3 className="text-sm font-semibold text-gray-700 dark:text-slate-200 mb-4">
                                         PR History
                                     </h3>
                                     {fileDetails?.recentPRs?.length > 0 ? (
@@ -290,7 +290,7 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                             {fileDetails.recentPRs.map((pr, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800 rounded-lg border border-transparent dark:border-slate-700"
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         {pr.status === "PASS" ? (
@@ -302,19 +302,19 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                                                         )}
                                                         <div>
                                                             <span className="font-medium">PR #{pr.prNumber}</span>
-                                                            <span className="text-gray-500 ml-2 text-sm truncate">
+                                                            <span className="text-gray-500 dark:text-slate-400 ml-2 text-sm truncate">
                                                                 {pr.title}
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    <span className="text-xs text-gray-400">
+                                                    <span className="text-xs text-gray-400 dark:text-slate-500">
                                                         {format(new Date(pr.createdAt), "MMM d, yyyy")}
                                                     </span>
                                                 </div>
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="text-gray-500 text-center py-8">
+                                        <p className="text-gray-500 dark:text-slate-400 text-center py-8">
                                             No PR history for this file
                                         </p>
                                     )}
@@ -346,19 +346,19 @@ const FileDetailsModal = ({ file, isOpen, onClose, onCreateTask }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800">
                     <a
                         href={`https://github.com/${displayFile.repoId}/blob/main/${displayFile.path}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                        className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100"
                     >
                         <FaGithub /> View on GitHub
                     </a>
                     <div className="flex gap-3">
                         <button
                             onClick={onClose}
-                            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+                            className="px-4 py-2 text-sm text-gray-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-slate-100"
                         >
                             Close
                         </button>

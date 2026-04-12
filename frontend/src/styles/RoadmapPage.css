@@ -692,3 +692,63 @@
         width: 100%;
     }
 }
+
+.dark .roadmap-page-v2 {
+    background:
+        radial-gradient(circle at top, rgba(56, 189, 248, 0.08), transparent 34%),
+        linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+}
+
+.dark .roadmap-header-v2,
+.dark .roadmap-filter-row,
+.dark .month-column-card,
+.dark .roadmap-kpi-card,
+.dark .sprint-card-wrapper,
+.dark .roadmap-chart-card,
+.dark .roadmap-insights-card,
+.dark .empty-month-state {
+    background: var(--color-bg-card);
+    border-color: var(--color-border);
+    box-shadow: var(--shadow-dark-sm);
+}
+
+.dark .roadmap-board-card .ant-card-body,
+.dark .month-stat-tile,
+.dark .task-mini-row,
+.dark .carry-over-section,
+.dark .month-insight-box {
+    background: var(--surface-secondary);
+    border-color: var(--color-border);
+}
+
+.dark .roadmap-header-v2 h1,
+.dark .kpi-value,
+.dark .month-stat-value,
+.dark .sprint-title,
+.dark .month-title-row,
+.dark .roadmap-chart-card .ant-card-head-title,
+.dark .roadmap-insights-card .ant-card-head-title {
+    color: var(--color-text-primary);
+}
+
+.dark .roadmap-subtitle,
+.dark .kpi-title,
+.dark .kpi-suffix,
+.dark .roadmap-board-subtitle,
+.dark .month-stat-label,
+.dark .sprint-project-name,
+.dark .task-mini-id,
+.dark .task-mini-title,
+.dark .sprint-progress-value {
+    color: var(--color-text-secondary);
+}
+
+.dark .roadmap-board::-webkit-scrollbar-track {
+    background: #21262d;
+}
+
+.dark .roadmap-board::-webkit-scrollbar-thumb,
+.dark .month-body-scroll::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+

@@ -11,11 +11,14 @@ import {
 } from '@ant-design/icons';
 import teamService from '../../services/teamService';
 import { useAuth } from '../../context/AuthContext';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const TeamManagement = () => {
+    const { mode } = useThemeMode();
+    const isDark = mode === 'dark';
     const { user } = useAuth();
     const [teams, setTeams] = useState([]);
     const [users, setUsers] = useState([]);
@@ -451,7 +454,7 @@ const TeamManagement = () => {
                                             alignItems: 'center', 
                                             justifyContent: 'space-between',
                                             padding: '12px',
-                                            borderBottom: '1px solid #f0f0f0'
+                                            borderBottom: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`
                                         }}
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -460,7 +463,7 @@ const TeamManagement = () => {
                                             </Avatar>
                                             <div>
                                                 <div style={{ fontWeight: 500 }}>{member.fullName}</div>
-                                                <div style={{ fontSize: '12px', color: '#8c8c8c' }}>{member.role?.replace('_', ' ')}</div>
+                                                <div style={{ fontSize: '12px', color: isDark ? '#9ca3af' : '#8c8c8c' }}>{member.role?.replace('_', ' ')}</div>
                                             </div>
                                         </div>
                                         <div>
@@ -480,7 +483,7 @@ const TeamManagement = () => {
                                     </div>
                                 ))}
                                 {(!selectedTeam.members || selectedTeam.members.length === 0) && (
-                                    <div style={{ textAlign: 'center', padding: '16px', color: 'rgba(0, 0, 0, 0.25)' }}>No members yet</div>
+                                    <div style={{ textAlign: 'center', padding: '16px', color: isDark ? '#64748b' : 'rgba(0, 0, 0, 0.25)' }}>No members yet</div>
                                 )}
                             </div>
                         </div>
@@ -508,7 +511,7 @@ const TeamManagement = () => {
                                             alignItems: 'center', 
                                             justifyContent: 'space-between',
                                             padding: '12px',
-                                            borderBottom: '1px solid #f0f0f0'
+                                            borderBottom: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`
                                         }}
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -517,7 +520,7 @@ const TeamManagement = () => {
                                             </Avatar>
                                             <div>
                                                 <div style={{ fontWeight: 500 }}>{user.fullName}</div>
-                                                <div style={{ fontSize: '12px', color: '#8c8c8c' }}>{user.role?.replace('_', ' ')}</div>
+                                                <div style={{ fontSize: '12px', color: isDark ? '#9ca3af' : '#8c8c8c' }}>{user.role?.replace('_', ' ')}</div>
                                             </div>
                                         </div>
                                         <Button
@@ -531,7 +534,7 @@ const TeamManagement = () => {
                                     </div>
                                 ))}
                                 {availableUsers.length === 0 && (
-                                    <div style={{ textAlign: 'center', padding: '16px', color: 'rgba(0, 0, 0, 0.25)' }}>No available users</div>
+                                    <div style={{ textAlign: 'center', padding: '16px', color: isDark ? '#64748b' : 'rgba(0, 0, 0, 0.25)' }}>No available users</div>
                                 )}
                             </div>
                         </div>

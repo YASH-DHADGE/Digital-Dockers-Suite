@@ -718,7 +718,7 @@ const ProjectDashboard = () => {
                                         })}
                                     </div>
                                 ) : (
-                                    <div style={{ textAlign: 'center', padding: '32px 16px', color: '#8c8c8c' }}>
+                                    <div style={{ textAlign: 'center', padding: '32px 16px', color: token.colorTextSecondary }}>
                                         <Text type="secondary" style={{ fontSize: '12px' }}>No workload data</Text>
                                     </div>
                                 )}

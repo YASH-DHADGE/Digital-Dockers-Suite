@@ -1,3 +1,4 @@
+import { useThemeMode } from '../../context/ThemeContext';
 import React, { useState, useEffect } from 'react';
 import { Button, Input, Space, Popconfirm, Avatar, Tooltip, message, Spin, Empty } from 'antd';
 import { SendOutlined, DeleteOutlined, LikeOutlined } from '@ant-design/icons';
@@ -10,6 +11,8 @@ import moment from 'moment';
  */
 const SpaceComments = ({ spaceId, currentUser }) => {
   const [comments, setComments] = useState([]);
+  const { mode } = useThemeMode();
+  const isDark = mode === 'dark';
   const [loading, setLoading] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -90,7 +93,7 @@ const SpaceComments = ({ spaceId, currentUser }) => {
                   gap: 12,
                   marginBottom: 16,
                   padding: '8px 0',
-                  borderBottom: '1px solid #f5f5f5'
+                  borderBottom: `1px solid ${isDark ? '#334155' : '#f5f5f5'}`
                 }}
               >
                 <Avatar src={comment.author.avatar} style={{ flexShrink: 0 }}>👤</Avatar>
@@ -100,12 +103,12 @@ const SpaceComments = ({ spaceId, currentUser }) => {
                       <Space size="small">
                         <span style={{ fontWeight: 500 }}>{comment.author.name}</span>
                         <Tooltip title={moment(comment.createdAt).format('YYYY-MM-DD HH:mm:ss')}>
-                          <span style={{ color: '#999', fontSize: '11px' }}>
+                          <span style={{ color: isDark ? '#94a3b8' : '#999', fontSize: '11px' }}>
                             {moment(comment.createdAt).fromNow()}
                           </span>
                         </Tooltip>
                       </Space>
-                      <div style={{ marginTop: 4, color: '#262626', fontSize: 13, whiteSpace: 'pre-wrap' }}>
+                      <div style={{ marginTop: 4, color: isDark ? '#e5e7eb' : '#262626', fontSize: 13, whiteSpace: 'pre-wrap' }}>
                         {comment.text}
                       </div>
                     </div>
@@ -126,7 +129,7 @@ const SpaceComments = ({ spaceId, currentUser }) => {
       </Spin>
 
       {/* Add comment */}
-      <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid #f0f0f0' }}>
+      <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${isDark ? '#334155' : '#f0f0f0'}` }}>
         <Space orientation="vertical" style={{ width: '100%' }}>
           <Input.TextArea
             rows={3}

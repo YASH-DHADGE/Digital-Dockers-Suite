@@ -14,7 +14,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: process.env.VITE_API_PROXY_TARGET || 'https://localhost:5002',
+        target: 'https://127.0.0.1:5002',
         changeOrigin: true,
         secure: false,
         ws: true,
@@ -24,7 +24,7 @@ export default defineConfig({
         })
       },
       '/socket.io': {
-        target: process.env.VITE_API_PROXY_TARGET || 'https://localhost:5002',
+        target: 'https://127.0.0.1:5002',
         ws: true,
         changeOrigin: true,
         secure: false,

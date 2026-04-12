@@ -292,3 +292,46 @@
         width: 100%;
     }
 }
+
+.dark .month-card {
+    border-color: var(--color-border);
+}
+
+.dark .month-card.past,
+.dark .month-card.future,
+.dark .task-item,
+.dark .capacity-item {
+    background: var(--color-bg-card);
+}
+
+.dark .month-card-header,
+.dark .carried-over-section,
+.dark .completion-date {
+    border-color: var(--color-border);
+}
+
+.dark .month-title,
+.dark .section-title,
+.dark .task-name,
+.dark .item-name {
+    color: var(--color-text-primary);
+}
+
+.dark .completion-metric,
+.dark .progress-label,
+.dark .story-points,
+.dark .item-reason,
+.dark .completion-date {
+    color: var(--color-text-secondary);
+}
+
+.dark .task-item:hover {
+    background: var(--surface-secondary);
+    border-color: #4b5563;
+}
+
+.dark .month-note,
+.dark .carried-item,
+.dark .assignee {
+    background: rgba(59, 130, 246, 0.16);
+}

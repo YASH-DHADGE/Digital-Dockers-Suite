@@ -21,8 +21,11 @@ import { format } from "date-fns";
 import { useGatekeeperFeed } from "../hooks/useGatekeeperFeed";
 import PRDetailModal from "./PRDetailModal";
 import api from "../services/api";
+import { useThemeMode } from "../context/ThemeContext";
 
-const GatekeeperStream = ({ isDarkMode, repoId }) => {
+const GatekeeperStream = ({ repoId }) => {
+  const { mode } = useThemeMode();
+  const isDarkMode = mode === "dark";
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedPR, setSelectedPR] = useState(null);
@@ -128,10 +131,10 @@ const GatekeeperStream = ({ isDarkMode, repoId }) => {
       };
     }
     return {
-      icon: <FaExclamationTriangle className="text-sky-400" />,
-      badgeClass: "bg-sky-500/20 text-sky-200 border border-sky-400/30",
-      cardClass: "border-sky-400/30",
-      ringColor: "#38bdf8",
+      icon: <FaExclamationTriangle className={isDarkMode ? "text-sky-300" : "text-sky-400"} />,
+      badgeClass: isDarkMode ? "bg-sky-500/20 text-sky-200 border border-sky-400/30" : "bg-sky-50 text-sky-700 border border-sky-200",
+      cardClass: isDarkMode ? "border-sky-400/30" : "border-sky-200",
+      ringColor: isDarkMode ? "#38bdf8" : "#0ea5e9",
     };
   };
 

@@ -332,7 +332,7 @@ const RoadmapPage = () => {
                         )
                     }
                 ]}
-                style={{ background: '#fff' }}
+                style={{ background: 'var(--color-bg-card)' }}
             />
 
             {/* Create Epic Modal */}

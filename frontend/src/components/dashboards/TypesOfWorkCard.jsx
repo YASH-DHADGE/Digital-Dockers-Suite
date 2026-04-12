@@ -3,10 +3,13 @@ import { BgColorsOutlined, FileTextOutlined, BugOutlined, CheckSquareOutlined, C
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import DistributionBar from '../common/DistributionBar';
+import { useThemeMode } from '../../context/ThemeContext';
 
 const { Text } = Typography;
 
 const TypesOfWorkCard = ({ projectId, onTypeClick }) => {
+    const { mode } = useThemeMode();
+    const isDark = mode === 'dark';
     const [workTypes, setWorkTypes] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -66,18 +69,19 @@ const TypesOfWorkCard = ({ projectId, onTypeClick }) => {
             <Card
                 title={
                     <div>
-                        <Text strong style={{ fontSize: '13px', color: '#262626', fontWeight: 600 }}>
+                        <Text strong style={{ fontSize: '13px', color: isDark ? '#e6edf3' : '#262626', fontWeight: 600 }}>
                             Types of work
                         </Text>
-                        <div style={{ fontSize: '12px', color: '#626f86', marginTop: 2 }}>
+                        <div style={{ fontSize: '12px', color: isDark ? '#8b949e' : '#626f86', marginTop: 2 }}>
                             Get a breakdown of work items by their types
                         </div>
                     </div>
                 }
                 style={{
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                     borderRadius: 8,
-                    border: '1px solid #f0f0f0'
+                    border: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`,
+                    background: isDark ? '#161b22' : '#fff',
                 }}
                 styles={{ body: { padding: '16px 0' } }}
             >
@@ -91,18 +95,19 @@ const TypesOfWorkCard = ({ projectId, onTypeClick }) => {
             <Card
                 title={
                     <div>
-                        <Text strong style={{ fontSize: '13px', color: '#262626', fontWeight: 600 }}>
+                        <Text strong style={{ fontSize: '13px', color: isDark ? '#e6edf3' : '#262626', fontWeight: 600 }}>
                             Types of work
                         </Text>
-                        <div style={{ fontSize: '12px', color: '#626f86', marginTop: 2 }}>
+                        <div style={{ fontSize: '12px', color: isDark ? '#8b949e' : '#626f86', marginTop: 2 }}>
                             Get a breakdown of work items by their types
                         </div>
                     </div>
                 }
                 style={{
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                     borderRadius: 8,
-                    border: '1px solid #f0f0f0'
+                    border: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`,
+                    background: isDark ? '#161b22' : '#fff',
                 }}
                 styles={{ body: { padding: '16px 0' } }}
             >
@@ -119,18 +124,19 @@ const TypesOfWorkCard = ({ projectId, onTypeClick }) => {
         <Card
             title={
                 <div>
-                    <Text strong style={{ fontSize: '13px', color: '#262626', fontWeight: 600 }}>
+                    <Text strong style={{ fontSize: '13px', color: isDark ? '#e6edf3' : '#262626', fontWeight: 600 }}>
                         Types of work
                     </Text>
-                    <div style={{ fontSize: '12px', color: '#626f86', marginTop: 2 }}>
+                    <div style={{ fontSize: '12px', color: isDark ? '#8b949e' : '#626f86', marginTop: 2 }}>
                         Get a breakdown of work items by their types
                     </div>
                 </div>
             }
             style={{
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                 borderRadius: 8,
-                border: '1px solid #f0f0f0'
+                border: `1px solid ${isDark ? '#30363d' : '#f0f0f0'}`,
+                background: isDark ? '#161b22' : '#fff',
             }}
             styles={{ body: { padding: '16px 0' } }}
         >
@@ -168,7 +174,7 @@ const TypesOfWorkCard = ({ projectId, onTypeClick }) => {
                     })}
                 </Space>
             ) : (
-                <div style={{ textAlign: 'center', padding: '32px 16px', color: '#8c8c8c' }}>
+                <div style={{ textAlign: 'center', padding: '32px 16px', color: isDark ? '#9ca3af' : '#8c8c8c' }}>
                     <Empty description="No work items found" />
                 </div>
             )}
