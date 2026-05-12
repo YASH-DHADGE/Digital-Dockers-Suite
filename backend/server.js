@@ -29,9 +29,30 @@ const llmScanService = require("./services/analysis/llmScanService");
 
 const app = express();
 
+const sslKeyPath = path.join(__dirname, '../ssl/key.pem');
+const sslCertPath = path.join(__dirname, '../ssl/cert.pem');
+
+// Auto-generate SSL certificates if missing to prevent crash on fresh setup
+if (!fs.existsSync(sslKeyPath) || !fs.existsSync(sslCertPath)) {
+  console.log("⚠️ SSL certificates missing. Generating self-signed certificates for local development...");
+  try {
+    const { execSync } = require("child_process");
+    // Ensure the ssl directory exists at root before running the script logic
+    const sslDir = path.join(__dirname, '../ssl');
+    if (!fs.existsSync(sslDir)) {
+      fs.mkdirSync(sslDir, { recursive: true });
+    }
+    execSync("node generate-certs.js", { cwd: __dirname });
+    console.log("✅ SSL certificates generated successfully.");
+  } catch (err) {
+    console.error("❌ Failed to auto-generate SSL certificates:", err.message);
+    console.error("Please run 'npm run generate-certs' manually in the backend directory.");
+  }
+}
+
 const sslOptions = {
-  key: fs.readFileSync(path.join(__dirname, '../ssl/key.pem')),
-  cert: fs.readFileSync(path.join(__dirname, '../ssl/cert.pem'))
+  key: fs.readFileSync(sslKeyPath),
+  cert: fs.readFileSync(sslCertPath)
 };
 
 const server = https.createServer(sslOptions, app);
